@@ -122,17 +122,3 @@ select {
   -webkit-user-drag: none;
   user-select: none;
 }
-
-#toggleButton, #fullscreenButton {
-  padding: 6px 12px;
-  background: #444;
-  color: white;
-  border: 1px solid #666;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-}
-#toggleButton:hover,
-#fullscreenButton:hover {
-  background: #666;
-}
