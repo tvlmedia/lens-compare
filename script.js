@@ -49,9 +49,6 @@ function updateImages() {
     const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
     const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
-    console.log("🟡 LEFT IMAGE PATH:", imgLeft);
-    console.log("🟡 RIGHT IMAGE PATH:", imgRight);
-
     beforeImage.style.backgroundImage = `url('${imgLeft}')`;
     afterImage.style.backgroundImage = `url('${imgRight}')`;
 
@@ -67,8 +64,18 @@ function updateImages() {
 
 let isDragging = false;
 
-slider.addEventListener("mousedown", () => isDragging = true);
+// Alleen slepen als je daadwerkelijk op de slider klikt
+slider.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    e.stopPropagation();
+});
+
+comparisonWrapper.addEventListener("mousedown", (e) => {
+    if (e.target !== slider) isDragging = false;
+});
+
 window.addEventListener("mouseup", () => isDragging = false);
+
 window.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
     const rect = comparisonWrapper.getBoundingClientRect();
