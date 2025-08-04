@@ -113,8 +113,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-
-  const logoUrl = "logo.png"; // Zorg dat logo.png in je map staat
+  const logoUrl = "logo.png";
 
   // Helpers
   async function loadImage(url) {
@@ -131,13 +130,17 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
-  function drawImageCentered(imgData, maxWidth, yStart) {
-    const imgRatio = imgData.width / imgData.height;
-    const displayWidth = maxWidth;
-    const displayHeight = maxWidth / imgRatio;
-    const x = (pageWidth - displayWidth) / 2;
-    pdf.addImage(imgData.src, "PNG", x, yStart, displayWidth, displayHeight);
-    return yStart + displayHeight;
+  function drawLogoCentered(y) {
+    const logoWidth = 120;
+    const logoHeight = 120;
+    const x = (pageWidth - logoWidth) / 2;
+    pdf.addImage(logoImage, "PNG", x, y, logoWidth, logoHeight);
+  }
+
+  function drawFooter() {
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
   }
 
   async function renderImageData(imgEl) {
@@ -156,47 +159,42 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     });
   }
 
-  const logo = await loadImage(logoUrl);
+  // Load all data
+  const logoImage = await loadImage(logoUrl);
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
-  const leftData = await renderImageData(leftImg);
-  const rightData = await renderImageData(rightImg);
+  const splitImg = splitCanvas.toDataURL("image/jpeg", 1.0);
+  const leftImgData = await renderImageData(leftImg);
+  const rightImgData = await renderImageData(rightImg);
 
-  // Pagina 1: Split
+  // -------- PAGE 1: SPLIT IMAGE --------
   fillBlack();
-  const split = await loadImage(splitData);
-  drawImageCentered(logo, 120, 20);
-  pdf.setTextColor(255, 255, 255);
+  drawLogoCentered(20);
   pdf.setFontSize(16);
-  pdf.text(leftLabel, 40, 50);
-  pdf.text(rightLabel, pageWidth - 40 - pdf.getTextWidth(rightLabel), 50);
-  pdf.addImage(split.src, "JPEG", 0, 70, pageWidth, pageHeight - 120);
-  pdf.setFontSize(12);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(leftLabel, 40, 160);
+  pdf.text(rightLabel, pageWidth - 40 - pdf.getTextWidth(rightLabel), 160);
+  pdf.addImage(splitImg, "JPEG", 0, 180, pageWidth, pageHeight - 220);
+  drawFooter();
 
-  // Pagina 2: Left
-  pdf.addPage();
+  // -------- PAGE 2: LEFT LENS --------
+  pdf.addPage("a4", "landscape");
   fillBlack();
-  const left = await loadImage(leftData);
-  drawImageCentered(logo, 120, 20);
-  pdf.setTextColor(255, 255, 255);
+  drawLogoCentered(20);
   pdf.setFontSize(16);
-  pdf.text(leftLabel, pageWidth / 2, 60, { align: "center" });
-  pdf.addImage(left.src, "JPEG", 0, 80, pageWidth, pageHeight - 120);
-  pdf.setFontSize(12);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(leftLabel, pageWidth / 2, 160, { align: "center" });
+  pdf.addImage(leftImgData, "JPEG", 0, 180, pageWidth, pageHeight - 220);
+  drawFooter();
 
-  // Pagina 3: Right
-  pdf.addPage();
+  // -------- PAGE 3: RIGHT LENS --------
+  pdf.addPage("a4", "landscape");
   fillBlack();
-  const right = await loadImage(rightData);
-  drawImageCentered(logo, 120, 20);
-  pdf.setTextColor(255, 255, 255);
+  drawLogoCentered(20);
   pdf.setFontSize(16);
-  pdf.text(rightLabel, pageWidth / 2, 60, { align: "center" });
-  pdf.addImage(right.src, "JPEG", 0, 80, pageWidth, pageHeight - 120);
-  pdf.setFontSize(12);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(rightLabel, pageWidth / 2, 160, { align: "center" });
+  pdf.addImage(rightImgData, "JPEG", 0, 180, pageWidth, pageHeight - 220);
+  drawFooter();
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
