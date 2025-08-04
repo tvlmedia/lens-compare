@@ -1,6 +1,6 @@
 
 const lenses = [
-    "IronGlass Red P",
+    "IronGlass Red ",
     "IronGlass Zeiss Jena",
     "DZO Vespid",
     "DZO Arles",
