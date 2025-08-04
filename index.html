@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +9,7 @@
   <div class="controls">
     <button id="toggleButton">↔ Flip</button>
     <button id="fullscreenButton">⛶ Fullscreen</button>
+    <button id="downloadPdfButton">⤓ Download PDF</button>
     <select id="leftLens"></select>
     <select id="rightLens"></select>
     <select id="tStop">
@@ -29,6 +29,7 @@
       <option value="135mm">135mm</option>
     </select>
   </div>
+
   <div id="comparisonWrapper">
     <div id="beforeImage">
       <img id="beforeImgTag" />
@@ -40,13 +41,20 @@
     </div>
     <div id="slider"></div>
   </div>
+
   <div id="infoContainer">
     <div id="leftLabel"></div>
     <div id="rightLabel"></div>
   </div>
+
   <div id="explanationBox">
     <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
   </div>
+
+  <!-- External libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
   <script src="script.js"></script>
 </body>
 </html>
