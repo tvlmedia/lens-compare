@@ -209,7 +209,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   pdf.addPage();
   fillBlack();
   const yLeftEnd = await drawImageCentered(leftData, 40, pageHeight - 250);
-  drawLogo(pageWidth - 100, 20, 00);
+  drawLogo(pageWidth - 100, 00, 80);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(leftLabel, pageWidth / 2, 30, { align: "center" });
@@ -219,7 +219,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   pdf.addPage();
   fillBlack();
   const yRightEnd = await drawImageCentered(rightData, 40, pageHeight - 250);
-  drawLogo(pageWidth - 100, 20, 40);
+  drawLogo(pageWidth - 100, 50, 80);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
