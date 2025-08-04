@@ -185,3 +185,29 @@ select {
   top: 0;
   left: 0;
 }
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .controls,
+  #explanationBox {
+    display: none !important;
+  }
+
+  #comparisonWrapper {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
+  }
+
+  #infoContainer {
+    margin-top: 20px;
+    color: black !important;
+  }
+
+  #comparisonWrapper img {
+    object-fit: contain !important;
+  }
+}
