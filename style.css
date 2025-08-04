@@ -21,8 +21,9 @@ select {
   position: relative;
   width: 90vw;
   max-width: 1200px;
-  aspect-ratio: 16/9;
   margin: auto;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
   overflow: hidden;
   cursor: ew-resize;
 }
