@@ -183,7 +183,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
 
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(10);
-    const lines = pdf.splitTextToSize(info.text, pageWidth - 110);
+    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
     pdf.text(lines, 50, yStart);
 
     pdf.setTextColor(80, 160, 255);
