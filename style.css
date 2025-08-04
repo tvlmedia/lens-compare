@@ -48,7 +48,7 @@ select {
 #beforeImage img, #afterImage img {
   width: 960px;
   height: 540px;
-  object-fit: none;
+  object-fit: contain;
   object-position: top left;
   position: absolute;
   top: 0;
@@ -96,10 +96,6 @@ select {
 }
 
 #infoText {
-  display: flex;
-  justify-content: space-between;
-  gap: 60px;
-  padding: 0 40px;
   margin-top: 12px;
   font-size: 16px;
   color: #eee;
