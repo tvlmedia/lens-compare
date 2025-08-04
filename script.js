@@ -198,7 +198,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
 
   // Pagina 1: splitscreen
   fillBlack();
-  await drawImageFullWidth(splitData, 40);
+  await drawImageFullWidth(splitData, 35);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(12);
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
@@ -206,8 +206,8 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Pagina 2: Left lens
   pdf.addPage();
   fillBlack();
-  const yLeftEnd = await drawImageFullWidth(leftData, 40);
-  drawLogo(pageWidth - 100, 20, 80);
+  const yLeftEnd = await drawImageFullWidth(leftData, 35);
+  drawLogo(pageWidth - 100, 0, 70);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(leftLabel, pageWidth / 2, 30, { align: "center" });
@@ -216,8 +216,8 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Pagina 3: Right lens
   pdf.addPage();
   fillBlack();
-  const yRightEnd = await drawImageFullWidth(rightData, 40);
-  drawLogo(pageWidth - 100, 20, 80);
+  const yRightEnd = await drawImageFullWidth(rightData, 35);
+  drawLogo(pageWidth - 100, 0, 80);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
