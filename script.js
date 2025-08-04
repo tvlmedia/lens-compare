@@ -201,6 +201,9 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   await drawImageFullWidth(splitData, 40);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(12);
+  pdf.setTextColor(255, 255, 255);
+pdf.setFontSize(14);
+pdf.text(`${leftLabel}  vs  ${rightLabel}`, pageWidth / 2, 30, { align: "center" });
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
   // Pagina 2: Left lens
