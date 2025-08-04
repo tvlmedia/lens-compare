@@ -23,8 +23,8 @@ const leftSelect = document.getElementById("leftLens");
 const rightSelect = document.getElementById("rightLens");
 const tStopSelect = document.getElementById("tStop");
 const focalLengthSelect = document.getElementById("focalLength");
-const beforeImage = document.getElementById("beforeImage");
-const afterImage = document.getElementById("afterImage");
+const beforeImgTag = document.getElementById("beforeImgTag");
+const afterImgTag = document.getElementById("afterImgTag");
 const afterWrapper = document.getElementById("afterWrapper");
 const slider = document.getElementById("slider");
 const infoText = document.getElementById("infoText");
@@ -49,8 +49,8 @@ function updateImages() {
     const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
     const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
-    beforeImage.style.backgroundImage = `url('${imgLeft}')`;
-    afterImage.style.backgroundImage = `url('${imgRight}')`;
+    beforeImgTag.src = imgLeft;
+    afterImgTag.src = imgRight;
 
     const leftNote = notes[`${leftLens}_${focalLength}`] ? ` (${notes[`${leftLens}_${focalLength}`]})` : "";
     const rightNote = notes[`${rightLens}_${focalLength}`] ? ` (${notes[`${rightLens}_${focalLength}`]})` : "";
@@ -64,23 +64,16 @@ function updateImages() {
 
 let isDragging = false;
 
-// Alleen slepen als je daadwerkelijk op de slider klikt
-slider.addEventListener("mousedown", (e) => {
+slider.addEventListener("mousedown", () => {
     isDragging = true;
-    e.stopPropagation();
 });
-
-comparisonWrapper.addEventListener("mousedown", (e) => {
-    if (e.target !== slider) isDragging = false;
+window.addEventListener("mouseup", () => {
+    isDragging = false;
 });
-
-window.addEventListener("mouseup", () => isDragging = false);
-
 window.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
     const rect = comparisonWrapper.getBoundingClientRect();
-    let offset = e.clientX - rect.left;
-    offset = Math.max(0, Math.min(offset, rect.width));
+    const offset = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
     const percent = (offset / rect.width) * 100;
     afterWrapper.style.width = `${percent}%`;
     slider.style.left = `${percent}%`;
