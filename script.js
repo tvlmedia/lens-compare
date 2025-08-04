@@ -102,32 +102,67 @@ document.getElementById("fullscreenButton").addEventListener("click", () => {
     }
   }
 });
-document.getElementById("downloadPdfButton").addEventListener("click", () => {
+document.getElementById("downloadPdfButton").addEventListener("click", async () => {
   const comparison = document.getElementById("comparisonWrapper");
+  const leftImg = document.getElementById("afterImgTag");
+  const rightImg = document.getElementById("beforeImgTag");
   const leftLabel = document.getElementById("leftLabel").textContent;
   const rightLabel = document.getElementById("rightLabel").textContent;
 
-  html2canvas(comparison, {
-    scale: 2,
-    useCORS: true
-  }).then(canvas => {
-    const imgData = canvas.toDataURL("image/jpeg", 1.0);
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "px",
-      format: [canvas.width, canvas.height + 60]
-    });
-
-    pdf.addImage(imgData, "JPEG", 0, 0, canvas.width, canvas.height);
-    pdf.setFontSize(12);
-    pdf.setTextColor(80);
-
-    pdf.text(leftLabel, 40, canvas.height + 30);
-    pdf.text(rightLabel, canvas.width - 250, canvas.height + 30);
-
-    const now = new Date();
-    const filename = `lens-comparison-${now.toISOString().slice(0, 10)}.pdf`;
-    pdf.save(filename);
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({
+    orientation: "landscape",
+    unit: "px",
+    format: "a4"
   });
+
+  // Pagina 1: splitscreen canvas
+  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+  const splitWidth = pdf.internal.pageSize.getWidth();
+  const splitHeight = splitWidth * (splitCanvas.height / splitCanvas.width);
+  pdf.addImage(splitCanvas.toDataURL("image/jpeg", 1.0), "JPEG", 0, 60, splitWidth, splitHeight - 60);
+
+  pdf.setFontSize(14);
+  pdf.text(leftLabel, 40, 40);
+  pdf.text(rightLabel, splitWidth - 250, 40);
+  pdf.setFontSize(10);
+  pdf.text("tvlrental.nl", splitWidth / 2, splitHeight + 20, { align: "center" });
+
+  // Pagina 2: alleen linkerbeeld
+  pdf.addPage("a4", "landscape");
+  const leftOnlyCanvas = await renderSingleImageCanvas(leftImg);
+  pdf.addImage(leftOnlyCanvas, "JPEG", 0, 60, splitWidth, splitHeight - 60);
+  pdf.setFontSize(14);
+  pdf.text(leftLabel, 40, 40);
+  pdf.setFontSize(10);
+  pdf.text("tvlrental.nl", splitWidth / 2, splitHeight + 20, { align: "center" });
+
+  // Pagina 3: alleen rechterbeeld
+  pdf.addPage("a4", "landscape");
+  const rightOnlyCanvas = await renderSingleImageCanvas(rightImg);
+  pdf.addImage(rightOnlyCanvas, "JPEG", 0, 60, splitWidth, splitHeight - 60);
+  pdf.setFontSize(14);
+  pdf.text(rightLabel, 40, 40);
+  pdf.setFontSize(10);
+  pdf.text("tvlrental.nl", splitWidth / 2, splitHeight + 20, { align: "center" });
+
+  const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
+  pdf.save(filename);
 });
+
+// Hulpfunctie om losse afbeelding op canvas te zetten
+async function renderSingleImageCanvas(imgElement) {
+  return new Promise(resolve => {
+    const canvas = document.createElement("canvas");
+    canvas.width = imgElement.naturalWidth || 1920;
+    canvas.height = imgElement.naturalHeight || 1080;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 1.0));
+    };
+    img.src = imgElement.src;
+  });
+}
