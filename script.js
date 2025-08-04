@@ -49,6 +49,9 @@ function updateImages() {
     const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
     const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
+    console.log("🟡 LEFT IMAGE PATH:", imgLeft);
+    console.log("🟡 RIGHT IMAGE PATH:", imgRight);
+
     beforeImage.style.backgroundImage = `url('${imgLeft}')`;
     afterImage.style.backgroundImage = `url('${imgRight}')`;
 
