@@ -136,7 +136,9 @@ select:hover, button:hover {
 :fullscreen #afterImage img,
 :-webkit-full-screen #beforeImage img,
 :-webkit-full-screen #afterImage img {
-  object-fit: contain;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
 }
 
 /* Selectiegedrag blokkeren */
