@@ -36,6 +36,8 @@ select:hover, button:hover {
   position: relative;
   width: 960px;
   aspect-ratio: 16 / 9;
+  max-width: 100vw;
+  max-height: 100vh;
   overflow: hidden;
   background: #000;
 }
@@ -136,9 +138,9 @@ select:hover, button:hover {
 :fullscreen #afterImage img,
 :-webkit-full-screen #beforeImage img,
 :-webkit-full-screen #afterImage img {
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* Selectiegedrag blokkeren */
