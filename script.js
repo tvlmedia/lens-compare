@@ -114,47 +114,51 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
 
-  // Pagina 1: Split view
+  // Set background to black on each page
+  function fillBlackBackground() {
+    pdf.setFillColor(15, 15, 15); // deep black
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  }
+
+  // Pagina 1: Split
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
   const splitImg = splitCanvas.toDataURL("image/jpeg", 1.0);
-  const imgHeight = pageHeight - 100;
-
+  fillBlackBackground();
+  pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
-  pdf.setTextColor(40);
   pdf.text(leftLabel, 40, 40);
   pdf.text(rightLabel, pageWidth - 40 - pdf.getTextWidth(rightLabel), 40);
-  pdf.addImage(splitImg, "JPEG", 0, 60, pageWidth, imgHeight);
+  pdf.addImage(splitImg, "JPEG", 0, 60, pageWidth, pageHeight - 100);
   pdf.setFontSize(12);
-  pdf.setTextColor(100);
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Pagina 2: Linker lens
+  // Pagina 2: Left only
   const leftImgData = await renderSingleImageCanvas(leftImg);
   pdf.addPage("a4", "landscape");
+  fillBlackBackground();
+  pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
-  pdf.setTextColor(40);
   pdf.text(leftLabel, pageWidth / 2, 40, { align: "center" });
-  pdf.addImage(leftImgData, "JPEG", 0, 60, pageWidth, imgHeight);
+  pdf.addImage(leftImgData, "JPEG", 0, 60, pageWidth, pageHeight - 100);
   pdf.setFontSize(12);
-  pdf.setTextColor(100);
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Pagina 3: Rechter lens
+  // Pagina 3: Right only
   const rightImgData = await renderSingleImageCanvas(rightImg);
   pdf.addPage("a4", "landscape");
+  fillBlackBackground();
+  pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
-  pdf.setTextColor(40);
   pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" });
-  pdf.addImage(rightImgData, "JPEG", 0, 60, pageWidth, imgHeight);
+  pdf.addImage(rightImgData, "JPEG", 0, 60, pageWidth, pageHeight - 100);
   pdf.setFontSize(12);
-  pdf.setTextColor(100);
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
 });
 
-// Extra helperfunctie (alleen 1x toevoegen)
+// Los beeld omzetten naar canvas + JPEG
 async function renderSingleImageCanvas(imgElement) {
   return new Promise(resolve => {
     const canvas = document.createElement("canvas");
