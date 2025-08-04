@@ -53,7 +53,7 @@ function updateImages() {
     const leftLabel = notes[`${leftLens}_${focalLength}`]?.split("=")[1]?.trim() || `${focalLength}`;
     const rightLabel = notes[`${rightLens}_${focalLength}`]?.split("=")[1]?.trim() || `${focalLength}`;
 
-    infoText.textContent = `${leftSelect.value} ${leftLabel}\t\t\t${rightSelect.value} ${rightLabel}`;
+    document.getElementById("leftLabel").textContent = `${leftSelect.value} ${leftLabel}\t\t\t${rightSelect.value} ${rightLabel}`;
 }
 
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>

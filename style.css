@@ -1,7 +1,7 @@
 
 body {
   margin: 0;
-  background: #0e0e0e;
+  background: #0f0f0f;
   color: white;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   display: flex;
@@ -10,15 +10,15 @@ body {
 }
 
 .controls {
-  margin: 20px 0 10px;
+  margin: 16px;
   display: flex;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 8px;
 }
 
 select {
-  padding: 6px 12px;
-  background: #1a1a1a;
+  padding: 6px 10px;
+  background: #222;
   color: white;
   border: 1px solid #444;
   border-radius: 4px;
@@ -27,12 +27,14 @@ select {
 
 #comparisonWrapper {
   position: relative;
-  width: 960px;
+  position: relative;
+  width: 100%;
+  max-width: 960px;
   height: 540px;
   overflow: hidden;
   background: #000;
-  border-radius: 8px;
   box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  border-radius: 8px;
 }
 
 #beforeImage, #afterImage {
@@ -50,6 +52,8 @@ select {
   left: 0;
   width: 960px;
   height: 540px;
+  object-fit: none;
+  object-position: top left;
 }
 
 #afterWrapper {
@@ -85,16 +89,14 @@ select {
   box-shadow: 0 0 4px rgba(0,0,0,0.5);
 }
 
-#infoText {
+#infoContainer {
+  display: none;
   margin-top: 12px;
   font-size: 16px;
   color: #eee;
   font-weight: 400;
-  display: flex;
-  justify-content: space-between;
-  width: 960px;
-  padding: 0 30px;
-  box-sizing: border-box;
+  text-align: center;
+  letter-spacing: 0.3px;
 }
 
 #explanationBox {
@@ -107,4 +109,19 @@ select {
   border-left: 4px solid orange;
   border-radius: 6px;
   line-height: 1.5;
+}
+
+#comparisonWrapper,
+#beforeImage,
+#afterImage,
+#slider {
+  user-select: none;
+}
+
+* {
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
