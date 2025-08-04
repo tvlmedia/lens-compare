@@ -211,3 +211,19 @@ select {
     object-fit: contain !important;
   }
 }
+#slider {
+  width: 4px; /* dunner dan standaard */
+  background-color: white; /* of wat je wil */
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ew-resize;
+  z-index: 10;
+  border-radius: 0; /* voorkomt bolling */
+}
+#slider::before,
+#slider::after {
+  display: none;
+}
