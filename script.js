@@ -1,77 +1,71 @@
-const lenses = {
-  "Cooke Panchro FF": "images/cooke_panchro.jpg",
-  "DZO Vespid": "images/dzo_vespid.jpg",
-  "DZO Arles": "images/dzo_arles.jpg",
-  "IronGlass Zeiss Jena": "images/zeiss_jena.jpg",
-  "IronGlass Red P": "images/red_p.jpg",
-  "IronGlass MKII": "images/mkii.jpg",
-  "Blazar Remus": "images/remus.jpg",
-  "Lomo Standard Speed": "images/lomo.jpg"
+const lenses = [
+    "IronGlass Red P",
+    "IronGlass Zeiss Jena",
+    "DZO Vespid",
+    "DZO Arles",
+    "Cooke Panchro FF",
+    "Lomo Standard Speed"
+];
+
+const notes = {
+    "red_p_35mm": "Red P = 37mm (gematcht op 35mm)",
+    "zeiss_jena_35mm": "Zeiss Jena = echte 35mm",
+    "cooke_panchro_ff_25mm": "Cooke Panchro = 32mm gematcht op 25mm"
 };
 
-const lensLeft = document.getElementById("lensLeft");
-const lensRight = document.getElementById("lensRight");
-const tStop = document.getElementById("tStop");
-const focalLength = document.getElementById("focalLength");
-const imageLeft = document.getElementById("imageLeft");
-const imageRight = document.getElementById("imageRight");
+const leftSelect = document.getElementById("leftLens");
+const rightSelect = document.getElementById("rightLens");
+const tStopSelect = document.getElementById("tStop");
+const focalLengthSelect = document.getElementById("focalLength");
+const beforeImage = document.getElementById("beforeImage");
+const afterImage = document.getElementById("afterImage");
+const afterWrapper = document.getElementById("afterWrapper");
 const slider = document.getElementById("slider");
-const container = document.getElementById("compareContainer");
-const infoBar = document.getElementById("infoBar");
+const infoText = document.getElementById("infoText");
 
-for (let name in lenses) {
-  lensLeft.add(new Option(name, lenses[name]));
-  lensRight.add(new Option(name, lenses[name]));
+lenses.forEach(lens => {
+    const opt1 = new Option(lens, lens);
+    const opt2 = new Option(lens, lens);
+    leftSelect.add(opt1);
+    rightSelect.add(opt2);
+});
+
+function updateImages() {
+    const leftLens = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
+    const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
+    const tStop = tStopSelect.value;
+    const focalLength = focalLengthSelect.value;
+
+    const imgLeft = `images/${leftLens}_${focalLength}_${tStop}.jpg`;
+    const imgRight = `images/${rightLens}_${focalLength}_${tStop}.jpg`;
+
+    beforeImage.style.backgroundImage = `url('${imgLeft}')`;
+    afterImage.style.backgroundImage = `url('${imgRight}')`;
+
+    const leftKey = `${leftLens}_${focalLength}`;
+    const rightKey = `${rightLens}_${focalLength}`;
+    const leftNote = notes[leftKey] ? ` (${notes[leftKey]})` : "";
+    const rightNote = notes[rightKey] ? ` (${notes[rightKey]})` : "";
+
+    infoText.textContent = `${leftSelect.value} @ ${focalLength} – ${tStop}${leftNote} | ${rightSelect.value} @ ${focalLength} – ${tStop}${rightNote}`;
 }
 
-lensLeft.selectedIndex = 0;
-lensRight.selectedIndex = 1;
-imageLeft.src = lensLeft.value;
-imageRight.src = lensRight.value;
-
-slider.style.left = "50%";
-imageRight.style.clipPath = "inset(0 0 0 50%)";
-
-const updateInfo = () => {
-  const leftText = `${lensLeft.options[lensLeft.selectedIndex].text}`;
-  const rightText = `${lensRight.options[lensRight.selectedIndex].text}`;
-  const t = tStop.value;
-  const f = focalLength.value;
-
-  infoBar.innerText = `${leftText} @ ${f} - ${t}  |  ${rightText} @ ${f} - ${t}`;
-};
-
-lensLeft.onchange = () => {
-  imageLeft.src = lensLeft.value;
-  updateInfo();
-};
-lensRight.onchange = () => {
-  imageRight.src = lensRight.value;
-  updateInfo();
-};
-tStop.onchange = updateInfo;
-focalLength.onchange = updateInfo;
+[leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el => {
+    el.addEventListener("change", updateImages);
+});
 
 let isDragging = false;
 
-const updateSlider = (clientX) => {
-  const rect = container.getBoundingClientRect();
-  const x = clientX - rect.left;
-  const percent = Math.max(0, Math.min(1, x / rect.width));
-  imageRight.style.clipPath = `inset(0 0 0 ${percent * 100}%)`;
-  slider.style.left = `${percent * 100}%`;
-};
-
 slider.addEventListener("mousedown", () => isDragging = true);
-document.addEventListener("mouseup", () => isDragging = false);
-document.addEventListener("mousemove", (e) => {
-  if (isDragging) updateSlider(e.clientX);
+window.addEventListener("mouseup", () => isDragging = false);
+window.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    const rect = comparisonWrapper.getBoundingClientRect();
+    let offset = e.clientX - rect.left;
+    offset = Math.max(0, Math.min(offset, rect.width));
+    const percent = (offset / rect.width) * 100;
+    afterWrapper.style.width = `${percent}%`;
+    slider.style.left = `${percent}%`;
 });
 
-slider.addEventListener("touchstart", () => isDragging = true);
-document.addEventListener("touchend", () => isDragging = false);
-document.addEventListener("touchmove", (e) => {
-  if (isDragging) updateSlider(e.touches[0].clientX);
-});
-
-updateInfo();
+updateImages();

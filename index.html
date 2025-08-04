@@ -1,44 +1,29 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lens Comparison</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Lens Comparison</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <div class="controls">
-    <select id="lensLeft"></select>
-    <select id="lensRight"></select>
-    <select id="tStop">
-      <option>T1.4</option>
-      <option>T2</option>
-      <option>T2.8</option>
-      <option>T4</option>
-      <option>T5.6</option>
-      <option>T8</option>
-    </select>
-    <select id="focalLength">
-      <option>18mm</option>
-      <option>25mm</option>
-      <option>35mm</option>
-      <option>50mm</option>
-      <option>80mm</option>
-      <option>135mm</option>
-    </select>
-  </div>
-
-  <div class="compare-container" id="compareContainer">
-    <img id="imageLeft" class="image" />
-    <img id="imageRight" class="image" />
-    <div class="slider" id="slider"></div>
-  </div>
-
-  <div class="info-bar" id="infoBar">
-    Selecteer lenzen en instellingen om details te tonen.
-  </div>
-
-  <script src="script.js"></script>
+    <div class="controls">
+        <select id="leftLens"></select>
+        <select id="rightLens"></select>
+        <select id="tStop">
+            <option>T1.4</option><option>T2</option><option>T2.8</option><option>T4</option><option>T5.6</option><option>T8</option>
+        </select>
+        <select id="focalLength">
+            <option>18mm</option><option>25mm</option><option>35mm</option><option>50mm</option><option>80mm</option><option>135mm</option>
+        </select>
+    </div>
+    <div id="comparisonWrapper">
+        <div id="beforeImage"></div>
+        <div id="afterWrapper">
+            <div id="afterImage"></div>
+        </div>
+        <div id="slider"></div>
+    </div>
+    <div id="infoText" class="info-text"></div>
+    <script src="script.js"></script>
 </body>
 </html>
