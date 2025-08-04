@@ -102,113 +102,113 @@ document.getElementById("fullscreenButton").addEventListener("click", () => {
     }
   }
 });
-// PDF DOWNLOAD MET LAYOUT FIXES — TVL RENTAL
-
-const lensDescriptions = {
-  "IronGlass Zeiss Jena": {
-    text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
-    url: "https://tvlrental.nl/ironglasszeissjena/"
-  },
-  "IronGlass Red P": {
-    text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series van Sovjet-lenzen (Helios, Mir, Jupiter) met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – dit zijn de lenzen zoals ze vroeger werden gebouwd, met alle optische imperfecties, flare-gevoeligheid en ziel die je mag verwachten van pure vintage glasoptiek.",
-    url: "https://tvlrental.nl/ironglassredp/"
-  }
-};
+// Zorg dat je HTML een knop bevat met id="downloadPdfButton"
+// en dat dit script onderaan je HTML staat (of gebruik defer)
 
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-
   const comparison = document.getElementById("comparisonWrapper");
   const leftImg = document.getElementById("afterImgTag");
   const rightImg = document.getElementById("beforeImgTag");
   const leftLabel = document.getElementById("leftLabel").textContent;
   const rightLabel = document.getElementById("rightLabel").textContent;
 
-  const logoUrl = "logo_pdf.png"; // recht formaat!
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
 
-  const loadImage = url => new Promise(resolve => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.src = url;
-  });
+  const logoUrl = "logo.png"; // Zorg dat dit logo in je map staat (zonder zwarte randen)
 
-  const renderImageData = imgEl => new Promise(resolve => {
-    const canvas = document.createElement("canvas");
-    canvas.width = imgEl.naturalWidth || 1920;
-    canvas.height = imgEl.naturalHeight || 1080;
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 1.0));
-    };
-    img.src = imgEl.src;
-  });
+  async function loadImage(url) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.src = url;
+    });
+  }
 
-  const drawImageFull = (src, y = 80) => {
-    const imgRatio = src.width / src.height;
-    const targetWidth = pageWidth;
-    const targetHeight = pageWidth / imgRatio;
-    const height = Math.min(targetHeight, pageHeight - y - 60);
-    pdf.addImage(src.src, "JPEG", 0, y, pageWidth, height);
-    return y + height;
-  };
+  function fillBlack() {
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  }
 
-  const drawLogoSmall = async () => {
-    const logo = await loadImage(logoUrl);
-    const logoWidth = 100;
-    const logoHeight = logo.height * (logoWidth / logo.width);
-    pdf.addImage(logo, "PNG", pageWidth - logoWidth - 20, pageHeight - logoHeight - 20, logoWidth, logoHeight);
-  };
+  async function renderImageData(imgEl) {
+    return new Promise(resolve => {
+      const canvas = document.createElement("canvas");
+      canvas.width = imgEl.naturalWidth || 1920;
+      canvas.height = imgEl.naturalHeight || 1080;
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 1.0));
+      };
+      img.src = imgEl.src;
+    });
+  }
 
-  const drawLensText = (label, descObj) => {
+  function drawLogo(img) {
+    const w = 90;
+    const h = (img.height / img.width) * w;
+    pdf.addImage(img, "PNG", pageWidth - w - 20, pageHeight - h - 20, w, h);
+  }
+
+  function drawTextBlock(label, url, desc, y) {
     pdf.setFontSize(16);
     pdf.setTextColor(255, 255, 255);
-    pdf.text(label, pageWidth / 2, 50, { align: "center" });
+    pdf.text(label, pageWidth / 2, y, { align: "center" });
 
     pdf.setFontSize(12);
-    const textLines = pdf.splitTextToSize(descObj.text, pageWidth - 100);
-    pdf.text(textLines, 50, 70);
+    pdf.setTextColor(150, 150, 150);
+    pdf.textWithLink(url, pageWidth / 2, y + 20, { url, align: "center" });
 
-    pdf.setTextColor(100, 150, 255);
-    pdf.textWithLink(descObj.url, 50, 80 + textLines.length * 14, { url: descObj.url });
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(11);
+    const split = pdf.splitTextToSize(desc, pageWidth - 160);
+    pdf.text(split, pageWidth / 2, y + 40, { align: "center" });
+  }
+
+  const logo = await loadImage(logoUrl);
+  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+  const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
+  const leftData = await renderImageData(leftImg);
+  const rightData = await renderImageData(rightImg);
+
+  const lensInfo = {
+    "IronGlass Red P": {
+      url: "https://tvlrental.nl/ironglassredp/",
+      desc: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series van Sovjet-lenzen (Helios, Mir, Jupiter) met single coating en maximale karakterweergave."
+    },
+    "IronGlass Zeiss Jena": {
+      url: "https://tvlrental.nl/ironglasszeissjena/",
+      desc: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares."
+    }
   };
 
-  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const split = await loadImage(splitCanvas.toDataURL("image/jpeg", 1.0));
-  const left = await loadImage(await renderImageData(leftImg));
-  const right = await loadImage(await renderImageData(rightImg));
-
-  // PAGINA 1: SPLIT
-  pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  // PAGE 1
+  fillBlack();
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
   pdf.text(leftLabel, 40, 40);
   pdf.text(rightLabel, pageWidth - 40 - pdf.getTextWidth(rightLabel), 40);
-  drawImageFull(split);
-  await drawLogoSmall();
+  pdf.addImage(splitData, "JPEG", 0, 60, pageWidth, pageHeight - 120);
+  drawLogo(logo);
 
-  // PAGINA 2: LEFT
+  // PAGE 2
   pdf.addPage();
-  pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, 0, pageWidth, pageHeight, "F");
-  drawLensText(leftLabel, lensDescriptions[leftSelect.value]);
-  drawImageFull(left);
-  await drawLogoSmall();
+  fillBlack();
+  pdf.addImage(leftData, "JPEG", 0, 60, pageWidth, pageHeight - 120);
+  drawTextBlock(leftLabel, lensInfo[leftLabel.split(": ")[1]]?.url || "https://tvlrental.nl", lensInfo[leftLabel.split(": ")[1]]?.desc || "", 30);
+  drawLogo(logo);
 
-  // PAGINA 3: RIGHT
+  // PAGE 3
   pdf.addPage();
-  pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, 0, pageWidth, pageHeight, "F");
-  drawLensText(rightLabel, lensDescriptions[rightSelect.value]);
-  drawImageFull(right);
-  await drawLogoSmall();
+  fillBlack();
+  pdf.addImage(rightData, "JPEG", 0, 60, pageWidth, pageHeight - 120);
+  drawTextBlock(rightLabel, lensInfo[rightLabel.split(": ")[1]]?.url || "https://tvlrental.nl", lensInfo[rightLabel.split(": ")[1]]?.desc || "", 30);
+  drawLogo(logo);
 
   pdf.save(`lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`);
 });
