@@ -163,14 +163,14 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const rightData = await renderImageData(rightImg);
   const logo = await loadImage(logoUrl);
 
-  function drawLogo(x, y, maxW = 100) {
+  function drawLogo(x, y, maxW = 90) {
     const ratio = logo.width / logo.height;
     const h = maxW / ratio;
     pdf.addImage(logo, "PNG", x, y, maxW, h);
   }
 
-  function drawDescriptionBlock(lensName, yStart) {
-    const info = lensDescriptions[lensName];
+  function drawDescriptionBlock(lensKey, yStart) {
+    const info = lensDescriptions[lensKey];
     if (!info) return;
 
     pdf.setTextColor(255, 255, 255);
@@ -179,37 +179,43 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     const lines = pdf.splitTextToSize(info.text, textWidth);
     pdf.text(lines, 50, yStart);
 
-    // hyperlink
-    pdf.setTextColor(100, 150, 255);
+    pdf.setTextColor(120, 180, 255);
+    pdf.setFontSize(10);
     pdf.textWithLink("Klik hier voor meer info", 50, yStart + lines.length * 12 + 10, { url: info.url });
   }
 
-  // Pagina 1: splitscreen
+  // SPLIT VIEW - Pagina 1
   fillBlack();
   pdf.addImage(splitData, "JPEG", 0, 0, pageWidth, pageHeight);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(12);
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Pagina 2: left lens
+  // LEFT IMAGE - Pagina 2
   pdf.addPage();
   fillBlack();
   pdf.addImage(leftData, "JPEG", 0, 0, pageWidth, pageHeight);
   drawLogo(pageWidth - 110, 20, 90);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
-  pdf.text(leftLabel, pageWidth / 2, 40, { align: "center" });
-  drawDescriptionBlock("IronGlass Red P", pageHeight - 110);
+  pdf.text(leftLabel, pageWidth / 2, 60, { align: "center" });
+  drawDescriptionBlock("IronGlass Red P", pageHeight - 120);
+  pdf.setFontSize(10);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Pagina 3: right lens
+  // RIGHT IMAGE - Pagina 3
   pdf.addPage();
   fillBlack();
   pdf.addImage(rightData, "JPEG", 0, 0, pageWidth, pageHeight);
   drawLogo(pageWidth - 110, 20, 90);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
-  pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" });
-  drawDescriptionBlock("IronGlass Zeiss Jena", pageHeight - 110);
+  pdf.text(rightLabel, pageWidth / 2, 60, { align: "center" });
+  drawDescriptionBlock("IronGlass Zeiss Jena", pageHeight - 120);
+  pdf.setFontSize(10);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
