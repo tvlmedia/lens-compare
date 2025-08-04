@@ -157,23 +157,17 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     });
   }
 
- function drawImageCentered(image, yOffset = 0, maxHeight = null, fillWidth = false) {
-  const imgRatio = image.width / image.height;
-
-  let width, height;
-  if (fillWidth) {
-    width = pageWidth;
-    height = pageWidth / imgRatio;
-  } else {
-    height = maxHeight || (pageHeight - 120);
-    width = height * imgRatio;
-  }
-
-  const x = (pageWidth - width) / 2;
-  const y = yOffset;
-  pdf.addImage(image, "JPEG", x, y, width, height);
-  return y + height;
-}
+  async function drawImageFullWidth(imageData, yOffset = 0) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        const aspectRatio = img.width / img.height;
+        const targetWidth = pageWidth;
+        const targetHeight = targetWidth / aspectRatio;
+        pdf.addImage(imageData, "JPEG", 0, yOffset, targetWidth, targetHeight);
+        resolve(yOffset + targetHeight);
+      };
+      img.src = imageData;
     });
   }
 
@@ -204,7 +198,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
 
   // Pagina 1: splitscreen
   fillBlack();
-  pdf.addImage(splitData, "JPEG", 0, 0, pageWidth, pageHeight);
+  await drawImageFullWidth(splitData);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(12);
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
@@ -212,22 +206,22 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Pagina 2: Left lens
   pdf.addPage();
   fillBlack();
-  const yLeftEnd = await drawImageCentered(leftData, 150, pageHeight - 250);
-  drawLogo(pageWidth - 100, 05, 80);
+  const yLeftEnd = await drawImageFullWidth(leftData);
+  drawLogo(pageWidth - 100, 20, 80);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(leftLabel, pageWidth / 2, 30, { align: "center" });
-  drawDescriptionBlock("IronGlass Red P", yLeftEnd + 20);
+  drawDescriptionBlock("IronGlass Red P", yLeftEnd + 10);
 
   // Pagina 3: Right lens
-pdf.addPage();
-fillBlack();
-const yRightEnd = await drawImageCentered(rightData, 0, null, true); // vul breedte
-drawLogo(pageWidth - 100, 20, 80); // ietsje lager voor visuele balans
-pdf.setTextColor(255, 255, 255);
-pdf.setFontSize(14);
-pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" }); // eventueel iets lager zetten
-drawDescriptionBlock("IronGlass Zeiss Jena", yRightEnd + 20); // tekst onder afbeelding
+  pdf.addPage();
+  fillBlack();
+  const yRightEnd = await drawImageFullWidth(rightData);
+  drawLogo(pageWidth - 100, 20, 80);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(14);
+  pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
+  drawDescriptionBlock("IronGlass Zeiss Jena", yRightEnd + 10);
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
