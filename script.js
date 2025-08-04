@@ -1,6 +1,6 @@
 
 const lenses = [
-    "IronGlass Red P",
+    "IronGlass Red F",
     "IronGlass Zeiss Jena",
     "DZO Vespid",
     "DZO Arles",
@@ -49,8 +49,8 @@ function updateImages() {
     const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
     const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
-    beforeImgTag.src = imgLeft;
-    afterImgTag.src = imgRight;
+    beforeImgTag.src = imgRight;
+    afterImgTag.src = imgLeft;
 
     const leftNote = notes[`${leftLens}_${focalLength}`] ? ` (${notes[`${leftLens}_${focalLength}`]})` : "";
     const rightNote = notes[`${rightLens}_${focalLength}`] ? ` (${notes[`${rightLens}_${focalLength}`]})` : "";
