@@ -102,7 +102,7 @@ document.getElementById("fullscreenButton").addEventListener("click", () => {
     }
   }
 });
-// === PDF GENERATOR VOOR TVL LENS TOOL === //
+// PDF export functie met nette layout en logo + beschrijvingen
 
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
   const comparison = document.getElementById("comparisonWrapper");
@@ -116,17 +116,17 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
 
-  const logoUrl = "tvlrental-logo.png"; // Zet dit bestand in je hoofdmap
+  const logoUrl = "Logo PDF.png";
 
-  // Beschrijvingen
-  const descriptions = {
-    "IronGlass Red P": {
-      text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series van Sovjet-lenzen (Helios, Mir, Jupiter) met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – dit zijn de lenzen zoals ze vroeger werden gebouwd, met alle optische imperfecties, flare-gevoeligheid en ziel die je mag verwachten van pure vintage glasoptiek.",
-      url: "https://tvlrental.nl/ironglassredp/"
-    },
+  // Lens links en beschrijvingen
+  const lensDescriptions = {
     "IronGlass Zeiss Jena": {
       text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
       url: "https://tvlrental.nl/ironglasszeissjena/"
+    },
+    "IronGlass Red P": {
+      text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series van Sovjet-lenzen (Helios, Mir, Jupiter) met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – dit zijn de lenzen zoals ze vroeger werden gebouwd, met alle optische imperfecties, flare-gevoeligheid en ziel die je mag verwachten van pure vintage glasoptiek.",
+      url: "https://tvlrental.nl/ironglassredp/"
     }
   };
 
@@ -140,79 +140,79 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     });
   }
 
+  function fillBlack() {
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  }
+
   async function renderImageData(imgEl) {
     return new Promise(resolve => {
       const canvas = document.createElement("canvas");
       canvas.width = imgEl.naturalWidth || 1920;
       canvas.height = imgEl.naturalHeight || 1080;
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 1.0));
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 1.0));
+      };
+      img.src = imgEl.src;
     });
-  }
-
-  function fillBlack() {
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, pageHeight, "F");
-  }
-
-  function drawImageFullWidth(imageDataUrl, yOffset = 60, height = pageHeight - 120) {
-    pdf.addImage(imageDataUrl, "JPEG", 0, yOffset, pageWidth, height, undefined, 'FAST');
-  }
-
-  function drawLogoSmall(logoImg) {
-    const logoW = 60;
-    const logoH = logoW * (logoImg.height / logoImg.width);
-    pdf.addImage(logoImg, "PNG", pageWidth - logoW - 20, pageHeight - logoH - 20, logoW, logoH);
   }
 
   const logo = await loadImage(logoUrl);
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
-  const leftData = await renderImageData(leftImg);
-  const rightData = await renderImageData(rightImg);
+  const splitImg = splitCanvas.toDataURL("image/jpeg", 1.0);
+  const leftImgData = await renderImageData(leftImg);
+  const rightImgData = await renderImageData(rightImg);
 
-  // Pagina 1 – Split View
+  function drawLogo() {
+    const logoWidth = 120 * 3;
+    const logoHeight = (logo.height / logo.width) * logoWidth;
+    pdf.addImage(logo, "PNG", pageWidth - logoWidth - 20, pageHeight - logoHeight - 20, logoWidth, logoHeight);
+  }
+
+  function drawTextBlock(text, link, yStart) {
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    const lines = pdf.splitTextToSize(text, pageWidth - 80);
+    pdf.text(lines, pageWidth / 2, yStart, { align: "center" });
+    pdf.setTextColor(100, 150, 255);
+    pdf.textWithLink(link, pageWidth / 2, yStart + lines.length * 12 + 8, { url: link, align: "center" });
+  }
+
+  // Pagina 1 – split
   fillBlack();
+  pdf.addImage(splitImg, "JPEG", 0, 60, pageWidth, pageHeight - 140);
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(14);
+  pdf.setFontSize(16);
   pdf.text(leftLabel, 40, 40);
   pdf.text(rightLabel, pageWidth - 40 - pdf.getTextWidth(rightLabel), 40);
-  drawImageFullWidth(splitData);
-  drawLogoSmall(logo);
+  drawLogo();
   pdf.setFontSize(12);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  pdf.setTextColor(255, 255, 255);
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 10, { align: "center" });
 
-  // Pagina 2 – Left
+  // Pagina 2 – left only
   pdf.addPage();
   fillBlack();
   pdf.setFontSize(16);
+  pdf.setTextColor(255, 255, 255);
   pdf.text(leftLabel, pageWidth / 2, 40, { align: "center" });
-  drawImageFullWidth(leftData);
-  drawLogoSmall(logo);
-  const leftDesc = descriptions[leftSelect.value];
-  if (leftDesc) {
-    pdf.setFontSize(12);
-    pdf.text(leftDesc.text, 40, pageHeight - 60, { maxWidth: pageWidth - 80 });
-    pdf.setTextColor(100, 150, 255);
-    pdf.textWithLink(leftDesc.url, 40, pageHeight - 40, { url: leftDesc.url });
-  }
+  pdf.addImage(leftImgData, "JPEG", 0, 60, pageWidth, pageHeight - 160);
+  drawTextBlock(lensDescriptions[leftLabel.split(": ")[1]]?.text || "", lensDescriptions[leftLabel.split(": ")[1]]?.url || "", pageHeight - 90);
+  drawLogo();
 
-  // Pagina 3 – Right
+  // Pagina 3 – right only
   pdf.addPage();
   fillBlack();
   pdf.setFontSize(16);
   pdf.setTextColor(255, 255, 255);
   pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" });
-  drawImageFullWidth(rightData);
-  drawLogoSmall(logo);
-  const rightDesc = descriptions[rightSelect.value];
-  if (rightDesc) {
-    pdf.setFontSize(12);
-    pdf.text(rightDesc.text, 40, pageHeight - 60, { maxWidth: pageWidth - 80 });
-    pdf.setTextColor(100, 150, 255);
-    pdf.textWithLink(rightDesc.url, 40, pageHeight - 40, { url: rightDesc.url });
-  }
+  pdf.addImage(rightImgData, "JPEG", 0, 60, pageWidth, pageHeight - 160);
+  drawTextBlock(lensDescriptions[rightLabel.split(": ")[1]]?.text || "", lensDescriptions[rightLabel.split(": ")[1]]?.url || "", pageHeight - 90);
+  drawLogo();
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
