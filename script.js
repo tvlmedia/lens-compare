@@ -102,3 +102,32 @@ document.getElementById("fullscreenButton").addEventListener("click", () => {
     }
   }
 });
+document.getElementById("downloadPdfButton").addEventListener("click", () => {
+  const comparison = document.getElementById("comparisonWrapper");
+  const leftLabel = document.getElementById("leftLabel").textContent;
+  const rightLabel = document.getElementById("rightLabel").textContent;
+
+  html2canvas(comparison, {
+    scale: 2,
+    useCORS: true
+  }).then(canvas => {
+    const imgData = canvas.toDataURL("image/jpeg", 1.0);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: [canvas.width, canvas.height + 60]
+    });
+
+    pdf.addImage(imgData, "JPEG", 0, 0, canvas.width, canvas.height);
+    pdf.setFontSize(12);
+    pdf.setTextColor(80);
+
+    pdf.text(leftLabel, 40, canvas.height + 30);
+    pdf.text(rightLabel, canvas.width - 250, canvas.height + 30);
+
+    const now = new Date();
+    const filename = `lens-comparison-${now.toISOString().slice(0, 10)}.pdf`;
+    pdf.save(filename);
+  });
+});
