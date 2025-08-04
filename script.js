@@ -127,6 +127,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     }
   };
 
+  // Helpers
   function fillBlack() {
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
@@ -157,20 +158,24 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     });
   }
 
-  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
-  const leftData = await renderImageData(leftImg);
-  const rightData = await renderImageData(rightImg);
-  const logo = await loadImage(logoUrl);
+  function drawImageCentered(image, yOffset = 0, maxHeight = pageHeight - 120) {
+    const imgRatio = image.width / image.height;
+    const height = Math.min(maxHeight, image.height);
+    const width = height * imgRatio;
+    const x = (pageWidth - width) / 2;
+    const y = yOffset;
+    pdf.addImage(image, "JPEG", x, y, width, height);
+    return y + height;
+  }
 
-  function drawLogo(x, y, maxW = 90) {
+  function drawLogo(x, y, maxW = 100) {
     const ratio = logo.width / logo.height;
     const h = maxW / ratio;
     pdf.addImage(logo, "PNG", x, y, maxW, h);
   }
 
-  function drawDescriptionBlock(lensKey, yStart) {
-    const info = lensDescriptions[lensKey];
+  function drawDescriptionBlock(lensName, yStart) {
+    const info = lensDescriptions[lensName];
     if (!info) return;
 
     pdf.setTextColor(255, 255, 255);
@@ -179,43 +184,46 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     const lines = pdf.splitTextToSize(info.text, textWidth);
     pdf.text(lines, 50, yStart);
 
-    pdf.setTextColor(120, 180, 255);
-    pdf.setFontSize(10);
+    pdf.setTextColor(100, 150, 255);
     pdf.textWithLink("Klik hier voor meer info", 50, yStart + lines.length * 12 + 10, { url: info.url });
   }
 
-  // SPLIT VIEW - Pagina 1
+  // Rendering images
+  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+  const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
+  const leftData = await renderImageData(leftImg);
+  const rightData = await renderImageData(rightImg);
+  const logo = await loadImage(logoUrl);
+
+  // Pagina 1: split
   fillBlack();
-  pdf.addImage(splitData, "JPEG", 0, 0, pageWidth, pageHeight);
+  const split = await loadImage(splitData);
+  drawImageCentered(split, 0);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(12);
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // LEFT IMAGE - Pagina 2
+  // Pagina 2: left lens
   pdf.addPage();
   fillBlack();
-  pdf.addImage(leftData, "JPEG", 0, 0, pageWidth, pageHeight);
+  const left = await loadImage(leftData);
+  drawImageCentered(left, 0);
   drawLogo(pageWidth - 110, 20, 90);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
-  pdf.text(leftLabel, pageWidth / 2, 60, { align: "center" });
-  drawDescriptionBlock("IronGlass Red P", pageHeight - 120);
-  pdf.setFontSize(10);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  pdf.text(leftLabel, pageWidth / 2, 40, { align: "center" });
+  drawDescriptionBlock("IronGlass Red P", pageHeight - 90);
 
-  // RIGHT IMAGE - Pagina 3
+  // Pagina 3: right lens
   pdf.addPage();
   fillBlack();
-  pdf.addImage(rightData, "JPEG", 0, 0, pageWidth, pageHeight);
+  const right = await loadImage(rightData);
+  drawImageCentered(right, 0);
   drawLogo(pageWidth - 110, 20, 90);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
-  pdf.text(rightLabel, pageWidth / 2, 60, { align: "center" });
-  drawDescriptionBlock("IronGlass Zeiss Jena", pageHeight - 120);
-  pdf.setFontSize(10);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" });
+  drawDescriptionBlock("IronGlass Zeiss Jena", pageHeight - 90);
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
