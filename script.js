@@ -63,6 +63,10 @@ function updateImages() {
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
   el.addEventListener("change", updateImages)
 );
+leftSelect.value = "IronGlass Red P";
+rightSelect.value = "IronGlass Zeiss Jena";
+tStopSelect.value = "2.8";
+focalLengthSelect.value = "35mm";
 
 let isDragging = false;
 
