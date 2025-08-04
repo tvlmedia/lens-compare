@@ -52,8 +52,11 @@ function updateImages() {
   beforeImgTag.src = imgRight;
   afterImgTag.src = imgLeft;
 
-  leftLabel.textContent = `${leftSelect.value} ${notes[leftKey] || focalLength}`;
-  rightLabel.textContent = `${rightSelect.value} ${notes[rightKey] || focalLength}`;
+ const tStopRaw = tStopSelect.value;
+const tStopFormatted = `T${tStopRaw}`;
+
+leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftKey] || focalLength} ${tStopFormatted}`;
+rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightKey] || focalLength} ${tStopFormatted}`;
 }
 
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
