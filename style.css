@@ -46,6 +46,8 @@ select {
 }
 
 #beforeImage img, #afterImage img {
+  max-width: 100%;
+  height: auto;
   position: absolute;
   top: 0;
   left: 0;
@@ -89,6 +91,9 @@ select {
 }
 
 #infoText {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
   margin-top: 12px;
   font-size: 16px;
   color: #eee;
