@@ -134,7 +134,7 @@ select {
 #toggleButton:hover {
   background: #666;
 }
-/* Alleen styling tijdens fullscreen */
+/* Alleen fullscreen correct schalen */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -160,5 +160,12 @@ select {
 :-webkit-full-screen #afterImage img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* behoud aspect-ratio zonder croppen */
+  object-fit: contain;
+}
+
+:fullscreen #afterWrapper,
+:-webkit-full-screen #afterWrapper {
+  left: 0;
+  overflow: hidden;
+  width: 50%; /* Cruciaal: anders blijft hij hangen op oude 960px */
 }
