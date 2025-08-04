@@ -27,8 +27,7 @@ select {
 
 #comparisonWrapper {
   position: relative;
-  width: 100%;
-  max-width: 960px;
+  width: 960px;
   height: 540px;
   overflow: hidden;
   background: #000;
@@ -51,7 +50,6 @@ select {
   left: 0;
   width: 960px;
   height: 540px;
-  object-fit: none;
 }
 
 #afterWrapper {
@@ -92,14 +90,11 @@ select {
   font-size: 16px;
   color: #eee;
   font-weight: 400;
-  text-align: center;
-  letter-spacing: 0.3px;
   display: flex;
   justify-content: space-between;
-  gap: 60px;
-  padding: 0 40px;
-  max-width: 960px;
-  width: 100%;
+  width: 960px;
+  padding: 0 30px;
+  box-sizing: border-box;
 }
 
 #explanationBox {
@@ -112,19 +107,4 @@ select {
   border-left: 4px solid orange;
   border-radius: 6px;
   line-height: 1.5;
-}
-
-#comparisonWrapper,
-#beforeImage,
-#afterImage,
-#slider {
-  user-select: none;
-}
-
-* {
-  -webkit-user-drag: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
