@@ -1,4 +1,3 @@
-
 const lenses = [
   "IronGlass Red P",
   "IronGlass Zeiss Jena",
@@ -42,6 +41,8 @@ function updateImages() {
   const tStop = tStopSelect.value.replace(".", "_");
   const focalLength = focalLengthSelect.value;
 
+  const leftBaseKey = `${leftLens}_${focalLength}`;
+  const rightBaseKey = `${rightLens}_${focalLength}`;
   const leftKey = `${leftLens}_${focalLength}_t${tStop}`;
   const rightKey = `${rightLens}_${focalLength}_t${tStop}`;
 
@@ -52,11 +53,11 @@ function updateImages() {
   beforeImgTag.src = imgRight;
   afterImgTag.src = imgLeft;
 
- const tStopRaw = tStopSelect.value;
-const tStopFormatted = `T${tStopRaw}`;
+  const tStopRaw = tStopSelect.value;
+  const tStopFormatted = `T${tStopRaw}`;
 
-leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
-rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
+  leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
+  rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
 }
 
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
@@ -77,7 +78,6 @@ window.addEventListener("mousemove", e => {
 });
 
 updateImages();
-
 
 document.getElementById("toggleButton").addEventListener("click", () => {
   const leftValue = leftSelect.value;
