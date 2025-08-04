@@ -127,7 +127,6 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     }
   };
 
-  // Helpers
   function fillBlack() {
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
@@ -158,17 +157,23 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     });
   }
 
-  function drawImageCentered(image, yOffset = 0, maxHeight = pageHeight - 120) {
-    const imgRatio = image.width / image.height;
-    const height = Math.min(maxHeight, image.height);
-    const width = height * imgRatio;
-    const x = (pageWidth - width) / 2;
-    const y = yOffset;
-    pdf.addImage(image, "JPEG", x, y, width, height);
-    return y + height;
+  function drawImageCentered(imageData, yOffset = 40, heightMax = pageHeight - 200) {
+    const img = new Image();
+    img.src = imageData;
+    return new Promise(resolve => {
+      img.onload = () => {
+        const ratio = img.width / img.height;
+        const targetHeight = Math.min(heightMax, pageHeight - 200);
+        const targetWidth = targetHeight * ratio;
+        const x = (pageWidth - targetWidth) / 2;
+        const y = yOffset;
+        pdf.addImage(imageData, "JPEG", x, y, targetWidth, targetHeight);
+        resolve(y + targetHeight);
+      };
+    });
   }
 
-  function drawLogo(x, y, maxW = 100) {
+  function drawLogo(x, y, maxW = 90) {
     const ratio = logo.width / logo.height;
     const h = maxW / ratio;
     pdf.addImage(logo, "PNG", x, y, maxW, h);
@@ -180,50 +185,45 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
 
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(10);
-    const textWidth = pageWidth - 100;
-    const lines = pdf.splitTextToSize(info.text, textWidth);
+    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
     pdf.text(lines, 50, yStart);
 
-    pdf.setTextColor(100, 150, 255);
+    pdf.setTextColor(80, 160, 255);
     pdf.textWithLink("Klik hier voor meer info", 50, yStart + lines.length * 12 + 10, { url: info.url });
   }
 
-  // Rendering images
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
   const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
   const leftData = await renderImageData(leftImg);
   const rightData = await renderImageData(rightImg);
   const logo = await loadImage(logoUrl);
 
-  // Pagina 1: split
+  // Pagina 1: splitscreen
   fillBlack();
-  const split = await loadImage(splitData);
-  drawImageCentered(split, 0);
+  pdf.addImage(splitData, "JPEG", 0, 0, pageWidth, pageHeight);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(12);
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Pagina 2: left lens
+  // Pagina 2: Left lens
   pdf.addPage();
   fillBlack();
-  const left = await loadImage(leftData);
-  drawImageCentered(left, 0);
-  drawLogo(pageWidth - 110, 20, 90);
+  const yLeftEnd = await drawImageCentered(leftData, 40, pageHeight - 250);
+  drawLogo(pageWidth - 100, 20, 80);
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(16);
-  pdf.text(leftLabel, pageWidth / 2, 40, { align: "center" });
-  drawDescriptionBlock("IronGlass Red P", pageHeight - 90);
+  pdf.setFontSize(14);
+  pdf.text(leftLabel, pageWidth / 2, 30, { align: "center" });
+  drawDescriptionBlock("IronGlass Red P", yLeftEnd + 20);
 
-  // Pagina 3: right lens
+  // Pagina 3: Right lens
   pdf.addPage();
   fillBlack();
-  const right = await loadImage(rightData);
-  drawImageCentered(right, 0);
-  drawLogo(pageWidth - 110, 20, 90);
+  const yRightEnd = await drawImageCentered(rightData, 40, pageHeight - 250);
+  drawLogo(pageWidth - 100, 20, 80);
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(16);
-  pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" });
-  drawDescriptionBlock("IronGlass Zeiss Jena", pageHeight - 90);
+  pdf.setFontSize(14);
+  pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
+  drawDescriptionBlock("IronGlass Zeiss Jena", yRightEnd + 20);
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
