@@ -1,17 +1,12 @@
 
 const lenses = [
     "IronGlass Red P",
-    "IronGlass Zeiss Jena",
-    "DZO Vespid",
-    "DZO Arles",
-    "Cooke Panchro FF",
-    "Lomo Standard Speed"
+    "IronGlass Zeiss Jena"
 ];
 
 const notes = {
-    "ironglass_red_p_35mm": "Red P = 37mm",
-    "ironglass_zeiss_jena_35mm": "Zeiss Jena = 35mm",
-    "cooke_panchro_ff_25mm": "Cooke Panchro = 32mm"
+    "ironglass_red_p_35mm": "37mm",
+    "ironglass_zeiss_jena_35mm": "35mm"
 };
 
 const lensImageMap = {
@@ -27,8 +22,9 @@ const beforeImgTag = document.getElementById("beforeImgTag");
 const afterImgTag = document.getElementById("afterImgTag");
 const afterWrapper = document.getElementById("afterWrapper");
 const slider = document.getElementById("slider");
-const infoText = document.getElementById("infoText");
 const comparisonWrapper = document.getElementById("comparisonWrapper");
+const leftLabel = document.getElementById("leftLabel");
+const rightLabel = document.getElementById("rightLabel");
 
 lenses.forEach(lens => {
     leftSelect.add(new Option(lens, lens));
@@ -47,13 +43,12 @@ function updateImages() {
     const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
     const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
-    beforeImgTag.src = imgLeft;
-    afterImgTag.src = imgRight;
+    // CORRECTE volgorde:
+    beforeImgTag.src = imgRight;
+    afterImgTag.src = imgLeft;
 
-    const leftLabel = notes[`${leftLens}_${focalLength}`]?.split("=")[1]?.trim() || `${focalLength}`;
-    const rightLabel = notes[`${rightLens}_${focalLength}`]?.split("=")[1]?.trim() || `${focalLength}`;
-
-    document.getElementById("leftLabel").textContent = `${leftSelect.value} ${leftLabel}\t\t\t${rightSelect.value} ${rightLabel}`;
+    leftLabel.textContent = `${leftSelect.value} ${notes[leftKey] || focalLength}`;
+    rightLabel.textContent = `${rightSelect.value} ${notes[rightKey] || focalLength}`;
 }
 
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
@@ -61,7 +56,6 @@ function updateImages() {
 );
 
 let isDragging = false;
-
 slider.addEventListener("mousedown", () => isDragging = true);
 window.addEventListener("mouseup", () => isDragging = false);
 window.addEventListener("mousemove", e => {
