@@ -86,3 +86,13 @@ document.getElementById("toggleButton").addEventListener("click", () => {
   rightSelect.value = leftValue;
   updateImages();
 });
+document.getElementById("fullscreenButton").addEventListener("click", () => {
+  const wrapper = document.getElementById("comparisonWrapper");
+  if (!document.fullscreenElement) {
+    wrapper.requestFullscreen().catch(err => {
+      alert(`Fullscreen werkt niet: ${err.message}`);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+});
