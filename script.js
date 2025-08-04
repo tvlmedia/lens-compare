@@ -184,10 +184,10 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(10);
     const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
-    pdf.text(lines, 50, yStart);
+    pdf.text(lines, 50, yStart + 10);
 
     pdf.setTextColor(80, 160, 255);
-    pdf.textWithLink("Klik hier voor meer info", 50, yStart + lines.length * 12 + 4, { url: info.url });
+    pdf.textWithLink("Klik hier voor meer info", 50, yStart + lines.length * 12 + 2, { url: info.url });
   }
 
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
