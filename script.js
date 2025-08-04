@@ -198,7 +198,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
 
   // Pagina 1: splitscreen
   fillBlack();
-  await drawImageFullWidth(splitData);
+  await drawImageFullWidth(splitData, 40);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(12);
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
