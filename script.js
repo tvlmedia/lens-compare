@@ -1,3 +1,4 @@
+
 const lenses = {
   "Cooke Panchro FF": "images/cooke_panchro.jpg",
   "DZO Vespid": "images/dzo_vespid.jpg",
@@ -42,16 +43,27 @@ const updateSlider = (clientX) => {
   slider.style.left = `${percent * 100}%`;
 };
 
-container.addEventListener("mousedown", () => isDragging = true);
-container.addEventListener("mouseup", () => isDragging = false);
-container.addEventListener("mouseleave", () => isDragging = false);
-container.addEventListener("mousemove", (e) => {
+// Alleen starten als je op de slider klikt
+slider.addEventListener("mousedown", () => {
+  isDragging = true;
+});
+document.addEventListener("mouseup", () => {
+  isDragging = false;
+});
+document.addEventListener("mousemove", (e) => {
   if (isDragging) updateSlider(e.clientX);
 });
 
-container.addEventListener("touchstart", () => isDragging = true);
-container.addEventListener("touchend", () => isDragging = false);
-container.addEventListener("touchcancel", () => isDragging = false);
-container.addEventListener("touchmove", (e) => {
+// Touch ondersteuning (alleen op slider)
+slider.addEventListener("touchstart", () => {
+  isDragging = true;
+});
+document.addEventListener("touchend", () => {
+  isDragging = false;
+});
+document.addEventListener("touchcancel", () => {
+  isDragging = false;
+});
+document.addEventListener("touchmove", (e) => {
   if (isDragging) updateSlider(e.touches[0].clientX);
 });
