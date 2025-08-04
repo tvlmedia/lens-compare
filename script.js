@@ -9,8 +9,8 @@ const lenses = [
 ];
 
 const notes = {
-    "ironglass_red_p_35mm": "Red P = 37mm (gematcht op 35mm)",
-    "ironglass_zeiss_jena_35mm": "Zeiss Jena = echte 35mm",
+    "red_p_35mm": "Red P = 37mm (gematcht op 35mm)",
+    "zeiss_jena_35mm": "Zeiss Jena = echte 35mm",
     "cooke_panchro_ff_25mm": "Cooke Panchro = 32mm gematcht op 25mm"
 };
 
@@ -55,7 +55,9 @@ function updateImages() {
     const leftNote = notes[`${leftLens}_${focalLength}`] ? ` (${notes[`${leftLens}_${focalLength}`]})` : "";
     const rightNote = notes[`${rightLens}_${focalLength}`] ? ` (${notes[`${rightLens}_${focalLength}`]})` : "";
 
-    infoText.textContent = `${leftSelect.value} @ ${focalLength} – T${tStop}${leftNote} | ${rightSelect.value} @ ${focalLength} – T${tStop}${rightNote}`;
+    const leftLabel = notes[`${leftLens}_${focalLength}`]?.split('=')[1]?.trim() || `${leftSelect.value} ${focalLength}`;
+    const rightLabel = notes[`${rightLens}_${focalLength}`]?.split('=')[1]?.trim() || `${rightSelect.value} ${focalLength}`;
+    infoText.textContent = `${leftSelect.value} ${leftLabel} \t\t\t ${rightSelect.value} ${rightLabel}`;
 }
 
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el => {
