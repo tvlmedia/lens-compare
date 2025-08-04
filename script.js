@@ -9,9 +9,9 @@ const lenses = [
 ];
 
 const notes = {
-    "red_p_35mm": "Red P = 37mm (gematcht op 35mm)",
-    "zeiss_jena_35mm": "Zeiss Jena = echte 35mm",
-    "cooke_panchro_ff_25mm": "Cooke Panchro = 32mm gematcht op 25mm"
+    "ironglass_red_p_35mm": "Red P = 37mm",
+    "ironglass_zeiss_jena_35mm": "Zeiss Jena = 35mm",
+    "cooke_panchro_ff_25mm": "Cooke Panchro = 32mm"
 };
 
 const lensImageMap = {
@@ -31,10 +31,8 @@ const infoText = document.getElementById("infoText");
 const comparisonWrapper = document.getElementById("comparisonWrapper");
 
 lenses.forEach(lens => {
-    const opt1 = new Option(lens, lens);
-    const opt2 = new Option(lens, lens);
-    leftSelect.add(opt1);
-    rightSelect.add(opt2);
+    leftSelect.add(new Option(lens, lens));
+    rightSelect.add(new Option(lens, lens));
 });
 
 function updateImages() {
@@ -52,27 +50,21 @@ function updateImages() {
     beforeImgTag.src = imgLeft;
     afterImgTag.src = imgRight;
 
-    const leftNote = notes[`${leftLens}_${focalLength}`] ? ` (${notes[`${leftLens}_${focalLength}`]})` : "";
-    const rightNote = notes[`${rightLens}_${focalLength}`] ? ` (${notes[`${rightLens}_${focalLength}`]})` : "";
+    const leftLabel = notes[`${leftLens}_${focalLength}`]?.split("=")[1]?.trim() || `${focalLength}`;
+    const rightLabel = notes[`${rightLens}_${focalLength}`]?.split("=")[1]?.trim() || `${focalLength}`;
 
-    const leftLabel = notes[`${leftLens}_${focalLength}`]?.split('=')[1]?.trim() || `${leftSelect.value} ${focalLength}`;
-    const rightLabel = notes[`${rightLens}_${focalLength}`]?.split('=')[1]?.trim() || `${rightSelect.value} ${focalLength}`;
-    infoText.textContent = `${leftSelect.value} ${leftLabel} \t\t\t ${rightSelect.value} ${rightLabel}`;
+    infoText.textContent = `${leftSelect.value} ${leftLabel}\t\t\t${rightSelect.value} ${rightLabel}`;
 }
 
-[leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el => {
-    el.addEventListener("change", updateImages);
-});
+[leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
+    el.addEventListener("change", updateImages)
+);
 
 let isDragging = false;
 
-slider.addEventListener("mousedown", () => {
-    isDragging = true;
-});
-window.addEventListener("mouseup", () => {
-    isDragging = false;
-});
-window.addEventListener("mousemove", (e) => {
+slider.addEventListener("mousedown", () => isDragging = true);
+window.addEventListener("mouseup", () => isDragging = false);
+window.addEventListener("mousemove", e => {
     if (!isDragging) return;
     const rect = comparisonWrapper.getBoundingClientRect();
     const offset = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
