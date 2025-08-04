@@ -104,73 +104,92 @@ document.getElementById("fullscreenButton").addEventListener("click", () => {
 });
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
   const comparison = document.getElementById("comparisonWrapper");
-  const leftImg = document.getElementById("afterImgTag");
-  const rightImg = document.getElementById("beforeImgTag");
-  const leftLabel = document.getElementById("leftLabel").textContent;
-  const rightLabel = document.getElementById("rightLabel").textContent;
+  const leftLabel = document.getElementById("leftLabel").textContent.trim();
+  const rightLabel = document.getElementById("rightLabel").textContent.trim();
+
+  const leftUrl = document.getElementById("beforeImage").querySelector("img").src;
+  const rightUrl = document.getElementById("afterImage").querySelector("img").src;
+  const logoUrl = "TVL Rental Logo Square.png"; // Zorg dat dit pad klopt
+
+  const lensDescriptions = {
+    "IronGlass Zeiss Jena": {
+      url: "https://tvlrental.nl/ironglasszeissjena/",
+      text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken."
+    },
+    "IronGlass Red P": {
+      url: "https://tvlrental.nl/ironglassredp/",
+      text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series van Sovjet-lenzen met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – dit is puur vintage glas met ziel."
+    }
+  };
+
+  const canvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+  const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+  const pdf = new jsPDF("landscape", "pt", "a4");
+
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
+  let y = 40;
 
-  // Set background to black on each page
-  function fillBlackBackground() {
-    pdf.setFillColor(15, 15, 15); // deep black
-    pdf.rect(0, 0, pageWidth, pageHeight, "F");
-  }
-
-  // Pagina 1: Split
-  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const splitImg = splitCanvas.toDataURL("image/jpeg", 1.0);
-  fillBlackBackground();
+  // Achtergrond zwart + witte tekst
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, 0, pageWidth, pdf.internal.pageSize.getHeight(), "F");
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(16);
-  pdf.text(leftLabel, 40, 40);
-  pdf.text(rightLabel, pageWidth - 40 - pdf.getTextWidth(rightLabel), 40);
-  pdf.addImage(splitImg, "JPEG", 0, 60, pageWidth, pageHeight - 100);
-  pdf.setFontSize(12);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  pdf.setFont("helvetica", "normal");
 
-  // Pagina 2: Left only
-  const leftImgData = await renderSingleImageCanvas(leftImg);
-  pdf.addPage("a4", "landscape");
-  fillBlackBackground();
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(16);
-  pdf.text(leftLabel, pageWidth / 2, 40, { align: "center" });
-  pdf.addImage(leftImgData, "JPEG", 0, 60, pageWidth, pageHeight - 100);
-  pdf.setFontSize(12);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  // Logo bovenin (optioneel)
+  const logo = await loadImage(logoUrl);
+  pdf.addImage(logo, "PNG", pageWidth / 2 - 50, y, 100, 100);
+  y += 120;
 
-  // Pagina 3: Right only
-  const rightImgData = await renderSingleImageCanvas(rightImg);
-  pdf.addPage("a4", "landscape");
-  fillBlackBackground();
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(16);
-  pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" });
-  pdf.addImage(rightImgData, "JPEG", 0, 60, pageWidth, pageHeight - 100);
-  pdf.setFontSize(12);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  // Titel
+  pdf.setFontSize(18);
+  pdf.text(`${leftLabel}  ⟷  ${rightLabel}`, pageWidth / 2, y, { align: "center" });
+  y += 20;
 
-  const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
+  // Split image
+  pdf.addImage(imgData, "JPEG", 40, y, pageWidth - 80, 180);
+  y += 200;
+
+  // Beide beelden los
+  const leftImg = await loadImage(leftUrl);
+  const rightImg = await loadImage(rightUrl);
+  const imgW = (pageWidth - 120) / 2;
+
+  pdf.addImage(leftImg, "JPEG", 40, y, imgW, 140);
+  pdf.addImage(rightImg, "JPEG", 60 + imgW, y, imgW, 140);
+  y += 160;
+
+  // Lensbeschrijvingen
+  pdf.setFontSize(12);
+  pdf.setTextColor(255);
+  [leftLabel, rightLabel].forEach((label, index) => {
+    const lens = Object.values(lensDescriptions).find(d => label.includes(d.url.split("/").pop().replace("ironglass", "").replace("/", "").trim()));
+    const desc = lensDescriptions[label] || null;
+    if (desc) {
+      const x = index === 0 ? 40 : pageWidth / 2 + 20;
+      pdf.textWithLink(desc.text, x, y, { url: desc.url, maxWidth: imgW });
+    }
+  });
+  y += 60;
+
+  // Footer
+  pdf.setFontSize(10);
+  pdf.setTextColor(180);
+  pdf.text("tvlrental.nl", pageWidth / 2, y, { align: "center" });
+
+  // Save
+  const now = new Date();
+  const filename = `lens-comparison-${now.toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
 });
 
-// Los beeld omzetten naar canvas + JPEG
-async function renderSingleImageCanvas(imgElement) {
+// Helper: afbeelding laden
+function loadImage(src) {
   return new Promise(resolve => {
-    const canvas = document.createElement("canvas");
-    canvas.width = imgElement.naturalWidth || 1920;
-    canvas.height = imgElement.naturalHeight || 1080;
-    const ctx = canvas.getContext("2d");
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 1.0));
-    };
-    img.src = imgElement.src;
+    img.onload = () => resolve(img);
+    img.src = src;
   });
 }
