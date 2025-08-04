@@ -88,11 +88,17 @@ document.getElementById("toggleButton").addEventListener("click", () => {
 });
 document.getElementById("fullscreenButton").addEventListener("click", () => {
   const wrapper = document.getElementById("comparisonWrapper");
-  if (!document.fullscreenElement) {
-    wrapper.requestFullscreen().catch(err => {
-      alert(`Fullscreen werkt niet: ${err.message}`);
-    });
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    if (wrapper.requestFullscreen) {
+      wrapper.requestFullscreen();
+    } else if (wrapper.webkitRequestFullscreen) {
+      wrapper.webkitRequestFullscreen();
+    }
   } else {
-    document.exitFullscreen();
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
   }
 });
