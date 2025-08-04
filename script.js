@@ -1,5 +1,5 @@
 const lenses = {
-  "Cooke Panchro FF": "images/cooke_panchro.jpg",
+  "Cooke Panchro Ff": "images/cooke_panchro.jpg",
   "DZO Vespid": "images/dzo_vespid.jpg",
   "DZO Arles": "images/dzo_arles.jpg",
   "IronGlass Zeiss Jena": "images/zeiss_jena.jpg",
