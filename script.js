@@ -14,6 +14,11 @@ const notes = {
     "cooke_panchro_ff_25mm": "Cooke Panchro = 32mm gematcht op 25mm"
 };
 
+const lensImageMap = {
+    "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
+    "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg"
+};
+
 const leftSelect = document.getElementById("leftLens");
 const rightSelect = document.getElementById("rightLens");
 const tStopSelect = document.getElementById("tStop");
@@ -38,16 +43,17 @@ function updateImages() {
     const tStop = tStopSelect.value.replace(".", "_");
     const focalLength = focalLengthSelect.value;
 
-    const imgLeft = `images/${leftLens}_${focalLength}_t${tStop}.jpg`;
-    const imgRight = `images/${rightLens}_${focalLength}_t${tStop}.jpg`;
+    const leftKey = `${leftLens}_${focalLength}_t${tStop}`;
+    const rightKey = `${rightLens}_${focalLength}_t${tStop}`;
+
+    const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
+    const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
     beforeImage.style.backgroundImage = `url('${imgLeft}')`;
     afterImage.style.backgroundImage = `url('${imgRight}')`;
 
-    const leftKey = `${leftLens}_${focalLength}`;
-    const rightKey = `${rightLens}_${focalLength}`;
-    const leftNote = notes[leftKey] ? ` (${notes[leftKey]})` : "";
-    const rightNote = notes[rightKey] ? ` (${notes[rightKey]})` : "";
+    const leftNote = notes[`${leftLens}_${focalLength}`] ? ` (${notes[`${leftLens}_${focalLength}`]})` : "";
+    const rightNote = notes[`${rightLens}_${focalLength}`] ? ` (${notes[`${rightLens}_${focalLength}`]})` : "";
 
     infoText.textContent = `${leftSelect.value} @ ${focalLength} – T${tStop}${leftNote} | ${rightSelect.value} @ ${focalLength} – T${tStop}${rightNote}`;
 }
