@@ -157,19 +157,23 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     });
   }
 
-  function drawImageCentered(imageData, yOffset = 40, heightMax = pageHeight - 200) {
-    const img = new Image();
-    img.src = imageData;
-    return new Promise(resolve => {
-      img.onload = () => {
-        const ratio = img.width / img.height;
-        const targetHeight = Math.min(heightMax, pageHeight - 200);
-        const targetWidth = targetHeight * ratio;
-        const x = (pageWidth - targetWidth) / 2;
-        const y = yOffset;
-        pdf.addImage(imageData, "JPEG", x, y, targetWidth, targetHeight);
-        resolve(y + targetHeight);
-      };
+ function drawImageCentered(image, yOffset = 0, maxHeight = null, fillWidth = false) {
+  const imgRatio = image.width / image.height;
+
+  let width, height;
+  if (fillWidth) {
+    width = pageWidth;
+    height = pageWidth / imgRatio;
+  } else {
+    height = maxHeight || (pageHeight - 120);
+    width = height * imgRatio;
+  }
+
+  const x = (pageWidth - width) / 2;
+  const y = yOffset;
+  pdf.addImage(image, "JPEG", x, y, width, height);
+  return y + height;
+}
     });
   }
 
@@ -216,14 +220,14 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   drawDescriptionBlock("IronGlass Red P", yLeftEnd + 20);
 
   // Pagina 3: Right lens
-  pdf.addPage();
-  fillBlack();
-  const yRightEnd = await drawImageCentered(rightData, 0, null, true);
-  drawLogo(pageWidth - 100, 05, 80);
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(14);
-  pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
-  drawDescriptionBlock("IronGlass Zeiss Jena", yRightEnd + 20);
+pdf.addPage();
+fillBlack();
+const yRightEnd = await drawImageCentered(rightData, 0, null, true); // vul breedte
+drawLogo(pageWidth - 100, 20, 80); // ietsje lager voor visuele balans
+pdf.setTextColor(255, 255, 255);
+pdf.setFontSize(14);
+pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" }); // eventueel iets lager zetten
+drawDescriptionBlock("IronGlass Zeiss Jena", yRightEnd + 20); // tekst onder afbeelding
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
