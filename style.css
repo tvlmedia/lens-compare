@@ -1,4 +1,3 @@
-
 body {
   margin: 0;
   background: #0f0f0f;
@@ -41,11 +40,12 @@ select {
   height: 540px;
 }
 
-#beforeImage img, #afterImage img {
+#beforeImage img,
+#afterImage img {
   position: absolute;
   width: 100%;
   height: 100%;
-  object-fit: none;
+  object-fit: contain;
   top: 0;
   left: 0;
 }
