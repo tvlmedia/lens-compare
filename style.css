@@ -39,6 +39,7 @@ select {
   width: 50%;
   overflow: hidden;
   z-index: 2;
+  position: absolute; /* <- DE FIX */
 }
 
 .slider {
