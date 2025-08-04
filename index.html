@@ -1,42 +1,50 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Lens Comparison</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Lens Comparison</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="controls">
-        <select id="leftLens"></select>
-        <select id="rightLens"></select>
-        <select id="tStop">
-            <option value="2.8">T2.8</option>
-        </select>
-        <select id="focalLength">
-            <option value="35mm">35mm</option>
-        </select>
+  <div class="controls">
+    <select id="leftLens"></select>
+    <select id="rightLens"></select>
+    <select id="tStop">
+      <option value="1.4">T1.4</option>
+      <option value="2">T2</option>
+      <option value="2.8">T2.8</option>
+      <option value="4">T4</option>
+      <option value="5.6">T5.6</option>
+      <option value="8">T8</option>
+    </select>
+    <select id="focalLength">
+      <option value="18mm">18mm</option>
+      <option value="25mm">25mm</option>
+      <option value="35mm">35mm</option>
+      <option value="50mm">50mm</option>
+      <option value="80mm">80mm</option>
+      <option value="135mm">135mm</option>
+    </select>
+  </div>
+  <div id="comparisonWrapper">
+    <div id="beforeImage">
+      <img id="beforeImgTag" />
     </div>
-
-    <div class="comparisonWrapper" id="comparisonWrapper">
-        <div class="afterWrapper" id="afterWrapper">
-            <img id="afterImgTag" src="" />
-        </div>
-        <div class="beforeWrapper">
-            <img id="beforeImgTag" src="" />
-        </div>
-        <div class="slider" id="slider"></div>
+    <div id="afterWrapper">
+      <div id="afterImage">
+        <img id="afterImgTag" />
+      </div>
     </div>
-
-    <div class="lensLabels">
-        <div id="leftLabel"></div>
-        <div id="rightLabel"></div>
-    </div>
-
-    <div class="warning">
-        ⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.
-    </div>
-
-    <script src="script.js"></script>
+    <div id="slider"></div>
+  </div>
+  <div id="infoContainer">
+    <div id="leftLabel"></div>
+    <div id="rightLabel"></div>
+  </div>
+  <div id="explanationBox">
+    <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
