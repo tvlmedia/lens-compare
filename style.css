@@ -171,8 +171,13 @@ select {
 
 :fullscreen #afterWrapper,
 :-webkit-full-screen #afterWrapper {
-  width: 50% !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50vw; /* DIT is cruciaal */
   overflow: hidden;
+  z-index: 2;
 }
 
 :fullscreen #beforeImage img,
