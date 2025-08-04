@@ -1,3 +1,4 @@
+
 const lenses = [
     "IronGlass Red P",
     "IronGlass Zeiss Jena",
@@ -22,6 +23,7 @@ const afterImage = document.getElementById("afterImage");
 const afterWrapper = document.getElementById("afterWrapper");
 const slider = document.getElementById("slider");
 const infoText = document.getElementById("infoText");
+const comparisonWrapper = document.getElementById("comparisonWrapper");
 
 lenses.forEach(lens => {
     const opt1 = new Option(lens, lens);
@@ -33,11 +35,11 @@ lenses.forEach(lens => {
 function updateImages() {
     const leftLens = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
     const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
-    const tStop = tStopSelect.value;
+    const tStop = tStopSelect.value.replace(".", "_");
     const focalLength = focalLengthSelect.value;
 
-    const imgLeft = `images/${leftLens}_${focalLength}_${tStop}.jpg`;
-    const imgRight = `images/${rightLens}_${focalLength}_${tStop}.jpg`;
+    const imgLeft = `images/${leftLens}_${focalLength}_t${tStop}.jpg`;
+    const imgRight = `images/${rightLens}_${focalLength}_t${tStop}.jpg`;
 
     beforeImage.style.backgroundImage = `url('${imgLeft}')`;
     afterImage.style.backgroundImage = `url('${imgRight}')`;
@@ -47,7 +49,7 @@ function updateImages() {
     const leftNote = notes[leftKey] ? ` (${notes[leftKey]})` : "";
     const rightNote = notes[rightKey] ? ` (${notes[rightKey]})` : "";
 
-    infoText.textContent = `${leftSelect.value} @ ${focalLength} – ${tStop}${leftNote} | ${rightSelect.value} @ ${focalLength} – ${tStop}${rightNote}`;
+    infoText.textContent = `${leftSelect.value} @ ${focalLength} – T${tStop}${leftNote} | ${rightSelect.value} @ ${focalLength} – T${tStop}${rightNote}`;
 }
 
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el => {

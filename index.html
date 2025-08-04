@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Lens Comparison</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Lens Comparison</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="controls">
-        <select id="leftLens"></select>
-        <select id="rightLens"></select>
-        <select id="tStop">
-            <option>T1.4</option><option>T2</option><option>T2.8</option><option>T4</option><option>T5.6</option><option>T8</option>
-        </select>
-        <select id="focalLength">
-            <option>18mm</option><option>25mm</option><option>35mm</option><option>50mm</option><option>80mm</option><option>135mm</option>
-        </select>
+  <div class="controls">
+    <select id="leftLens"></select>
+    <select id="rightLens"></select>
+    <select id="tStop">
+      <option value="1.4">T1.4</option>
+      <option value="2">T2</option>
+      <option value="2.8">T2.8</option>
+      <option value="4">T4</option>
+      <option value="5.6">T5.6</option>
+      <option value="8">T8</option>
+    </select>
+    <select id="focalLength">
+      <option value="18mm">18mm</option>
+      <option value="25mm">25mm</option>
+      <option value="35mm">35mm</option>
+      <option value="50mm">50mm</option>
+      <option value="80mm">80mm</option>
+      <option value="135mm">135mm</option>
+    </select>
+  </div>
+  <div id="comparisonWrapper">
+    <div id="beforeImage"></div>
+    <div id="afterWrapper">
+      <div id="afterImage"></div>
     </div>
-    <div id="comparisonWrapper">
-        <div id="beforeImage"></div>
-        <div id="afterWrapper">
-            <div id="afterImage"></div>
-        </div>
-        <div id="slider"></div>
-    </div>
-    <div id="infoText" class="info-text"></div>
-    <script src="script.js"></script>
+    <div id="slider"></div>
+  </div>
+  <div id="infoText"></div>
+  <script src="script.js"></script>
 </body>
 </html>
