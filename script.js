@@ -208,7 +208,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Pagina 2: Left lens
   pdf.addPage();
   fillBlack();
-  const yLeftEnd = await drawImageCentered(leftData, 0, pageHeight - 250);
+  const yLeftEnd = await drawImageCentered(leftData, 150, pageHeight - 350);
   drawLogo(pageWidth - 100, 05, 80);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
@@ -218,7 +218,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Pagina 3: Right lens
   pdf.addPage();
   fillBlack();
-  const yRightEnd = await drawImageCentered(rightData, 0, pageHeight - 250);
+  const yRightEnd = await drawImageCentered(rightData, 150, pageHeight - 350);
   drawLogo(pageWidth - 100, 05, 80);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
