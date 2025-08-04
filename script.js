@@ -113,11 +113,29 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const logoUrl = "Logo PDF.png";
+
+  const lensDescriptions = {
+    "IronGlass Red P": {
+      text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series van Sovjet-lenzen met maximale karakterweergave.",
+      url: "https://tvlrental.nl/ironglassredp/"
+    },
+    "IronGlass Zeiss Jena": {
+      text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie.",
+      url: "https://tvlrental.nl/ironglasszeissjena/"
+    }
+  };
 
   function fillBlack() {
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  }
+
+  function addLogo(pdf, logoImg) {
+    const logoWidth = 80;
+    const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
+    const x = pageWidth - logoWidth - 20;
+    const y = 20;
+    pdf.addImage(logoImg, "PNG", x, y, logoWidth, logoHeight);
   }
 
   async function loadImage(url) {
@@ -145,54 +163,57 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     });
   }
 
-  const logo = await loadImage(logoUrl);
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
   const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
   const leftData = await renderImageData(leftImg);
   const rightData = await renderImageData(rightImg);
+  const logoImg = await loadImage("Logo PDF.png");
 
-  const drawLogo = () => {
-    const logoWidth = 100;
-    const logoHeight = (logo.height / logo.width) * logoWidth;
-    const x = pageWidth - logoWidth - 20;
-    const y = pageHeight - logoHeight - 20;
-    pdf.addImage(logo, "PNG", x, y, logoWidth, logoHeight);
-  };
-
-  // Pagina 1: Split
+  // --- Pagina 1: splitbeeld ---
   fillBlack();
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(16);
+  pdf.setFontSize(14);
   pdf.text(leftLabel, 40, 40);
   pdf.text(rightLabel, pageWidth - 40 - pdf.getTextWidth(rightLabel), 40);
-  pdf.addImage(splitData, "JPEG", 0, 60, pageWidth, pageHeight - 120);
-  drawLogo();
-  pdf.setFontSize(12);
-  pdf.textWithLink("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center", url: "https://tvlrental.nl" });
+  pdf.addImage(splitData, "JPEG", 0, 60, pageWidth, pageHeight - 100);
+  pdf.setFontSize(10);
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Pagina 2: Left
+  // --- Pagina 2: linkerbeeld ---
   pdf.addPage();
   fillBlack();
+  addLogo(pdf, logoImg);
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(16);
-  pdf.text(leftLabel, 40, 40);
-  pdf.setFontSize(12);
-  pdf.text("De IronGlass RED P set is een zeldzame vondst...", 40, 60, { maxWidth: pageWidth - 80 });
-  pdf.textWithLink("tvlrental.nl/ironglassredp", 40, 80, { url: "https://tvlrental.nl/ironglassredp" });
-  pdf.addImage(leftData, "JPEG", 0, 100, pageWidth, pageHeight - 140);
-  drawLogo();
+  pdf.setFontSize(14);
+  pdf.text(leftLabel, pageWidth / 2, 40, { align: "center" });
+  pdf.addImage(leftData, "JPEG", 0, 60, pageWidth, pageHeight - 140);
 
-  // Pagina 3: Right
+  const leftLens = leftLabel.split(" ")[1];
+  const leftInfo = lensDescriptions[leftLens];
+  if (leftInfo) {
+    pdf.setFontSize(10);
+    pdf.text(leftInfo.text, 40, pageHeight - 40, { maxWidth: pageWidth - 80 });
+    pdf.setTextColor(150, 200, 255);
+    pdf.textWithLink("Klik hier voor meer info", 40, pageHeight - 25, { url: leftInfo.url });
+  }
+
+  // --- Pagina 3: rechterbeeld ---
   pdf.addPage();
   fillBlack();
+  addLogo(pdf, logoImg);
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(16);
-  pdf.text(rightLabel, 40, 40);
-  pdf.setFontSize(12);
-  pdf.text("De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen...", 40, 60, { maxWidth: pageWidth - 80 });
-  pdf.textWithLink("tvlrental.nl/ironglasszeissjena", 40, 80, { url: "https://tvlrental.nl/ironglasszeissjena" });
-  pdf.addImage(rightData, "JPEG", 0, 100, pageWidth, pageHeight - 140);
-  drawLogo();
+  pdf.setFontSize(14);
+  pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" });
+  pdf.addImage(rightData, "JPEG", 0, 60, pageWidth, pageHeight - 140);
+
+  const rightLens = rightLabel.split(" ")[1];
+  const rightInfo = lensDescriptions[rightLens];
+  if (rightInfo) {
+    pdf.setFontSize(10);
+    pdf.text(rightInfo.text, 40, pageHeight - 40, { maxWidth: pageWidth - 80 });
+    pdf.setTextColor(150, 200, 255);
+    pdf.textWithLink("Klik hier voor meer info", 40, pageHeight - 25, { url: rightInfo.url });
+  }
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
