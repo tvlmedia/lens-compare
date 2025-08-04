@@ -1,4 +1,3 @@
-
 const lenses = {
   "Cooke Panchro FF": "images/cooke_panchro.jpg",
   "DZO Vespid": "images/dzo_vespid.jpg",
