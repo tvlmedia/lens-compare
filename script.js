@@ -110,47 +110,51 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const rightLabel = document.getElementById("rightLabel").textContent;
 
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({
-    orientation: "landscape",
-    unit: "px",
-    format: "a4"
-  });
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
 
-  // Pagina 1: splitscreen canvas
+  // Pagina 1: Split view
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const splitWidth = pdf.internal.pageSize.getWidth();
-  const splitHeight = splitWidth * (splitCanvas.height / splitCanvas.width);
-  pdf.addImage(splitCanvas.toDataURL("image/jpeg", 1.0), "JPEG", 0, 60, splitWidth, splitHeight - 60);
+  const splitImg = splitCanvas.toDataURL("image/jpeg", 1.0);
+  const imgHeight = pageHeight - 100;
 
-  pdf.setFontSize(14);
+  pdf.setFontSize(16);
+  pdf.setTextColor(40);
   pdf.text(leftLabel, 40, 40);
-  pdf.text(rightLabel, splitWidth - 250, 40);
-  pdf.setFontSize(10);
-  pdf.text("tvlrental.nl", splitWidth / 2, splitHeight + 20, { align: "center" });
+  pdf.text(rightLabel, pageWidth - 40 - pdf.getTextWidth(rightLabel), 40);
+  pdf.addImage(splitImg, "JPEG", 0, 60, pageWidth, imgHeight);
+  pdf.setFontSize(12);
+  pdf.setTextColor(100);
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Pagina 2: alleen linkerbeeld
+  // Pagina 2: Linker lens
+  const leftImgData = await renderSingleImageCanvas(leftImg);
   pdf.addPage("a4", "landscape");
-  const leftOnlyCanvas = await renderSingleImageCanvas(leftImg);
-  pdf.addImage(leftOnlyCanvas, "JPEG", 0, 60, splitWidth, splitHeight - 60);
-  pdf.setFontSize(14);
-  pdf.text(leftLabel, 40, 40);
-  pdf.setFontSize(10);
-  pdf.text("tvlrental.nl", splitWidth / 2, splitHeight + 20, { align: "center" });
+  pdf.setFontSize(16);
+  pdf.setTextColor(40);
+  pdf.text(leftLabel, pageWidth / 2, 40, { align: "center" });
+  pdf.addImage(leftImgData, "JPEG", 0, 60, pageWidth, imgHeight);
+  pdf.setFontSize(12);
+  pdf.setTextColor(100);
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Pagina 3: alleen rechterbeeld
+  // Pagina 3: Rechter lens
+  const rightImgData = await renderSingleImageCanvas(rightImg);
   pdf.addPage("a4", "landscape");
-  const rightOnlyCanvas = await renderSingleImageCanvas(rightImg);
-  pdf.addImage(rightOnlyCanvas, "JPEG", 0, 60, splitWidth, splitHeight - 60);
-  pdf.setFontSize(14);
-  pdf.text(rightLabel, 40, 40);
-  pdf.setFontSize(10);
-  pdf.text("tvlrental.nl", splitWidth / 2, splitHeight + 20, { align: "center" });
+  pdf.setFontSize(16);
+  pdf.setTextColor(40);
+  pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" });
+  pdf.addImage(rightImgData, "JPEG", 0, 60, pageWidth, imgHeight);
+  pdf.setFontSize(12);
+  pdf.setTextColor(100);
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
 });
 
-// Hulpfunctie om losse afbeelding op canvas te zetten
+// Extra helperfunctie (alleen 1x toevoegen)
 async function renderSingleImageCanvas(imgElement) {
   return new Promise(resolve => {
     const canvas = document.createElement("canvas");
