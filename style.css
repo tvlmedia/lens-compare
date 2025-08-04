@@ -41,12 +41,11 @@ select {
   height: 540px;
 }
 
-#beforeImage img,
-#afterImage img {
+#beforeImage img, #afterImage img {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: 960px;
+  height: 540px;
+  object-fit: none;
   top: 0;
   left: 0;
 }
@@ -121,4 +120,17 @@ select {
 * {
   -webkit-user-drag: none;
   user-select: none;
+}
+
+#toggleButton {
+  padding: 6px 12px;
+  background: #444;
+  color: white;
+  border: 1px solid #666;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+#toggleButton:hover {
+  background: #666;
 }

@@ -74,3 +74,12 @@ window.addEventListener("mousemove", e => {
 });
 
 updateImages();
+
+
+document.getElementById("toggleButton").addEventListener("click", () => {
+  const leftValue = leftSelect.value;
+  const rightValue = rightSelect.value;
+  leftSelect.value = rightValue;
+  rightSelect.value = leftValue;
+  updateImages();
+});
