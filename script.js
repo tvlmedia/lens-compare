@@ -9,8 +9,8 @@ const lenses = [
 ];
 
 const notes = {
-    "red_p_35mm": "Red P = 37mm (gematcht op 35mm)",
-    "zeiss_jena_35mm": "Zeiss Jena = echte 35mm",
+    "ironglass_red_p_35mm": "Red P = 37mm (gematcht op 35mm)",
+    "ironglass_zeiss_jena_35mm": "Zeiss Jena = echte 35mm",
     "cooke_panchro_ff_25mm": "Cooke Panchro = 32mm gematcht op 25mm"
 };
 
@@ -49,8 +49,8 @@ function updateImages() {
     const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
     const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
-    beforeImgTag.src = imgRight;
-    afterImgTag.src = imgLeft;
+    beforeImgTag.src = imgLeft;
+    afterImgTag.src = imgRight;
 
     const leftNote = notes[`${leftLens}_${focalLength}`] ? ` (${notes[`${leftLens}_${focalLength}`]})` : "";
     const rightNote = notes[`${rightLens}_${focalLength}`] ? ` (${notes[`${rightLens}_${focalLength}`]})` : "";
