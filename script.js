@@ -32,18 +32,26 @@ imageRight.style.clipPath = "inset(0 0 0 50%)";
 lensLeft.onchange = () => imageLeft.src = lensLeft.value;
 lensRight.onchange = () => imageRight.src = lensRight.value;
 
-container.addEventListener("mousemove", (e) => {
+let isDragging = false;
+
+const updateSlider = (clientX) => {
   const rect = container.getBoundingClientRect();
-  const x = e.clientX - rect.left;
+  const x = clientX - rect.left;
   const percent = Math.max(0, Math.min(1, x / rect.width));
   imageRight.style.clipPath = `inset(0 0 0 ${percent * 100}%)`;
   slider.style.left = `${percent * 100}%`;
+};
+
+container.addEventListener("mousedown", () => isDragging = true);
+container.addEventListener("mouseup", () => isDragging = false);
+container.addEventListener("mouseleave", () => isDragging = false);
+container.addEventListener("mousemove", (e) => {
+  if (isDragging) updateSlider(e.clientX);
 });
 
+container.addEventListener("touchstart", () => isDragging = true);
+container.addEventListener("touchend", () => isDragging = false);
+container.addEventListener("touchcancel", () => isDragging = false);
 container.addEventListener("touchmove", (e) => {
-  const rect = container.getBoundingClientRect();
-  const x = e.touches[0].clientX - rect.left;
-  const percent = Math.max(0, Math.min(1, x / rect.width));
-  imageRight.style.clipPath = `inset(0 0 0 ${percent * 100}%)`;
-  slider.style.left = `${percent * 100}%`;
+  if (isDragging) updateSlider(e.touches[0].clientX);
 });
