@@ -69,3 +69,13 @@ body {
   font-size: 14px;
   color: #ccc;
 }
+
+#explanationBox {
+  margin-top: 10px;
+  max-width: 960px;
+  font-size: 13px;
+  color: #999;
+  padding: 10px;
+  background: #1a1a1a;
+  border-radius: 5px;
+}
