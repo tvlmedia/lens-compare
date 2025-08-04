@@ -1,3 +1,4 @@
+
 const lenses = {
   "Cooke Panchro FF": "images/cooke_panchro.jpg",
   "DZO Vespid": "images/dzo_vespid.jpg",
@@ -26,6 +27,10 @@ lensLeft.selectedIndex = 0;
 lensRight.selectedIndex = 1;
 imageLeft.src = lensLeft.value;
 imageRight.src = lensRight.value;
+
+// Zet startpositie slider & masker op 50%
+afterWrapper.style.width = "50%";
+slider.style.left = "50%";
 
 lensLeft.onchange = () => imageLeft.src = lensLeft.value;
 lensRight.onchange = () => imageRight.src = lensRight.value;
