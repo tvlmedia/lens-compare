@@ -214,7 +214,7 @@ pdf.text(`${leftLabel}  vs  ${rightLabel}`, pageWidth / 2, 30, { align: "center"
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(leftLabel, pageWidth / 2, 30, { align: "center" });
-  drawDescriptionBlock("IronGlass Red P", yLeftEnd + 10);
+ drawDescriptionBlock(leftSelect.value, yLeftEnd + 10);
 
   // Pagina 3: Right lens
   pdf.addPage();
@@ -224,7 +224,7 @@ pdf.text(`${leftLabel}  vs  ${rightLabel}`, pageWidth / 2, 30, { align: "center"
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
-  drawDescriptionBlock("IronGlass Zeiss Jena", yRightEnd + 10);
+ drawDescriptionBlock(rightSelect.value, yRightEnd + 10);
 
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
