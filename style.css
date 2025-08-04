@@ -45,12 +45,12 @@ select {
 
 #beforeImage img,
 #afterImage img {
-  position: absolute;
   width: 100%;
   height: 100%;
   object-fit: contain;
   top: 0;
   left: 0;
+  position: absolute;
 }
 
 #afterWrapper {
@@ -60,6 +60,7 @@ select {
   width: 50%;
   height: 100%;
   overflow: hidden;
+  z-index: 2;
 }
 
 #slider {
@@ -138,23 +139,19 @@ select {
   font-size: 14px;
   cursor: pointer;
 }
-
 #toggleButton:hover {
   background: #666;
 }
 
-/* === Fullscreen Fix === */
+/* ================= FULLSCREEN ================= */
+
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100vw !important;
+  height: 100vh !important;
   max-width: none;
   max-height: none;
   background: black;
-  z-index: 999;
 }
 
 :fullscreen #beforeImage,
@@ -165,18 +162,17 @@ select {
 :-webkit-full-screen #afterImage,
 :-webkit-full-screen #afterWrapper,
 :-webkit-full-screen #slider {
-  position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
 }
 
 :fullscreen #afterWrapper,
 :-webkit-full-screen #afterWrapper {
-  width: 50%;
+  width: 50% !important;
   overflow: hidden;
-  z-index: 2;
 }
 
 :fullscreen #beforeImage img,
