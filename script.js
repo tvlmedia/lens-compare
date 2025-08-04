@@ -102,118 +102,113 @@ document.getElementById("fullscreenButton").addEventListener("click", () => {
     }
   }
 });
-// PDF export functie met nette layout en logo + beschrijvingen
+// PDF DOWNLOAD MET LAYOUT FIXES — TVL RENTAL
+
+const lensDescriptions = {
+  "IronGlass Zeiss Jena": {
+    text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
+    url: "https://tvlrental.nl/ironglasszeissjena/"
+  },
+  "IronGlass Red P": {
+    text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series van Sovjet-lenzen (Helios, Mir, Jupiter) met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – dit zijn de lenzen zoals ze vroeger werden gebouwd, met alle optische imperfecties, flare-gevoeligheid en ziel die je mag verwachten van pure vintage glasoptiek.",
+    url: "https://tvlrental.nl/ironglassredp/"
+  }
+};
 
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+
   const comparison = document.getElementById("comparisonWrapper");
   const leftImg = document.getElementById("afterImgTag");
   const rightImg = document.getElementById("beforeImgTag");
   const leftLabel = document.getElementById("leftLabel").textContent;
   const rightLabel = document.getElementById("rightLabel").textContent;
 
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
+  const logoUrl = "logo_pdf.png"; // recht formaat!
 
-  const logoUrl = "Logo PDF.png";
+  const loadImage = url => new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.src = url;
+  });
 
-  // Lens links en beschrijvingen
-  const lensDescriptions = {
-    "IronGlass Zeiss Jena": {
-      text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
-      url: "https://tvlrental.nl/ironglasszeissjena/"
-    },
-    "IronGlass Red P": {
-      text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series van Sovjet-lenzen (Helios, Mir, Jupiter) met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – dit zijn de lenzen zoals ze vroeger werden gebouwd, met alle optische imperfecties, flare-gevoeligheid en ziel die je mag verwachten van pure vintage glasoptiek.",
-      url: "https://tvlrental.nl/ironglassredp/"
-    }
+  const renderImageData = imgEl => new Promise(resolve => {
+    const canvas = document.createElement("canvas");
+    canvas.width = imgEl.naturalWidth || 1920;
+    canvas.height = imgEl.naturalHeight || 1080;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 1.0));
+    };
+    img.src = imgEl.src;
+  });
+
+  const drawImageFull = (src, y = 80) => {
+    const imgRatio = src.width / src.height;
+    const targetWidth = pageWidth;
+    const targetHeight = pageWidth / imgRatio;
+    const height = Math.min(targetHeight, pageHeight - y - 60);
+    pdf.addImage(src.src, "JPEG", 0, y, pageWidth, height);
+    return y + height;
   };
 
-  // Helpers
-  async function loadImage(url) {
-    return new Promise(resolve => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => resolve(img);
-      img.src = url;
-    });
-  }
-
-  function fillBlack() {
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, pageHeight, "F");
-  }
-
-  async function renderImageData(imgEl) {
-    return new Promise(resolve => {
-      const canvas = document.createElement("canvas");
-      canvas.width = imgEl.naturalWidth || 1920;
-      canvas.height = imgEl.naturalHeight || 1080;
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 1.0));
-      };
-      img.src = imgEl.src;
-    });
-  }
-
-  const logo = await loadImage(logoUrl);
-  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const splitImg = splitCanvas.toDataURL("image/jpeg", 1.0);
-  const leftImgData = await renderImageData(leftImg);
-  const rightImgData = await renderImageData(rightImg);
-
-  function drawLogo() {
-    const logoWidth = 120 * 3;
-    const logoHeight = (logo.height / logo.width) * logoWidth;
+  const drawLogoSmall = async () => {
+    const logo = await loadImage(logoUrl);
+    const logoWidth = 100;
+    const logoHeight = logo.height * (logoWidth / logo.width);
     pdf.addImage(logo, "PNG", pageWidth - logoWidth - 20, pageHeight - logoHeight - 20, logoWidth, logoHeight);
-  }
+  };
 
-  function drawTextBlock(text, link, yStart) {
+  const drawLensText = (label, descObj) => {
+    pdf.setFontSize(16);
     pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(10);
-    const lines = pdf.splitTextToSize(text, pageWidth - 80);
-    pdf.text(lines, pageWidth / 2, yStart, { align: "center" });
-    pdf.setTextColor(100, 150, 255);
-    pdf.textWithLink(link, pageWidth / 2, yStart + lines.length * 12 + 8, { url: link, align: "center" });
-  }
+    pdf.text(label, pageWidth / 2, 50, { align: "center" });
 
-  // Pagina 1 – split
-  fillBlack();
-  pdf.addImage(splitImg, "JPEG", 0, 60, pageWidth, pageHeight - 140);
+    pdf.setFontSize(12);
+    const textLines = pdf.splitTextToSize(descObj.text, pageWidth - 100);
+    pdf.text(textLines, 50, 70);
+
+    pdf.setTextColor(100, 150, 255);
+    pdf.textWithLink(descObj.url, 50, 80 + textLines.length * 14, { url: descObj.url });
+  };
+
+  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+  const split = await loadImage(splitCanvas.toDataURL("image/jpeg", 1.0));
+  const left = await loadImage(await renderImageData(leftImg));
+  const right = await loadImage(await renderImageData(rightImg));
+
+  // PAGINA 1: SPLIT
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16);
   pdf.text(leftLabel, 40, 40);
   pdf.text(rightLabel, pageWidth - 40 - pdf.getTextWidth(rightLabel), 40);
-  drawLogo();
-  pdf.setFontSize(12);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 10, { align: "center" });
+  drawImageFull(split);
+  await drawLogoSmall();
 
-  // Pagina 2 – left only
+  // PAGINA 2: LEFT
   pdf.addPage();
-  fillBlack();
-  pdf.setFontSize(16);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(leftLabel, pageWidth / 2, 40, { align: "center" });
-  pdf.addImage(leftImgData, "JPEG", 0, 60, pageWidth, pageHeight - 160);
-  drawTextBlock(lensDescriptions[leftLabel.split(": ")[1]]?.text || "", lensDescriptions[leftLabel.split(": ")[1]]?.url || "", pageHeight - 90);
-  drawLogo();
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  drawLensText(leftLabel, lensDescriptions[leftSelect.value]);
+  drawImageFull(left);
+  await drawLogoSmall();
 
-  // Pagina 3 – right only
+  // PAGINA 3: RIGHT
   pdf.addPage();
-  fillBlack();
-  pdf.setFontSize(16);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(rightLabel, pageWidth / 2, 40, { align: "center" });
-  pdf.addImage(rightImgData, "JPEG", 0, 60, pageWidth, pageHeight - 160);
-  drawTextBlock(lensDescriptions[rightLabel.split(": ")[1]]?.text || "", lensDescriptions[rightLabel.split(": ")[1]]?.url || "", pageHeight - 90);
-  drawLogo();
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  drawLensText(rightLabel, lensDescriptions[rightSelect.value]);
+  drawImageFull(right);
+  await drawLogoSmall();
 
-  const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
-  pdf.save(filename);
+  pdf.save(`lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`);
 });
