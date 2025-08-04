@@ -47,8 +47,8 @@ function updateImages() {
     const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
     const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
-    beforeImgTag.src = imgLeft;
-    afterImgTag.src = imgRight;
+    beforeImgTag.src = imgRight;
+    afterImgTag.src = imgLeft;
 
     const leftLabel = notes[`${leftLens}_${focalLength}`]?.split("=")[1]?.trim() || `${focalLength}`;
     const rightLabel = notes[`${rightLens}_${focalLength}`]?.split("=")[1]?.trim() || `${focalLength}`;
