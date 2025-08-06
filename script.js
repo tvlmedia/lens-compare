@@ -209,7 +209,3 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // 6. Download PDF
   pdf.save("lens_comparison.pdf");
 });
-
-
-
-Kun jij hele script maken?
