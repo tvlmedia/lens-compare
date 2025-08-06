@@ -51,31 +51,36 @@ select:focus {
   max-width: 960px;
   aspect-ratio: 16 / 9;
   margin: 0 auto;
-  overflow: hidden;
   background: #000;
+  overflow: hidden;
 }
 
+/* Containers met absolute positionering */
 #beforeImage,
 #afterWrapper,
-#afterImage,
-#beforeImgTag,
-#afterImgTag {
+#afterImage {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  display: block;
-  z-index: 1;
 }
 
+/* IMG tags zelf */
+#beforeImgTag,
+#afterImgTag {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Slider */
 #afterWrapper {
   overflow: hidden;
   z-index: 2;
 }
 
-/* ========== SLIDER ========== */
 #slider {
   position: absolute;
   top: 0;
@@ -99,7 +104,7 @@ select:focus {
   transform: translate(-50%, -50%);
 }
 
-/* ========== INFO ONDER BEELD ========== */
+/* ========== INFO & UITLEG ========== */
 #infoContainer {
   display: flex;
   justify-content: space-between;
@@ -125,7 +130,6 @@ select:focus {
   white-space: nowrap;
 }
 
-/* ========== UITLEGBOX ========== */
 #explanationBox {
   margin-top: 16px;
   max-width: 960px;
@@ -141,7 +145,7 @@ select:focus {
   text-align: center;
 }
 
-/* ========== RESPONSIVE (MOBIEL) ========== */
+/* ========== RESPONSIVE ========== */
 @media (max-width: 767px) {
   .controls {
     flex-direction: column;
