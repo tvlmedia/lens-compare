@@ -227,26 +227,26 @@ select:focus {
   object-fit: contain;
 }
 
-/* ✅ MOBILE FIX */
 @media screen and (max-width: 767px) {
   #comparisonWrapper {
+    position: relative;
     width: 100%;
-    height: auto;
     aspect-ratio: 16 / 9;
+    overflow: hidden;
   }
 
   #beforeImage,
-  #afterImage,
-  #afterWrapper {
+  #afterWrapper,
+  #afterImage {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
   }
 
   #afterWrapper {
-    width: 50% !important; /* ✅ FIX */
-    position: absolute;
-    top: 0;
-    left: 0;
+    width: 50% !important;
     overflow: hidden;
     z-index: 2;
   }
@@ -255,16 +255,17 @@ select:focus {
   #afterImage img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
   }
 
   #slider {
     width: 2px;
+    z-index: 3;
   }
 
   #slider::before {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
   }
 
   #infoContainer {
