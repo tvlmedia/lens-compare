@@ -436,7 +436,14 @@ html, body {
 }
 @media (max-width: 767px) {
   #comparisonWrapper {
-    transform: scale(0.35);
+    transform: scale(0.33);
+    transform-origin: top center;
+  }
+}
+@media (max-width: 767px) {
+  #comparisonWrapper,
+  #infoContainer {
+    transform: scale(0.33);
     transform-origin: top center;
   }
 }
