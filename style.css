@@ -249,3 +249,34 @@ select:hover,
     object-fit: contain;
   }
 }
+/* Mobiel fullscreen fix voor beide images */
+@media screen and (max-width: 767px) {
+  body.mobile-mode:fullscreen #comparisonWrapper,
+  body.mobile-mode:-webkit-full-screen #comparisonWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    max-height: 100vh;
+  }
+
+  #beforeImage,
+  #afterImage {
+    width: 100%;
+    height: auto;
+  }
+
+  #beforeImage img,
+  #afterImage img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  #afterWrapper {
+    height: auto;
+  }
+}
