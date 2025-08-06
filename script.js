@@ -173,17 +173,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     pdf.addImage(logo, "PNG", x, y, w, h);
   }
 
-  function drawDescription(lens, y) {
-    const info = lensDescriptions[lens];
-    if (!info) return;
-    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
-    const topMargin = 30;
-    const spacing = lines.length * 12 + 14;
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(10);
-    pdf.text(lines, 50, y + topMargin);
-    pdf.setTextColor(80, 160, 255);
-    pdf.textWithLink("Klik hier voor meer info", 50, y + topMargin + spacing, { url: info.url });
+  pdf.text(lines, 50, yStart + 10);
   }
 
   const logoImg = await loadImage(logoUrl);
