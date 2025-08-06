@@ -230,6 +230,8 @@ pdf.textWithLink("Klik hier voor meer info", 50, yStart + topMargin + spacing, {
   pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
   drawDescriptionBlock(rightSelect.value, yRightEnd + 10);
 
-  const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
+  const safeLeft = left.replace(/\s+/g, "");
+const safeRight = right.replace(/\s+/g, "");
+const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
   pdf.save(filename);
 });
