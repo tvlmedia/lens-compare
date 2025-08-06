@@ -233,11 +233,32 @@ select:focus {
     width: 100%;
     height: auto;
     aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
   }
 
-  #beforeImage,
-  #afterImage,
+  #beforeImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   #afterWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 2;
+  }
+
+  #afterImage {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
   }
@@ -249,16 +270,9 @@ select:focus {
     object-fit: contain;
   }
 
-  #afterWrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: 2;
-  }
-
   #slider {
     width: 2px;
+    z-index: 10;
   }
 
   #slider::before {
@@ -278,7 +292,4 @@ select:focus {
     width: 100%;
     text-align: center;
   }
-} 
-
-
-
+}
