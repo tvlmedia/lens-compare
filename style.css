@@ -203,3 +203,32 @@ select:focus {
     background-color: #000;
   }
 }
+#comparisonWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-width: 960px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: black; /* fallback voor loading */
+}
+
+#comparisonWrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+#beforeImage,
+#afterWrapper,
+#afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+@media screen and (max-width: 768px) {
+  #comparisonWrapper {
+    max-height: 60vh;
+  }
+}
