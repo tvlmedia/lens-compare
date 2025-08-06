@@ -234,3 +234,37 @@ button:hover,
     object-fit: contain !important;
   }
 }
+
+/* Mobile scaling fix */
+@media screen and (max-width: 767px) {
+  #comparisonWrapper {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    max-height: 180px;
+  }
+
+  #beforeImage, #afterImage {
+    width: 100%;
+    height: 100%;
+  }
+
+  #infoContainer {
+    flex-direction: column;
+    width: 100%;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+
+  #leftLabel, #rightLabel {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+  }
+}
