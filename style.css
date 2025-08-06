@@ -409,3 +409,8 @@ select:focus {
     margin-top: 100px; /* iets extra ruimte boven op mobiel */
   }
 }
+.lens-frame-wrapper {
+  max-width: 100vw !important;
+  width: 100vw !important;
+  margin-left: calc(-50vw + 50%) !important;
+}
