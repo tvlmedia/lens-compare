@@ -284,3 +284,37 @@ select:hover, #toggleButton:hover {
   background: white;
   z-index: 10;
 }
+#comparisonWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+}
+
+#afterWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+#afterImgTag,
+#beforeImgTag {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: white;
+  z-index: 3;
+  cursor: ew-resize;
+}
