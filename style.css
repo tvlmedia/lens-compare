@@ -1,4 +1,4 @@
-/* ========== Algemene opmaak ========== */
+/* Algemene opmaak */
 * {
   -webkit-user-drag: none;
   user-select: none;
@@ -16,7 +16,7 @@ body {
   line-height: 1.6;
 }
 
-/* ========== Controls ========== */
+/* Controls */
 .controls {
   margin: 20px;
   display: flex;
@@ -24,7 +24,7 @@ body {
   flex-wrap: wrap;
 }
 
-select, #toggleButton, #fullscreenButton, #downloadPdfButton {
+select, #toggleButton {
   padding: 6px 12px;
   background: #1a1a1a;
   color: white;
@@ -34,15 +34,12 @@ select, #toggleButton, #fullscreenButton, #downloadPdfButton {
   cursor: pointer;
 }
 
-select:hover,
-#toggleButton:hover,
-#fullscreenButton:hover,
-#downloadPdfButton:hover {
+select:hover, #toggleButton:hover {
   background: #666;
   border-color: #666;
 }
 
-/* ========== Wrapper en afbeeldingen ========== */
+/* Wrapper en afbeeldingen */
 #comparisonWrapper {
   position: relative;
   width: 960px;
@@ -79,7 +76,7 @@ select:hover,
   z-index: 2;
 }
 
-/* ========== Slider ========== */
+/* Slider */
 #slider {
   position: absolute;
   top: 0;
@@ -98,7 +95,7 @@ select:hover,
   display: none;
 }
 
-/* ========== Info labels ========== */
+/* Info labels */
 #infoContainer {
   display: flex;
   justify-content: space-between;
@@ -115,7 +112,7 @@ select:hover,
   text-align: center;
 }
 
-/* ========== Uitlegtekst ========== */
+/* Uitlegbox */
 #explanationBox {
   margin-top: 12px;
   max-width: 960px;
@@ -128,43 +125,7 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ========== Fullscreen scaling ========== */
-:fullscreen #comparisonWrapper,
-:-webkit-full-screen #comparisonWrapper {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  max-height: none;
-}
-
-:fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage,
-:fullscreen #afterImage,
-:-webkit-full-screen #afterImage {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-:fullscreen #afterWrapper,
-:-webkit-full-screen #afterWrapper {
-  width: 50vw;
-  height: 100%;
-  overflow: hidden;
-  z-index: 2;
-}
-
-:fullscreen #beforeImage img,
-:-webkit-full-screen #beforeImage img,
-:fullscreen #afterImage img,
-:-webkit-full-screen #afterImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* ========== Print styling ========== */
+/* Print */
 @media print {
   body {
     background: white !important;
@@ -192,43 +153,78 @@ select:hover,
   }
 }
 
-/* ========== Mobile scaling via JS class ========== */
-.mobile-mode #comparisonWrapper {
-  width: 100vw;
-  height: auto;
-  aspect-ratio: 16 / 9;
+/* Mobiele weergave */
+@media (max-width: 768px) {
+  #comparisonWrapper {
+    width: 100vw;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  #beforeImage,
+  #afterImage {
+    width: 100vw;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  #beforeImage img,
+  #afterImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  #afterWrapper {
+    width: 50vw;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  #infoContainer {
+    width: 100%;
+    padding: 0 16px;
+    flex-direction: column;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  #leftLabel, #rightLabel {
+    width: 100%;
+    margin: 4px 0;
+  }
 }
 
-.mobile-mode #beforeImage,
-.mobile-mode #afterImage {
-  width: 100vw;
-  height: auto;
-  aspect-ratio: 16 / 9;
+/* Fullscreen fix – los van mobiele regels */
+:fullscreen #comparisonWrapper,
+:-webkit-full-screen #comparisonWrapper {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none;
+  max-height: none;
 }
 
-.mobile-mode #beforeImage img,
-.mobile-mode #afterImage img {
+:fullscreen #beforeImage,
+:-webkit-full-screen #beforeImage,
+:fullscreen #afterImage,
+:-webkit-full-screen #afterImage {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+:fullscreen #afterWrapper,
+:-webkit-full-screen #afterWrapper {
+  width: 50vw !important;
+  height: 100% !important;
+  overflow: hidden;
+  z-index: 2;
+}
+
+:fullscreen #beforeImage img,
+:-webkit-full-screen #beforeImage img,
+:fullscreen #afterImage img,
+:-webkit-full-screen #afterImage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-.mobile-mode #afterWrapper {
-  width: 50vw;
-  height: auto;
-  aspect-ratio: 16 / 9;
-}
-
-.mobile-mode #infoContainer {
-  width: 100%;
-  padding: 0 16px;
-  flex-direction: column;
-  font-size: 14px;
-  text-align: center;
-}
-
-.mobile-mode #leftLabel,
-.mobile-mode #rightLabel {
-  width: 100%;
-  margin: 4px 0;
 }
