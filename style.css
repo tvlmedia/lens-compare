@@ -2,7 +2,6 @@
 * {
   -webkit-user-drag: none;
   user-select: none;
-  box-sizing: border-box;
 }
 
 body {
@@ -43,39 +42,41 @@ select:hover,
   border-color: #666;
 }
 
-/* ========== Wrapper en afbeeldingen (basis PC weergave) ========== */
+/* ========== Wrapper en afbeeldingen ========== */
 #comparisonWrapper {
   position: relative;
   width: 960px;
   height: 540px;
-  background: black;
   overflow: hidden;
+  background: #000;
 }
 
-#beforeImage,
-#afterWrapper {
+#beforeImage, #afterImage {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
   width: 100%;
-  overflow: hidden;
-}
-
-#afterWrapper {
-  width: 50%;
-  z-index: 2;
-  pointer-events: none;
+  height: 100%;
 }
 
 #beforeImage img,
-#afterWrapper img {
-  position: absolute;
-  top: 0;
-  left: 0;
+#afterImage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#afterWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
 }
 
 /* ========== Slider ========== */
@@ -92,7 +93,12 @@ select:hover,
   border-radius: 0;
 }
 
-/* ========== Labels ========== */
+#slider::before,
+#slider::after {
+  display: none;
+}
+
+/* ========== Info labels ========== */
 #infoContainer {
   display: flex;
   justify-content: space-between;
@@ -122,77 +128,56 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ========== Fullscreen (desktop + mobiel fullscreen) ========== */
+/* ========== Fullscreen scaling ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
   height: 100vh;
+  position: relative;
+  max-width: none;
+  max-height: none;
 }
 
 :fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage,
-:fullscreen #afterWrapper,
-:-webkit-full-screen #afterWrapper {
-  width: 100%;
-  height: 100%;
+:-webkit-full-screen #beforeImage {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
-:fullscreen #afterWrapper {
-  width: 50vw;
+:fullscreen #afterWrapper,
+:-webkit-full-screen #afterWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+:fullscreen #afterImage,
+:-webkit-full-screen #afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 :fullscreen #beforeImage img,
-:fullscreen #afterWrapper img,
+:fullscreen #afterImage img,
 :-webkit-full-screen #beforeImage img,
-:-webkit-full-screen #afterWrapper img {
-  position: absolute;
+:-webkit-full-screen #afterImage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  position: absolute;
   top: 0;
   left: 0;
-}
-
-/* ========== Mobile view (alleen buiten fullscreen) ========== */
-.mobile-mode #comparisonWrapper {
-  width: 100vw;
-  height: auto;
-  aspect-ratio: 16 / 9;
-}
-
-.mobile-mode #beforeImage,
-.mobile-mode #afterWrapper {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-}
-
-.mobile-mode #afterWrapper {
-  width: 50vw;
-}
-
-.mobile-mode #beforeImage img,
-.mobile-mode #afterWrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.mobile-mode #infoContainer {
-  width: 100%;
-  padding: 0 16px;
-  flex-direction: column;
-  font-size: 14px;
-  text-align: center;
-}
-
-.mobile-mode #leftLabel,
-.mobile-mode #rightLabel {
-  width: 100%;
-  margin: 4px 0;
 }
 
 /* ========== Print styling ========== */
@@ -221,4 +206,49 @@ select:hover,
   #comparisonWrapper img {
     object-fit: contain !important;
   }
+}
+
+/* ========== Mobile scaling via JS class ========== */
+.mobile-mode #comparisonWrapper {
+  width: 100vw;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.mobile-mode #beforeImage,
+.mobile-mode #afterImage,
+.mobile-mode #afterWrapper {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  position: relative;
+}
+
+.mobile-mode #afterWrapper {
+  width: 50vw;
+}
+
+.mobile-mode #beforeImage img,
+.mobile-mode #afterImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.mobile-mode #infoContainer {
+  width: 100%;
+  padding: 0 16px;
+  flex-direction: column;
+  font-size: 14px;
+  text-align: center;
+}
+
+.mobile-mode #leftLabel,
+.mobile-mode #rightLabel {
+  width: 100%;
+  margin: 4px 0;
 }
