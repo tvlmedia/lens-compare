@@ -51,22 +51,13 @@ select:hover,
   background: #000;
 }
 
-#beforeImage, #afterImage {
+#beforeImage {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-}
-
-#beforeImage img,
-#afterImage img {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  top: 0;
-  left: 0;
+  z-index: 1;
 }
 
 #afterWrapper {
@@ -77,6 +68,22 @@ select:hover,
   height: 100%;
   overflow: hidden;
   z-index: 2;
+}
+
+#afterImage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#beforeImage img,
+#afterImage img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* ========== Slider ========== */
@@ -128,7 +135,7 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ========== Fullscreen scaling (gefixt) ========== */
+/* ========== Fullscreen scaling ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -138,18 +145,28 @@ select:hover,
 }
 
 :fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage,
-:fullscreen #afterImage,
-:-webkit-full-screen #afterImage,
+:-webkit-full-screen #beforeImage {
+  width: 100%;
+  height: 100%;
+}
+
 :fullscreen #afterWrapper,
 :-webkit-full-screen #afterWrapper {
+  width: 50vw;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+:fullscreen #afterImage,
+:-webkit-full-screen #afterImage {
   width: 100%;
   height: 100%;
 }
 
 :fullscreen #beforeImage img,
-:-webkit-full-screen #beforeImage img,
 :fullscreen #afterImage img,
+:-webkit-full-screen #beforeImage img,
 :-webkit-full-screen #afterImage img {
   width: 100%;
   height: 100%;
@@ -191,11 +208,21 @@ select:hover,
   aspect-ratio: 16 / 9;
 }
 
-.mobile-mode #beforeImage,
-.mobile-mode #afterImage {
+.mobile-mode #beforeImage {
   width: 100vw;
   height: auto;
   aspect-ratio: 16 / 9;
+}
+
+.mobile-mode #afterWrapper {
+  width: 50vw;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.mobile-mode #afterImage {
+  width: 100%;
+  height: 100%;
 }
 
 .mobile-mode #beforeImage img,
@@ -203,12 +230,6 @@ select:hover,
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-.mobile-mode #afterWrapper {
-  width: 50vw;
-  height: auto;
-  aspect-ratio: 16 / 9;
 }
 
 .mobile-mode #infoContainer {
