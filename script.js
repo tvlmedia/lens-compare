@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (GEOPTIMALISEERD - GELIJK AFGESTEMDE PAGINA'S) ======
+// ====== LENS COMPARISON TOOL SCRIPT (GEOPTIMALISEERD - VOLLEDIG) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -57,7 +57,6 @@ function updateImages() {
   afterImgTag.src = imgLeft;
 
   const tStopFormatted = `T${tStopSelect.value}`;
-
   leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
   rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
 }
@@ -73,15 +72,27 @@ focalLengthSelect.value = "35mm";
 updateImages();
 
 let isDragging = false;
+
+function updateSlider(x) {
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const offset = Math.max(0, Math.min(x - rect.left, rect.width));
+  const percent = (offset / rect.width) * 100;
+  afterWrapper.style.width = `${percent}%`;
+  slider.style.left = `${percent}%`;
+}
+
 slider.addEventListener("mousedown", () => isDragging = true);
 window.addEventListener("mouseup", () => isDragging = false);
 window.addEventListener("mousemove", e => {
   if (!isDragging) return;
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const offset = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-  const percent = (offset / rect.width) * 100;
-  afterWrapper.style.width = `${percent}%`;
-  slider.style.left = `${percent}%`;
+  updateSlider(e.clientX);
+});
+
+slider.addEventListener("touchstart", () => isDragging = true);
+window.addEventListener("touchend", () => isDragging = false);
+window.addEventListener("touchmove", e => {
+  if (!isDragging) return;
+  updateSlider(e.touches[0].clientX);
 });
 
 document.getElementById("toggleButton").addEventListener("click", () => {
@@ -92,14 +103,21 @@ document.getElementById("toggleButton").addEventListener("click", () => {
   updateImages();
 });
 
-document.getElementById("downloadPdfButton").addEventListener("click", async () => {
+document.getElementById("fullscreenButton")?.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    comparisonWrapper.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+
+document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
   const comparison = document.getElementById("comparisonWrapper");
   const leftImg = afterImgTag;
   const rightImg = beforeImgTag;
   const leftText = leftLabel.textContent;
   const rightText = rightLabel.textContent;
-
   const left = leftSelect.value;
   const right = rightSelect.value;
   const focal = focalLengthSelect.value;
@@ -108,7 +126,6 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
   const logo = await loadImage(logoUrl);
 
@@ -141,14 +158,11 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     img.src = imgData;
     await new Promise(resolve => img.onload = resolve);
     const aspect = img.width / img.height;
-
     const availableHeight = pageHeight - top - bottom;
     const imgHeight = availableHeight;
     const imgWidth = imgHeight * aspect;
-
     const x = (pageWidth - imgWidth) / 2;
     const y = top;
-
     pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
   }
 
@@ -166,15 +180,12 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     const margin = 20;
     const logoSpace = 150;
     const textWidth = pageWidth - margin - logoSpace;
-
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
-
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(10);
     const lines = pdf.splitTextToSize(text, textWidth);
     pdf.text(lines, margin, pageHeight - barHeight + 20);
-
     if (link) {
       pdf.setTextColor(80, 160, 255);
       pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, { url: link });
@@ -206,14 +217,12 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
 
-  // Page 1
   fillBlack();
-  drawTopBar(`${leftText}  vs  ${rightText}`);
+  drawTopBar(`${leftText} vs ${rightText}`);
   await drawFullWidthImage(splitData);
   drawSiteURL();
   drawBottomLogo();
 
-  // Page 2
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
@@ -221,7 +230,6 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
   drawBottomLogo();
 
-  // Page 3
   pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
@@ -243,6 +251,3 @@ async function loadImage(url) {
     img.src = url;
   });
 }
-slider.addEventListener("mousedown", () => isDragging = true);
-window.addEventListener("mouseup", () => isDragging = false);
-window.addEventListener("mousemove", e => { ... });
