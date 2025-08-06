@@ -1,7 +1,8 @@
-/* Algemene opmaak */
+/* Algemene reset */
 * {
   -webkit-user-drag: none;
   user-select: none;
+  box-sizing: border-box;
 }
 
 body {
@@ -24,7 +25,7 @@ body {
   flex-wrap: wrap;
 }
 
-select, #toggleButton {
+select, #toggleButton, #fullscreenButton, #downloadPdfButton {
   padding: 6px 12px;
   background: #1a1a1a;
   color: white;
@@ -32,20 +33,22 @@ select, #toggleButton {
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
-select:hover, #toggleButton:hover {
+select:hover, #toggleButton:hover, #fullscreenButton:hover, #downloadPdfButton:hover {
   background: #666;
   border-color: #666;
 }
 
-/* Wrapper en afbeeldingen */
+/* Wrapper en images */
 #comparisonWrapper {
   position: relative;
   width: 960px;
   height: 540px;
   overflow: hidden;
   background: #000;
+  user-select: none;
 }
 
 #beforeImage, #afterImage {
@@ -66,6 +69,7 @@ select:hover, #toggleButton:hover {
   left: 0;
 }
 
+/* After wrapper (linker helft van slider) */
 #afterWrapper {
   position: absolute;
   top: 0;
@@ -95,14 +99,13 @@ select:hover, #toggleButton:hover {
   display: none;
 }
 
-/* Info labels */
+/* Info onder afbeelding */
 #infoContainer {
   display: flex;
   justify-content: space-between;
   width: 960px;
   margin-top: 12px;
   padding: 0 40px;
-  box-sizing: border-box;
   font-size: 16px;
   color: #eee;
 }
@@ -112,7 +115,7 @@ select:hover, #toggleButton:hover {
   text-align: center;
 }
 
-/* Uitleg */
+/* Uitlegbox */
 #explanationBox {
   margin-top: 12px;
   max-width: 960px;
@@ -125,7 +128,7 @@ select:hover, #toggleButton:hover {
   line-height: 1.5;
 }
 
-/* Fullscreen scaling fix */
+/* Fullscreen styling */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -138,8 +141,6 @@ select:hover, #toggleButton:hover {
 :-webkit-full-screen #beforeImage,
 :fullscreen #afterImage,
 :-webkit-full-screen #afterImage {
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
 }
@@ -188,34 +189,36 @@ select:hover, #toggleButton:hover {
     object-fit: contain !important;
   }
 }
+
+/* ✅ Mobiele layout — alleen als NIET fullscreen */
 @media (max-width: 768px) {
-  #comparisonWrapper {
+  :not(:fullscreen) #comparisonWrapper {
     width: 100vw;
     height: auto;
     aspect-ratio: 16 / 9;
   }
 
-  #beforeImage,
-  #afterImage {
+  :not(:fullscreen) #beforeImage,
+  :not(:fullscreen) #afterImage {
     width: 100vw;
     height: auto;
     aspect-ratio: 16 / 9;
   }
 
-  #beforeImage img,
-  #afterImage img {
+  :not(:fullscreen) #beforeImage img,
+  :not(:fullscreen) #afterImage img {
     width: 100%;
     height: 100%;
     object-fit: contain;
   }
 
-  #afterWrapper {
+  :not(:fullscreen) #afterWrapper {
     width: 50vw;
     height: auto;
     aspect-ratio: 16 / 9;
   }
 
-  #infoContainer {
+  :not(:fullscreen) #infoContainer {
     width: 100%;
     padding: 0 16px;
     flex-direction: column;
@@ -223,7 +226,8 @@ select:hover, #toggleButton:hover {
     text-align: center;
   }
 
-  #leftLabel, #rightLabel {
+  :not(:fullscreen) #leftLabel,
+  :not(:fullscreen) #rightLabel {
     width: 100%;
     margin: 4px 0;
   }
