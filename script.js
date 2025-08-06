@@ -170,7 +170,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
       pdf.textWithLink("Klik hier voor meer info", 40, 490, { url: link });
 
       const logo = new Image();
-      logo.src = "images/logo_tvlrental.png";
+      logo.src = "images/logo_goed.png";
       await new Promise(resolve => logo.onload = resolve);
       pdf.addImage(logo, "PNG", 840, 410, 80, 80);
     };
