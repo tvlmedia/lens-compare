@@ -7,6 +7,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .controls {
@@ -16,13 +18,37 @@ body {
   flex-wrap: wrap;
 }
 
-select {
-  padding: 6px 12px;
-  background: #1a1a1a;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 4px;
+select, #toggleButton, #fullscreenButton, #downloadPdfButton {
+  padding: 8px 16px;
+  background: #121212;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 6px;
   font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  transition: border 0.2s ease, background 0.2s ease;
+  appearance: none;
+  cursor: pointer;
+}
+
+select:hover, #toggleButton:hover, #fullscreenButton:hover, #downloadPdfButton:hover {
+  border-color: #ff8800;
+  background: #1a1a1a;
+}
+
+select:focus {
+  border-color: #ff8800;
+  box-shadow: 0 0 4px #ff8800;
+}
+
+button:hover,
+#toggleButton:hover,
+#fullscreenButton:hover,
+#downloadPdfButton:hover {
+  background-color: #111;
+  border-color: #555;
+  transform: scale(1.03);
 }
 
 #comparisonWrapper {
@@ -30,7 +56,8 @@ select {
   width: 960px;
   height: 540px;
   overflow: hidden;
-  background: #000;
+  background: #000000;
+  user-select: none;
 }
 
 #beforeImage, #afterImage {
@@ -39,6 +66,7 @@ select {
   left: 0;
   width: 960px;
   height: 540px;
+  user-select: none;
 }
 
 #beforeImage img,
@@ -49,6 +77,8 @@ select {
   object-fit: contain;
   top: 0;
   left: 0;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 #afterWrapper {
@@ -65,23 +95,28 @@ select {
   position: absolute;
   top: 0;
   left: 50%;
-  width: 4px;
+  width: 2px;
   height: 100%;
   background: white;
   cursor: ew-resize;
   z-index: 10;
+  border-radius: 0;
 }
 
 #slider::before {
   content: "";
   position: absolute;
   top: 50%;
-  left: -8px;
-  width: 16px;
-  height: 16px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
   background: white;
   border-radius: 50%;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
+}
+
+#slider::after {
+  display: none;
 }
 
 #infoContainer {
@@ -89,55 +124,40 @@ select {
   justify-content: space-between;
   width: 960px;
   margin-top: 12px;
-  padding: 0 40px;
+  padding: 8px 40px;
   box-sizing: border-box;
-  font-size: 16px;
+  font-size: 14px;
   color: #eee;
+  background-color: #111;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
 }
 
 #leftLabel, #rightLabel {
   width: 50%;
   text-align: center;
+  font-weight: normal;
+  text-transform: none;
 }
 
 #explanationBox {
-  margin-top: 12px;
+  margin-top: 16px;
   max-width: 960px;
   font-size: 13px;
-  color: #aaa;
-  padding: 12px 16px;
-  background: #1a1a1a;
-  border-left: 4px solid orange;
+  color: #ddd;
+  padding: 16px 20px;
+  background: #111;
+  border-left: 4px solid #ff8800;
   border-radius: 6px;
-  line-height: 1.5;
+  line-height: 1.6;
+  font-weight: 400;
+  box-shadow: 0 0 12px rgba(255, 136, 0, 0.1);
 }
 
-#comparisonWrapper,
-#beforeImage,
-#afterImage,
-#slider {
-  user-select: none;
-}
-
-* {
-  -webkit-user-drag: none;
-  user-select: none;
-}
-
-#toggleButton {
-  padding: 6px 12px;
-  background: #444;
-  color: white;
-  border: 1px solid #666;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-}
-#toggleButton:hover {
-  background: #666;
-}
-
-/* Alleen fullscreen correct schalen */
+/* Fullscreen support */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -176,6 +196,7 @@ select {
   height: 100%;
   object-fit: contain;
 }
+
 :fullscreen #afterWrapper img,
 :-webkit-full-screen #afterWrapper img {
   position: absolute;
@@ -185,6 +206,8 @@ select {
   top: 0;
   left: 0;
 }
+
+/* Print support */
 @media print {
   body {
     background: white !important;
@@ -210,183 +233,4 @@ select {
   #comparisonWrapper img {
     object-fit: contain !important;
   }
-}
-#slider {
-  width: 4px; /* dunner dan standaard */
-  background-color: white; /* of wat je wil */
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  cursor: ew-resize;
-  z-index: 10;
-  border-radius: 0; /* voorkomt bolling */
-}
-#slider::before,
-#slider::after {
-  display: none;
-}
-#comparisonWrapper {
-  background: #000000;
-}
-select, #toggleButton, #fullscreenButton, #downloadPdfButton {
-  padding: 8px 14px;
-  background: #000000;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: background 0.2s ease;
-}
-
-select:hover, #toggleButton:hover, #fullscreenButton:hover, #downloadPdfButton:hover {
-  background: #1a1a1a;
-}
-#slider {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 2px;
-  height: 100%;
-  background: white;
-  cursor: ew-resize;
-  z-index: 10;
-}
-
-#slider::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 12px;
-  height: 12px;
-  background: white;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-body {
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-#infoContainer {
-  font-size: 14px;
-  color: #ddd;
-  margin-top: 16px;
-  padding: 0 20px;
-}
-
-#explanationBox {
-  font-size: 12px;
-  color: #bbb;
-  background: #111;
-  border-left: 3px solid #ff9900;
-  padding: 12px 16px;
-  border-radius: 4px;
-  line-height: 1.5;
-  margin-top: 16px;
-}
-
-#leftLabel, #rightLabel {
-  font-weight: normal;
-  text-transform: none;
-}
-button,
-#toggleButton,
-#fullscreenButton,
-#downloadPdfButton {
-  background-color: #000;
-  color: white;
-  border: 1px solid #333;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-button:hover,
-#toggleButton:hover,
-#fullscreenButton:hover,
-#downloadPdfButton:hover {
-  background-color: #111;
-  border-color: #555;
-  transform: scale(1.03);
-}
-
-select {
-  padding: 6px 12px;
-  background-color: #111; /* donkerder dan eerder */
-  color: white;
-  border: 1px solid #333;
-  border-radius: 4px;
-  font-size: 14px;
-  appearance: none; /* voorkomt lelijke systeempijltjes */
-  cursor: pointer;
-}
-
-select:focus {
-  outline: none;
-  border-color: #555;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
-}
-#infoContainer {
-  display: flex;
-  justify-content: space-between;
-  width: 960px;
-  margin-top: 12px;
-  padding: 0 40px;
-  box-sizing: border-box;
-  font-size: 14px;
-  color: #eee;
-  background-color: #111;
-  border-top: 1px solid #333;
-  border-bottom: 1px solid #333;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  border-radius: 6px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-}
-
-#leftLabel, #rightLabel {
-  width: 50%;
-  text-align: center;
-}
-#explanationBox {
-  margin-top: 16px;
-  max-width: 960px;
-  font-size: 13px;
-  color: #ddd;
-  padding: 16px 20px;
-  background: #111;
-  border-left: 4px solid #ff8800;
-  border-radius: 6px;
-  line-height: 1.6;
-  font-weight: 400;
-  box-shadow: 0 0 12px rgba(255, 136, 0, 0.1);
-}
-select {
-  padding: 8px 16px;
-  background: #121212;
-  color: #fff;
-  border: 1px solid #333;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  outline: none;
-  transition: border 0.2s ease, background 0.2s ease;
-  appearance: none;
-  cursor: pointer;
-}
-
-select:hover {
-  border-color: #ff8800;
-  background: #1a1a1a;
-}
-
-select:focus {
-  border-color: #ff8800;
-  box-shadow: 0 0 4px #ff8800;
 }
