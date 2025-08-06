@@ -1,3 +1,4 @@
+/* ========== Algemene opmaak ========== */
 * {
   -webkit-user-drag: none;
   user-select: none;
@@ -15,7 +16,7 @@ body {
   line-height: 1.6;
 }
 
-/* Controls */
+/* ========== Controls ========== */
 .controls {
   margin: 20px;
   display: flex;
@@ -23,7 +24,7 @@ body {
   flex-wrap: wrap;
 }
 
-select, button {
+select, #toggleButton, #fullscreenButton, #downloadPdfButton {
   padding: 6px 12px;
   background: #1a1a1a;
   color: white;
@@ -33,12 +34,15 @@ select, button {
   cursor: pointer;
 }
 
-button:hover, select:hover {
+select:hover,
+#toggleButton:hover,
+#fullscreenButton:hover,
+#downloadPdfButton:hover {
   background: #666;
   border-color: #666;
 }
 
-/* Comparison Wrapper */
+/* ========== Wrapper en afbeeldingen ========== */
 #comparisonWrapper {
   position: relative;
   width: 960px;
@@ -47,21 +51,16 @@ button:hover, select:hover {
   background: #000;
 }
 
-#beforeImage, #afterImage, #afterWrapper {
+#beforeImage, #afterImage {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
-#afterWrapper {
-  width: 50%;
-  overflow: hidden;
-  z-index: 2;
-}
-
-#beforeImage img, #afterImage img {
+#beforeImage img,
+#afterImage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -70,7 +69,17 @@ button:hover, select:hover {
   left: 0;
 }
 
-/* Slider */
+#afterWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* ========== Slider ========== */
 #slider {
   position: absolute;
   top: 0;
@@ -81,15 +90,22 @@ button:hover, select:hover {
   background: white;
   cursor: ew-resize;
   z-index: 10;
+  border-radius: 0;
 }
 
-/* Info */
+#slider::before,
+#slider::after {
+  display: none;
+}
+
+/* ========== Info labels ========== */
 #infoContainer {
   display: flex;
   justify-content: space-between;
   width: 960px;
   margin-top: 12px;
   padding: 0 40px;
+  box-sizing: border-box;
   font-size: 16px;
   color: #eee;
 }
@@ -99,7 +115,7 @@ button:hover, select:hover {
   text-align: center;
 }
 
-/* Uitleg */
+/* ========== Uitlegtekst ========== */
 #explanationBox {
   margin-top: 12px;
   max-width: 960px;
@@ -109,63 +125,130 @@ button:hover, select:hover {
   background: #1a1a1a;
   border-left: 4px solid orange;
   border-radius: 6px;
+  line-height: 1.5;
 }
 
-/* Fullscreen mode */
+/* ========== Fullscreen scaling ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  max-width: none;
+  max-height: none;
+}
+
+:fullscreen #beforeImage,
+:-webkit-full-screen #beforeImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
 :fullscreen #afterWrapper,
 :-webkit-full-screen #afterWrapper {
-  width: 50vw !important;
-  height: 100vh !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+:fullscreen #afterImage,
+:-webkit-full-screen #afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 :fullscreen #beforeImage img,
 :fullscreen #afterImage img,
 :-webkit-full-screen #beforeImage img,
 :-webkit-full-screen #afterImage img {
-  object-fit: contain !important;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-/* Mobiele modus */
-@media (max-width: 1000px) {
+/* ========== Print styling ========== */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .controls,
+  #explanationBox {
+    display: none !important;
+  }
+
   #comparisonWrapper {
-    width: 100vw;
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-
-  #beforeImage,
-  #afterWrapper,
-  #afterImage {
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-
-  #beforeImage img,
-  #afterImage img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    object-fit: contain;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
   }
 
   #infoContainer {
-    flex-direction: column;
-    padding: 0 16px;
-    width: 100%;
-    font-size: 14px;
-    text-align: center;
+    margin-top: 20px;
+    color: black !important;
   }
 
-  #leftLabel, #rightLabel {
-    width: 100%;
-    margin: 4px 0;
+  #comparisonWrapper img {
+    object-fit: contain !important;
   }
+}
+
+/* ========== Mobile scaling via JS class ========== */
+.mobile-mode #comparisonWrapper {
+  width: 100vw;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.mobile-mode #beforeImage,
+.mobile-mode #afterImage,
+.mobile-mode #afterWrapper {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  position: relative;
+}
+
+.mobile-mode #afterWrapper {
+  width: 50vw;
+}
+
+.mobile-mode #beforeImage img,
+.mobile-mode #afterImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.mobile-mode #infoContainer {
+  width: 100%;
+  padding: 0 16px;
+  flex-direction: column;
+  font-size: 14px;
+  text-align: center;
+}
+
+.mobile-mode #leftLabel,
+.mobile-mode #rightLabel {
+  width: 100%;
+  margin: 4px 0;
 }
