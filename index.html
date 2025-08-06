@@ -3,59 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <title>Lens Comparison</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ voor mobiel -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- === Controls === -->
   <div class="controls">
     <button id="toggleButton">↔ Flip</button>
     <button id="fullscreenButton">⛶ Fullscreen</button>
     <button id="downloadPdfButton">⤓ Download PDF</button>
+
     <select id="leftLens"></select>
     <select id="rightLens"></select>
+
     <select id="tStop">
       <option value="1.4">T1.4</option>
       <option value="2">T2</option>
-      <option value="2.8">T2.8</option>
+      <option value="2.8" selected>T2.8</option>
       <option value="4">T4</option>
       <option value="5.6">T5.6</option>
       <option value="8">T8</option>
     </select>
+
     <select id="focalLength">
       <option value="18mm">18mm</option>
       <option value="25mm">25mm</option>
-      <option value="35mm">35mm</option>
+      <option value="35mm" selected>35mm</option>
       <option value="50mm">50mm</option>
       <option value="80mm">80mm</option>
       <option value="135mm">135mm</option>
     </select>
   </div>
 
+  <!-- === Comparison area === -->
   <div id="comparisonWrapper">
     <div id="beforeImage">
-      <img id="beforeImgTag" />
+      <img id="beforeImgTag" alt="Right lens preview">
     </div>
+
     <div id="afterWrapper">
       <div id="afterImage">
-        <img id="afterImgTag" />
+        <img id="afterImgTag" alt="Left lens preview">
       </div>
     </div>
+
     <div id="slider"></div>
   </div>
 
+  <!-- === Lens labels === -->
   <div id="infoContainer">
     <div id="leftLabel"></div>
     <div id="rightLabel"></div>
   </div>
 
+  <!-- === Explanation box === -->
   <div id="explanationBox">
     <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
   </div>
 
-  <!-- External libraries -->
+  <!-- === External libraries === -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
+
+  <!-- === Main script === -->
   <script src="script.js"></script>
+
 </body>
 </html>
-<script src="script.js"></script>
