@@ -275,6 +275,6 @@ select:hover,
 
   body:not(.mobile-mode):not(:fullscreen) #beforeImage img,
   body:not(.mobile-mode):not(:fullscreen) #afterImage img {
-    object-fit: cover;
+    object-fit: contain;
   }
 }
