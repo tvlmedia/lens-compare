@@ -228,3 +228,59 @@ select:hover, #toggleButton:hover {
   height: 100%;
   object-fit: contain;
 }
+
+/* Fullscreen fix voor echte slider reveal behavior */
+:fullscreen #comparisonWrapper,
+:-webkit-full-screen #comparisonWrapper {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  position: relative;
+  overflow: hidden;
+}
+
+:fullscreen #beforeImage,
+:-webkit-full-screen #beforeImage,
+:fullscreen #afterImage,
+:-webkit-full-screen #afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+:fullscreen #beforeImage img,
+:-webkit-full-screen #beforeImage img,
+:fullscreen #afterImage img,
+:-webkit-full-screen #afterImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Cruciale fix: masker de rechterhelft correct */
+:fullscreen #afterWrapper,
+:-webkit-full-screen #afterWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* Slider correct gecentreerd */
+:fullscreen #slider,
+:-webkit-full-screen #slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  background: white;
+  z-index: 10;
+}
