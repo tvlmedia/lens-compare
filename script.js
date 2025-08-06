@@ -240,3 +240,20 @@ async function loadImage(url) {
     img.src = url;
   });
 }
+document.getElementById("fullscreenButton").addEventListener("click", () => {
+  const elem = document.getElementById("comparisonWrapper");
+
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  } else {
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen(); // Safari
+    }
+  }
+});
