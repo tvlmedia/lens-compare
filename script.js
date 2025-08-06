@@ -92,15 +92,6 @@ document.getElementById("toggleButton").addEventListener("click", () => {
   updateImages();
 });
 
-document.getElementById("fullscreenButton").addEventListener("click", () => {
-  const wrapper = document.getElementById("comparisonWrapper");
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    wrapper.requestFullscreen?.() || wrapper.webkitRequestFullscreen?.();
-  } else {
-    document.exitFullscreen?.() || document.webkitExitFullscreen?.();
-  }
-});
-
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
   const comparison = document.getElementById("comparisonWrapper");
@@ -159,18 +150,18 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     const barHeight = 40;
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, 0, pageWidth, barHeight, "F");
-    pdf.setFontSize(16);
+    pdf.setFontSize(18);
     pdf.setTextColor(255, 255, 255);
     pdf.text(text, pageWidth / 2, 26, { align: "center" });
   }
 
-  function drawLogoBottomRight(logo) {
-    const logoHeight = 35;
+  function drawLogoBottomRight() {
+    const targetHeight = 50;
     const ratio = logo.width / logo.height;
-    const logoWidth = logoHeight * ratio;
-    const x = pageWidth - logoWidth - 12;
-    const y = pageHeight - logoHeight - 12;
-    pdf.addImage(logo, "PNG", x, y, logoWidth, logoHeight);
+    const targetWidth = targetHeight * ratio;
+    const x = pageWidth - targetWidth - 12;
+    const y = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", x, y, targetWidth, targetHeight);
   }
 
   function drawDescriptionBox(lens) {
@@ -179,14 +170,13 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
 
     const boxHeight = 70;
     const margin = 20;
-    const logoSafeRight = 140;
+    const logoSafeRight = 160;
     const safeTextWidth = pageWidth - margin - logoSafeRight;
 
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
 
     const lines = pdf.splitTextToSize(info.text, safeTextWidth);
-
     pdf.setFontSize(10);
     pdf.setTextColor(255, 255, 255);
     pdf.text(lines, margin, pageHeight - boxHeight + 20);
@@ -206,14 +196,13 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const rightData = await renderImage(rightImg);
 
   // Page 1
-  pdf.addPage();
   fillBlack();
   drawTopLabel(`${leftText}  vs  ${rightText}`);
   await drawFullWidth(splitData, 40);
-  drawLogoBottomRight(logo);
+  drawLogoBottomRight();
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(12);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  pdf.setFontSize(14);
+  pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 20, { align: "center" });
 
   // Page 2
   pdf.addPage();
@@ -221,7 +210,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   drawTopLabel(leftText);
   await drawFullWidth(leftData, 40);
   drawDescriptionBox(left);
-  drawLogoBottomRight(logo);
+  drawLogoBottomRight();
 
   // Page 3
   pdf.addPage();
@@ -229,7 +218,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   drawTopLabel(rightText);
   await drawFullWidth(rightData, 40);
   drawDescriptionBox(right);
-  drawLogoBottomRight(logo);
+  drawLogoBottomRight();
 
   const safeLeft = left.replace(/\s+/g, "");
   const safeRight = right.replace(/\s+/g, "");
