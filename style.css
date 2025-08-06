@@ -51,6 +51,7 @@ button:hover,
   transform: scale(1.03);
 }
 
+/* Wrapper voor vergelijking */
 #comparisonWrapper {
   position: relative;
   width: 960px;
@@ -91,6 +92,7 @@ button:hover,
   z-index: 2;
 }
 
+/* Slider */
 #slider {
   position: absolute;
   top: 0;
@@ -100,7 +102,6 @@ button:hover,
   background: white;
   cursor: ew-resize;
   z-index: 10;
-  border-radius: 0;
 }
 
 #slider::before {
@@ -115,10 +116,7 @@ button:hover,
   transform: translate(-50%, -50%);
 }
 
-#slider::after {
-  display: none;
-}
-
+/* Labels */
 #infoContainer {
   display: flex;
   justify-content: space-between;
@@ -143,6 +141,7 @@ button:hover,
   text-transform: none;
 }
 
+/* Uitleg */
 #explanationBox {
   margin-top: 16px;
   max-width: 960px;
@@ -197,15 +196,13 @@ button:hover,
   object-fit: contain;
 }
 
-:fullscreen #afterWrapper img,
-:-webkit-full-screen #afterWrapper img {
-  position: absolute;
+/* ⚠️ Verwijderd:
+:fullscreen #afterWrapper img {
   width: 100vw;
   height: 100vh;
-  object-fit: contain;
-  top: 0;
-  left: 0;
+  ...
 }
+*/
 
 /* Print support */
 @media print {
