@@ -17,7 +17,9 @@ const notes = {
 
 const lensImageMap = {
   "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
-  "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg"
+  "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg",
+  "ironglass_red_p_50mm_t2_8": "red_p_58mm_t2_8.jpg",
+  "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg"
 };
 
 const leftSelect = document.getElementById("leftLens");
@@ -54,8 +56,7 @@ function updateImages() {
   beforeImgTag.src = imgRight;
   afterImgTag.src = imgLeft;
 
-  const tStopRaw = tStopSelect.value;
-  const tStopFormatted = `T${tStopRaw}`;
+  const tStopFormatted = `T${tStopSelect.value}`;
 
   leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
   rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
@@ -64,10 +65,12 @@ function updateImages() {
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
   el.addEventListener("change", updateImages)
 );
+
 leftSelect.value = "IronGlass Red P";
 rightSelect.value = "IronGlass Zeiss Jena";
 tStopSelect.value = "2.8";
 focalLengthSelect.value = "35mm";
+updateImages();
 
 let isDragging = false;
 slider.addEventListener("mousedown", () => isDragging = true);
@@ -81,13 +84,11 @@ window.addEventListener("mousemove", e => {
   slider.style.left = `${percent}%`;
 });
 
-updateImages();
-
 document.getElementById("toggleButton").addEventListener("click", () => {
-  const leftValue = leftSelect.value;
-  const rightValue = rightSelect.value;
-  leftSelect.value = rightValue;
-  rightSelect.value = leftValue;
+  const left = leftSelect.value;
+  const right = rightSelect.value;
+  leftSelect.value = right;
+  rightSelect.value = left;
   updateImages();
 });
 
@@ -110,13 +111,17 @@ document.getElementById("fullscreenButton").addEventListener("click", () => {
 
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
   const comparison = document.getElementById("comparisonWrapper");
-  const leftImg = document.getElementById("afterImgTag");
-  const rightImg = document.getElementById("beforeImgTag");
-  const leftLabel = document.getElementById("leftLabel").textContent;
-  const rightLabel = document.getElementById("rightLabel").textContent;
+  const leftImg = afterImgTag;
+  const rightImg = beforeImgTag;
+  const leftText = leftLabel.textContent;
+  const rightText = rightLabel.textContent;
+
+  const left = leftSelect.value;
+  const right = rightSelect.value;
+  const focal = focalLengthSelect.value;
+  const t = tStopSelect.value;
 
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
-
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -138,114 +143,90 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
-  async function loadImage(url) {
-    return new Promise(resolve => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => resolve(img);
-      img.src = url;
-    });
+  async function renderImage(imgEl) {
+    const canvas = document.createElement("canvas");
+    canvas.width = imgEl.naturalWidth || 1920;
+    canvas.height = imgEl.naturalHeight || 1080;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imgEl.src;
+    await new Promise(resolve => img.onload = resolve);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 1.0);
   }
 
-  async function renderImageData(imgEl) {
-    return new Promise(resolve => {
-      const canvas = document.createElement("canvas");
-      canvas.width = imgEl.naturalWidth || 1920;
-      canvas.height = imgEl.naturalHeight || 1080;
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 1.0));
-      };
-      img.src = imgEl.src;
-    });
+  async function drawFullWidth(imgData, yOffset = 0) {
+    const img = new Image();
+    img.src = imgData;
+    await new Promise(resolve => img.onload = resolve);
+    const aspect = img.width / img.height;
+    const h = pageWidth / aspect;
+    pdf.addImage(imgData, "JPEG", 0, yOffset, pageWidth, h);
+    return yOffset + h;
   }
 
-  async function drawImageFullWidth(imageData, yOffset = 0) {
-    return new Promise(resolve => {
-      const img = new Image();
-      img.onload = () => {
-        const aspectRatio = img.width / img.height;
-        const targetWidth = pageWidth;
-        const targetHeight = targetWidth / aspectRatio;
-        pdf.addImage(imageData, "JPEG", 0, yOffset, targetWidth, targetHeight);
-        resolve(yOffset + targetHeight);
-      };
-      img.src = imageData;
-    });
-  }
-
-  function drawLogo(x, y, maxW = 90, logo) {
+  function drawLogo(x, y, logo) {
     const ratio = logo.width / logo.height;
-    const h = maxW / ratio;
-    pdf.addImage(logo, "PNG", x, y, maxW, h);
+    const w = 90;
+    const h = w / ratio;
+    pdf.addImage(logo, "PNG", x, y, w, h);
   }
 
- function drawDescriptionBlock(lensName, yStart) {
-  const info = lensDescriptions[lensName];
-  if (!info) return;
-
-  const topMargin = 20; // Extra ruimte boven de tekst
-  const textY = yStart + topMargin;
-
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(10);
-  const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
-  pdf.text(lines, 50, textY);
-
-  // Bereken waar de link moet komen
-  const linkY = textY + lines.length * 12 + 10;
-
-  pdf.setTextColor(80, 160, 255);
-  pdf.textWithLink("Klik hier voor meer info", 50, linkY, { url: info.url });
-}
-
-// Meer spacing onder de tekst voor de link
-const spacing = lines.length * 12 + 14;
-pdf.setTextColor(80, 160, 255);
-pdf.textWithLink("Klik hier voor meer info", 50, yStart + topMargin + spacing, { url: info.url });
+  function drawDescription(lens, y) {
+    const info = lensDescriptions[lens];
+    if (!info) return;
+    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
+    const topMargin = 30;
+    const spacing = lines.length * 12 + 14;
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    pdf.text(lines, 50, y + topMargin);
+    pdf.setTextColor(80, 160, 255);
+    pdf.textWithLink("Klik hier voor meer info", 50, y + topMargin + spacing, { url: info.url });
   }
 
+  const logoImg = await loadImage(logoUrl);
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
   const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
-  const leftData = await renderImageData(leftImg);
-  const rightData = await renderImageData(rightImg);
-  const logo = await loadImage(logoUrl);
+  const leftData = await renderImage(leftImg);
+  const rightData = await renderImage(rightImg);
 
+  // Page 1 - splitscreen
   fillBlack();
-  await drawImageFullWidth(splitData, 40);
-  pdf.setTextColor(255, 255, 255);
+  await drawFullWidth(splitData, 40);
   pdf.setFontSize(14);
-  pdf.text(`${leftLabel}  vs  ${rightLabel}`, pageWidth / 2, 30, { align: "center" });
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(`${leftText}  vs  ${rightText}`, pageWidth / 2, 30, { align: "center" });
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
+  // Page 2 - left lens
   pdf.addPage();
   fillBlack();
-  const yLeftEnd = await drawImageFullWidth(leftData, 40);
-  drawLogo(pageWidth - 100, 0, 70, logo);
-  pdf.setFontSize(14);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(leftLabel, pageWidth / 2, 30, { align: "center" });
-  drawDescriptionBlock(leftSelect.value, yLeftEnd + 10);
+  const yLeft = await drawFullWidth(leftData, 40);
+  drawLogo(pageWidth - 100, 0, logoImg);
+  pdf.text(leftText, pageWidth / 2, 30, { align: "center" });
+  drawDescription(left, yLeft + 10);
 
+  // Page 3 - right lens
   pdf.addPage();
   fillBlack();
-  const yRightEnd = await drawImageFullWidth(rightData, 40);
-  drawLogo(pageWidth - 100, 0, 70, logo);
-  pdf.setFontSize(14);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
-  drawDescriptionBlock(rightSelect.value, yRightEnd + 10);
+  const yRight = await drawFullWidth(rightData, 40);
+  drawLogo(pageWidth - 100, 0, logoImg);
+  pdf.text(rightText, pageWidth / 2, 30, { align: "center" });
+  drawDescription(right, yRight + 10);
 
-  const left = leftSelect.value;
-const right = rightSelect.value;
-const focal = focalLengthSelect.value;
-const t = tStopSelect.value;
-
-const safeLeft = left.replace(/\s+/g, "");
-const safeRight = right.replace(/\s+/g, "");
-const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
-pdf.save(filename);
+  const safeLeft = left.replace(/\s+/g, "");
+  const safeRight = right.replace(/\s+/g, "");
+  const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
+  pdf.save(filename);
 });
+
+async function loadImage(url) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.src = url;
+  });
+}
