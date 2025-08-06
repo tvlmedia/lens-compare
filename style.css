@@ -1,33 +1,35 @@
-/* Algemene opmaak */
+/* ========== ALGEMENE STYLING ========== */
 body {
   margin: 0;
   background: #0f0f0f;
   color: white;
   font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   font-size: 14px;
   line-height: 1.6;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* ========== CONTROLS ========== */
 .controls {
   margin: 20px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 select, button {
-  padding: 8px 14px;
+  padding: 10px 16px;
   background: #000;
   color: white;
   border: 1px solid #333;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: 0.2s ease-in-out;
 }
 
 select:hover, button:hover {
@@ -42,7 +44,7 @@ select:focus {
   box-shadow: 0 0 4px #ff8800;
 }
 
-/* --- VERGELIJKINGSBLOCK --- */
+/* ========== VERGELIJKINGSBLOCK ========== */
 #comparisonWrapper {
   position: relative;
   width: 100%;
@@ -55,28 +57,25 @@ select:focus {
 
 #beforeImage,
 #afterWrapper,
-#afterImage {
+#afterImage,
+#beforeImgTag,
+#afterImgTag {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-}
-
-#beforeImgTag,
-#afterImgTag {
-  width: 100%;
-  height: 100%;
   object-fit: contain;
   display: block;
+  z-index: 1;
 }
 
-/* Slider (middenlijn) */
 #afterWrapper {
   overflow: hidden;
   z-index: 2;
 }
 
+/* ========== SLIDER ========== */
 #slider {
   position: absolute;
   top: 0;
@@ -100,7 +99,7 @@ select:focus {
   transform: translate(-50%, -50%);
 }
 
-/* Info onder afbeelding */
+/* ========== INFO ONDER BEELD ========== */
 #infoContainer {
   display: flex;
   justify-content: space-between;
@@ -126,7 +125,7 @@ select:focus {
   white-space: nowrap;
 }
 
-/* Uitleg box */
+/* ========== UITLEGBOX ========== */
 #explanationBox {
   margin-top: 16px;
   max-width: 960px;
@@ -142,24 +141,17 @@ select:focus {
   text-align: center;
 }
 
-/* 📲 MOBIEL */
-/* 📲 MOBIEL FIX */
+/* ========== RESPONSIVE (MOBIEL) ========== */
 @media (max-width: 767px) {
-  #comparisonWrapper {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    max-width: 100%;
-    height: auto;
+  .controls {
+    flex-direction: column;
+    width: 90%;
+    gap: 12px;
   }
 
-  #beforeImage,
-  #afterWrapper,
-  #afterImage,
-  #beforeImgTag,
-  #afterImgTag {
+  select, button {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
+    font-size: 15px;
   }
 
   #infoContainer,
@@ -171,19 +163,9 @@ select:focus {
     max-width: 100%;
     box-sizing: border-box;
   }
-
-  .controls {
-    flex-direction: column;
-    gap: 12px;
-    width: 90%;
-  }
-
-  select, button {
-    width: 100%;
-    font-size: 15px;
-  }
 }
-/* Fullscreen modus */
+
+/* ========== FULLSCREEN ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -193,17 +175,15 @@ select:focus {
 }
 
 :fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage,
 :fullscreen #afterImage,
-:-webkit-full-screen #afterImage,
 :fullscreen #afterWrapper,
-:-webkit-full-screen #afterWrapper {
-  width: 100%;
-  height: 100%;
-}
-
 :fullscreen #beforeImgTag,
-:fullscreen #afterImgTag {
+:fullscreen #afterImgTag,
+:-webkit-full-screen #beforeImage,
+:-webkit-full-screen #afterImage,
+:-webkit-full-screen #afterWrapper,
+:-webkit-full-screen #beforeImgTag,
+:-webkit-full-screen #afterImgTag {
   width: 100%;
   height: 100%;
   object-fit: contain;
