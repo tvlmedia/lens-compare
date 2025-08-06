@@ -170,17 +170,21 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     pdf.addImage(logo, "PNG", x, y, w, h);
   }
 
-  function drawDescription(lens, yStart) {
-    const info = lensDescriptions[lens];
-    if (!info) return;
-    const topMargin = 30;
-    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
-    const spacing = lines.length * 12 + 14;
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(10);
-    pdf.text(lines, 50, yStart + topMargin);
-    pdf.setTextColor(80, 160, 255);
-    pdf.textWithLink("Klik hier voor meer info", 50, yStart + topMargin + spacing, { url: info.url });
+  function drawDescription(lens) {
+  const info = lensDescriptions[lens];
+  if (!info) return;
+
+  const boxHeight = 70;
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
+
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(10);
+  const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
+  pdf.text(lines, 50, pageHeight - boxHeight + 20);
+
+  pdf.setTextColor(80, 160, 255);
+  pdf.textWithLink("Klik hier voor meer info", 50, pageHeight - 15, { url: info.url });
   }
 
   function fillBlack() {
@@ -205,7 +209,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Page 2
   pdf.addPage();
   fillBlack();
-  const hLeft = await drawFullWidth(leftData, 40);
+  const hLeft = await drawFullWidth(leftData, 20);
   drawLogo(pageWidth - 100, 0, logo);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
@@ -215,7 +219,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Page 3
   pdf.addPage();
   fillBlack();
-  const hRight = await drawFullWidth(rightData, 40);
+  const hRight = await drawFullWidth(rightData, 10);
   drawLogo(pageWidth - 100, 0, logo);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
