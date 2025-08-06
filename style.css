@@ -48,21 +48,18 @@ select:hover,
   overflow: hidden;
 }
 
-/* ✅ BEFORE/AFTER STRUCTUUR */
-#beforeImage,
-#afterImage {
+/* ✅ BEFORE/AFTER LAAG */
+#beforeImage, #afterImage, #afterWrapper {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
   height: 100%;
 }
+#beforeImage, #afterImage {
+  width: 100%;
+}
 #afterWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 50%;
-  height: 100%;
   overflow: hidden;
   z-index: 2;
 }
@@ -124,36 +121,25 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ✅ FULLSCREEN */
+/* ✅ FULLSCREEN FIXES */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
   height: 100vh;
 }
 :fullscreen #beforeImage,
-:fullscreen #afterImage,
 :fullscreen #afterWrapper,
+:fullscreen #afterImage,
 :-webkit-full-screen #beforeImage,
-:-webkit-full-screen #afterImage,
-:-webkit-full-screen #afterWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
+:-webkit-full-screen #afterWrapper,
+:-webkit-full-screen #afterImage {
+  width: 100%;
   height: 100%;
 }
-:fullscreen #afterWrapper,
-:-webkit-full-screen #afterWrapper {
+:fullscreen #afterWrapper {
   width: 50vw;
   overflow: hidden;
   z-index: 2;
-}
-:fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage {
-  width: 100%;
-}
-:fullscreen #afterImage,
-:-webkit-full-screen #afterImage {
-  width: 100%;
 }
 :fullscreen #beforeImage img,
 :fullscreen #afterImage img,
@@ -165,6 +151,30 @@ select:hover,
   position: absolute;
   top: 0;
   left: 0;
+}
+
+/* ✅ PRINT WEERGAVE */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .controls,
+  #explanationBox {
+    display: none !important;
+  }
+  #comparisonWrapper {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
+  }
+  #infoContainer {
+    margin-top: 20px;
+    color: black !important;
+  }
+  #comparisonWrapper img {
+    object-fit: contain !important;
+  }
 }
 
 /* ✅ MOBILE MODE */
@@ -205,28 +215,4 @@ select:hover,
 .mobile-mode #rightLabel {
   width: 100%;
   margin: 4px 0;
-}
-
-/* ✅ PRINT */
-@media print {
-  body {
-    background: white !important;
-    color: black !important;
-  }
-  .controls,
-  #explanationBox {
-    display: none !important;
-  }
-  #comparisonWrapper {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: auto !important;
-  }
-  #infoContainer {
-    margin-top: 20px;
-    color: black !important;
-  }
-  #comparisonWrapper img {
-    object-fit: contain !important;
-  }
 }
