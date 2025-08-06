@@ -261,3 +261,16 @@ select:hover,
     object-position: center center;
   }
 }
+/* Verberg fullscreen op mobiel */
+@media screen and (max-width: 767px) {
+  #fullscreenButton {
+    display: none !important;
+  }
+}
+
+/* Toon fullscreen op desktop */
+@media screen and (min-width: 768px) {
+  #fullscreenButton {
+    display: inline-block;
+  }
+}
