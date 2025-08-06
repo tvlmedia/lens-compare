@@ -179,7 +179,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
 
     const boxHeight = 70;
     const margin = 20;
-    const logoSafeRight = 120;
+    const logoSafeRight = 70;
 
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
