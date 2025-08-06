@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (GEOPTIMALISEERD - VOLLEDIG) ======
+// ====== LENS COMPARISON TOOL SCRIPT (GEOPTIMALISEERD - VOLLEDIG EN CORRECT) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -154,31 +154,25 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   }
 
   async function drawFullWidthImage(imgData, top = 40, bottom = 70) {
-  const img = new Image();
-  img.src = imgData;
-  await new Promise(resolve => img.onload = resolve);
+    const img = new Image();
+    img.src = imgData;
+    await new Promise(resolve => img.onload = resolve);
 
-  const aspect = img.width / img.height;
+    const aspect = img.width / img.height;
+    let imgWidth = pageWidth;
+    let imgHeight = imgWidth / aspect;
+    let x = 0;
+    const y = top;
 
-  let imgWidth = pageWidth;
-  let imgHeight = imgWidth / aspect;
-  let x = 0;
-  const y = top;
+    const availableHeight = pageHeight - top - bottom;
+    if (imgHeight > availableHeight) {
+      imgHeight = availableHeight;
+      imgWidth = imgHeight * aspect;
+      x = (pageWidth - imgWidth) / 2;
+    }
 
-  const availableHeight = pageHeight - top - bottom;
-
-  if (imgHeight > availableHeight) {
-    // hoogte is te groot → schaal af op hoogte
-    imgHeight = availableHeight;
-    imgWidth = imgHeight * aspect;
-    x = (pageWidth - imgWidth) / 2;
+    pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
   }
-
-  pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
-}
-
-  pdf.addImage(imgData, "JPEG", x, y, finalWidth, finalHeight);
-}
 
   function drawTopBar(text) {
     const barHeight = 40;
