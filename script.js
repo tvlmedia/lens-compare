@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF LOGO) ======
+// ====== LENS COMPARISON TOOL SCRIPT (GEOPTIMALISEERD) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -18,8 +18,8 @@ const notes = {
 const lensImageMap = {
   "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
   "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg",
-  "ironglass_red_p_50mm_t2_8": "red_p_58mm_t2_8.jpg",
-  "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg"
+  "ironglass_red_p_58mm_t2_1": "red_p_58mm_t2_8.jpg",
+  "ironglass_zeiss_jena_50mm_t1_9": "zeiss_jena_50mm_t2_8.jpg"
 };
 
 const leftSelect = document.getElementById("leftLens");
@@ -95,17 +95,11 @@ document.getElementById("toggleButton").addEventListener("click", () => {
 document.getElementById("fullscreenButton").addEventListener("click", () => {
   const wrapper = document.getElementById("comparisonWrapper");
   if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    if (wrapper.requestFullscreen) {
-      wrapper.requestFullscreen();
-    } else if (wrapper.webkitRequestFullscreen) {
-      wrapper.webkitRequestFullscreen();
-    }
+    if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+    else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
   } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
   }
 });
 
@@ -173,7 +167,21 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     pdf.addImage(logo, "PNG", x, y, w, h);
   }
 
-  pdf.text(lines, 50, yStart + 10);
+  function drawDescription(lens, yStart) {
+    const info = lensDescriptions[lens];
+    if (!info) return;
+
+    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
+    const topMargin = 30;
+    const spacing = lines.length * 12 + 14;
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    pdf.text(lines, 50, yStart + topMargin);
+
+    pdf.setTextColor(80, 160, 255);
+    pdf.textWithLink("Klik hier voor meer info", 50, yStart + topMargin + spacing, { url: info.url });
+    pdf.setTextColor(255, 255, 255);
   }
 
   const logoImg = await loadImage(logoUrl);
@@ -189,6 +197,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   pdf.setTextColor(255, 255, 255);
   pdf.text(`${leftText}  vs  ${rightText}`, pageWidth / 2, 30, { align: "center" });
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  drawLogo(pageWidth - 100, pageHeight - 50, logoImg); // extra logo rechts onderin
 
   // Page 2 - left lens
   pdf.addPage();
