@@ -240,8 +240,7 @@ select:hover,
   width: 100%;
   margin: 4px 0;
 }
-[04-08-2025, 23:37:49] Timo van Lierop: enige was dit:
-[04-08-2025, 23:37:55] Timo van Lierop: :fullscreen #afterWrapper img,
+:fullscreen #afterWrapper img,
 :-webkit-full-screen #afterWrapper img {
   position: absolute;
   width: 100vw;
