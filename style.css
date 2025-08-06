@@ -20,20 +20,33 @@ html, body {
   line-height: 1.6;
 }
 
-/* ========== Controls bovenaan ========== */
+/* ========== Controls ========== */
 .controls {
   margin: 20px;
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
   padding: 0 16px;
+  width: 100%;
+  max-width: 960px;
+}
+
+.button-row,
+.select-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.select-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 select,
-#toggleButton,
-#fullscreenButton,
-#downloadPdfButton {
+button {
   padding: 6px 12px;
   background: #1a1a1a;
   color: white;
@@ -44,14 +57,12 @@ select,
 }
 
 select:hover,
-#toggleButton:hover,
-#fullscreenButton:hover,
-#downloadPdfButton:hover {
+button:hover {
   background: #666;
   border-color: #666;
 }
 
-/* ========== Wrapper en sliderstructuur ========== */
+/* ========== Vergelijkingsgebied ========== */
 #comparisonWrapper {
   width: 100%;
   max-width: 960px;
@@ -80,7 +91,7 @@ select:hover,
   inset: 0;
 }
 
-/* ========== AFTER WRAPPER voor split ========== */
+/* ========== AFTER wrapper ========== */
 #afterWrapper {
   position: absolute;
   top: 0;
@@ -93,9 +104,6 @@ select:hover,
 }
 
 #afterWrapper #afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 960px;
   height: 540px;
 }
@@ -138,11 +146,11 @@ select:hover,
   width: 48%;
   text-align: center;
   white-space: normal;
-  overflow-wrap: break-word;
   word-break: break-word;
+  overflow-wrap: break-word;
 }
 
-/* ========== Extra uitlegtekst ========== */
+/* ========== Uitlegtekst ========== */
 #explanationBox {
   margin-top: 12px;
   max-width: 960px;
@@ -155,37 +163,7 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ========== Fullscreen ========== */
-:fullscreen #comparisonWrapper,
-:-webkit-full-screen #comparisonWrapper {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  max-height: none;
-}
-
-:fullscreen #afterWrapper,
-:-webkit-full-screen #afterWrapper {
-  width: 50%;
-  height: 100%;
-  overflow: hidden;
-}
-
-:fullscreen #afterWrapper #afterImage,
-:-webkit-full-screen #afterWrapper #afterImage {
-  width: 100vw;
-  height: 100vh;
-}
-
-:fullscreen #afterWrapper #afterImage img,
-:-webkit-full-screen #afterWrapper #afterImage img {
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  object-position: center center;
-}
-
-/* ========== Print ========== */
+/* ========== Print view ========== */
 @media print {
   body {
     background: white !important;
@@ -212,7 +190,7 @@ select:hover,
   }
 }
 
-/* ========== Mobiele weergave ========== */
+/* ========== Mobile weergave ========== */
 @media screen and (max-width: 767px) {
   #comparisonWrapper {
     width: 100vw;
@@ -245,45 +223,15 @@ select:hover,
     width: 100%;
     margin: 4px 0;
     font-size: 13.5px;
-    word-break: break-word;
-    overflow-wrap: break-word;
+    color: #ccc;
   }
 
   #explanationBox {
     margin: 16px;
     font-size: 12.5px;
   }
-}
 
-@media screen and (max-width: 480px) {
-  #infoContainer {
-    font-size: 13px;
-  }
-
-  #leftLabel,
-  #rightLabel {
-    font-size: 12.5px;
-    color: #ccc;
-  }
-}
-@media screen and (max-width: 767px) {
   .controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .button-row,
-  .select-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .select-column {
-    display: flex;
-    flex-direction: column;
     gap: 10px;
   }
 
