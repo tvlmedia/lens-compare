@@ -621,6 +621,37 @@ Dit de Index
     window.jspdf = window.jspdf || window.jspdf;
   </script>
   <script src="script.js"></script>
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: black;
+  width: 100%;
+  max-width: 960px;
+}
 
+.logo {
+  height: 40px;
+  object-fit: contain;
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.menu-toggle .bar {
+  width: 28px;
+  height: 3px;
+  background-color: white;
+  border-radius: 2px;
+}
 </body>
 </html>
