@@ -453,6 +453,8 @@ html, body {
   #explanationBox {
     transform: scale(0.35);
     transform-origin: top center;
+    margin: 0 auto;
+    width: fit-content;
   }
 
   #infoContainer {
@@ -460,6 +462,7 @@ html, body {
     display: flex;
     justify-content: space-between;
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
+    width: fit-content;
   }
 }
