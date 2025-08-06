@@ -2,65 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Lens Comparison</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lens Comparison – TVL Rental</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="controls">
     <button id="toggleButton">↔ Flip</button>
     <button id="fullscreenButton">⛶ Fullscreen</button>
-    <button id="downloadPdfButton">⤓ Download PDF</button>
-    <select id="leftLens"></select>
-    <select id="rightLens"></select>
-    <select id="tStop">
-      <option value="1.4">T1.4</option>
-      <option value="2">T2</option>
-      <option value="2.8">T2.8</option>
-      <option value="4">T4</option>
-      <option value="5.6">T5.6</option>
-      <option value="8">T8</option>
-    </select>
-    <select id="focalLength">
-      <option value="18mm">18mm</option>
-      <option value="25mm">25mm</option>
-      <option value="35mm">35mm</option>
-      <option value="50mm">50mm</option>
-      <option value="80mm">80mm</option>
-      <option value="135mm">135mm</option>
-    </select>
+    <button id="downloadPdfButton">⇩ Download PDF</button>
+    <select id="leftLensSelect"></select>
+    <select id="rightLensSelect"></select>
+    <select id="tStopSelect"></select>
+    <select id="focalLengthSelect"></select>
   </div>
 
-  <!-- 👇 Alles hieronder wordt geschaald op mobiel -->
-  <div id="scaledContent">
-
-    <div id="comparisonWrapper">
-      <div id="beforeImage">
-        <img id="beforeImgTag" />
+  <div id="comparisonWrapper">
+    <div id="beforeImage">
+      <img src="image-left.jpg" alt="Left lens image">
+    </div>
+    <div id="afterWrapper">
+      <div id="afterImage">
+        <img src="image-right.jpg" alt="Right lens image">
       </div>
-      <div id="afterWrapper">
-        <div id="afterImage">
-          <img id="afterImgTag" />
-        </div>
-      </div>
-      <div id="slider"></div>
     </div>
-
-    <div id="infoContainer">
-      <div id="leftLabel"></div>
-      <div id="rightLabel"></div>
-    </div>
-
-    <div id="explanationBox">
-      <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
-    </div>
-
+    <div id="slider"></div>
   </div>
-  <!-- ☝️ Einde scaling container -->
 
-  <!-- External libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
-  <script src="script.js"></script>
+  <div id="infoContainer">
+    <div id="leftLabel">Lens: IronGlass Red P 37mm T2.8</div>
+    <div id="rightLabel">Lens: IronGlass Zeiss Jena 35mm T2.8</div>
+  </div>
+
+  <div id="explanationBox">
+    <!-- Uitleg over de lenzenvergelijking of wat je wil tonen -->
+    Deze tool vergelijkt twee lenzen in split-view. Sleep de slider om verschillen te zien.
+  </div>
+
+  <script>
+    const slider = document.getElementById('slider');
+    const afterWrapper = document.getElementById('afterWrapper');
+    let isDragging = false;
+
+    slider.addEventListener('mousedown', () => isDragging = true);
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const bounds = document.getElementById('comparisonWrapper').getBoundingClientRect();
+      const offsetX = e.clientX - bounds.left;
+      const percentage = Math.max(0, Math.min(offsetX / bounds.width, 1));
+      afterWrapper.style.width = `${percentage * 100}%`;
+      slider.style.left = `${percentage * 100}%`;
+    });
+  </script>
 </body>
 </html>
