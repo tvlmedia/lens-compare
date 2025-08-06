@@ -183,15 +183,24 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     pdf.addImage(logo, "PNG", x, y, maxW, h);
   }
 
-  function drawDescriptionBlock(lensName, yStart) {
-    const info = lensDescriptions[lensName];
-    if (!info) return;
+ function drawDescriptionBlock(lensName, yStart) {
+  const info = lensDescriptions[lensName];
+  if (!info) return;
 
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(10);
-    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
-   const topMargin = 30; // iets hoger
-pdf.text(lines, 50, yStart + topMargin);
+  const topMargin = 20; // Extra ruimte boven de tekst
+  const textY = yStart + topMargin;
+
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(10);
+  const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
+  pdf.text(lines, 50, textY);
+
+  // Bereken waar de link moet komen
+  const linkY = textY + lines.length * 12 + 10;
+
+  pdf.setTextColor(80, 160, 255);
+  pdf.textWithLink("Klik hier voor meer info", 50, linkY, { url: info.url });
+}
 
 // Meer spacing onder de tekst voor de link
 const spacing = lines.length * 12 + 14;
@@ -230,8 +239,13 @@ pdf.textWithLink("Klik hier voor meer info", 50, yStart + topMargin + spacing, {
   pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
   drawDescriptionBlock(rightSelect.value, yRightEnd + 10);
 
-  const safeLeft = left.replace(/\s+/g, "");
+  const left = leftSelect.value;
+const right = rightSelect.value;
+const focal = focalLengthSelect.value;
+const t = tStopSelect.value;
+
+const safeLeft = left.replace(/\s+/g, "");
 const safeRight = right.replace(/\s+/g, "");
 const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
-  pdf.save(filename);
+pdf.save(filename);
 });
