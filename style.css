@@ -239,14 +239,12 @@ select:hover,
     max-height: 100vh;
   }
 
-  #beforeImage,
-  #afterImage {
+  #beforeImage {
     width: 100%;
     height: auto;
   }
 
-  #beforeImage img,
-  #afterImage img {
+  #beforeImage img {
     width: 100%;
     height: auto;
     object-fit: cover;
