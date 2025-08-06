@@ -1,4 +1,3 @@
-/* ========== Algemene opmaak ========== */
 * {
   -webkit-user-drag: none;
   user-select: none;
@@ -16,7 +15,7 @@ body {
   line-height: 1.6;
 }
 
-/* ========== Controls ========== */
+/* Controls */
 .controls {
   margin: 20px;
   display: flex;
@@ -24,7 +23,7 @@ body {
   flex-wrap: wrap;
 }
 
-select, #toggleButton, #fullscreenButton, #downloadPdfButton {
+select, button {
   padding: 6px 12px;
   background: #1a1a1a;
   color: white;
@@ -34,15 +33,12 @@ select, #toggleButton, #fullscreenButton, #downloadPdfButton {
   cursor: pointer;
 }
 
-select:hover,
-#toggleButton:hover,
-#fullscreenButton:hover,
-#downloadPdfButton:hover {
+button:hover, select:hover {
   background: #666;
   border-color: #666;
 }
 
-/* ========== Wrapper en afbeeldingen ========== */
+/* Comparison Wrapper */
 #comparisonWrapper {
   position: relative;
   width: 960px;
@@ -51,8 +47,7 @@ select:hover,
   background: #000;
 }
 
-#beforeImage,
-#afterWrapper {
+#beforeImage, #afterImage, #afterWrapper {
   position: absolute;
   top: 0;
   left: 0;
@@ -60,8 +55,13 @@ select:hover,
   width: 100%;
 }
 
-#beforeImage img,
-#afterImage img {
+#afterWrapper {
+  width: 50%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+#beforeImage img, #afterImage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -70,21 +70,7 @@ select:hover,
   left: 0;
 }
 
-#afterWrapper {
-  z-index: 2;
-  overflow: hidden;
-  width: 50%;
-}
-
-#afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-}
-
-/* ========== Slider ========== */
+/* Slider */
 #slider {
   position: absolute;
   top: 0;
@@ -97,14 +83,13 @@ select:hover,
   z-index: 10;
 }
 
-/* ========== Info labels ========== */
+/* Info */
 #infoContainer {
   display: flex;
   justify-content: space-between;
   width: 960px;
   margin-top: 12px;
   padding: 0 40px;
-  box-sizing: border-box;
   font-size: 16px;
   color: #eee;
 }
@@ -114,7 +99,7 @@ select:hover,
   text-align: center;
 }
 
-/* ========== Uitlegtekst ========== */
+/* Uitleg */
 #explanationBox {
   margin-top: 12px;
   max-width: 960px;
@@ -124,87 +109,63 @@ select:hover,
   background: #1a1a1a;
   border-left: 4px solid orange;
   border-radius: 6px;
-  line-height: 1.5;
 }
 
-/* ========== Fullscreen scaling ========== */
+/* Fullscreen mode */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  max-height: none;
+  width: 100vw !important;
+  height: 100vh !important;
 }
 
-:fullscreen #beforeImage,
 :fullscreen #afterWrapper,
-:-webkit-full-screen #beforeImage,
 :-webkit-full-screen #afterWrapper {
-  width: 100%;
-  height: 100%;
-}
-
-:fullscreen #afterWrapper {
-  width: 50%;
+  width: 50vw !important;
+  height: 100vh !important;
 }
 
 :fullscreen #beforeImage img,
 :fullscreen #afterImage img,
 :-webkit-full-screen #beforeImage img,
 :-webkit-full-screen #afterImage img {
-  object-fit: contain;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
+  object-fit: contain !important;
 }
 
-/* ========== Mobile scaling via JS class ========== */
-.mobile-mode #comparisonWrapper {
-  width: 100vw;
-  height: auto;
-  aspect-ratio: 16 / 9;
-}
+/* Mobiele modus */
+@media (max-width: 1000px) {
+  #comparisonWrapper {
+    width: 100vw;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
 
-.mobile-mode #beforeImage,
-.mobile-mode #afterWrapper {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  position: relative;
-}
+  #beforeImage,
+  #afterWrapper,
+  #afterImage {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
 
-.mobile-mode #afterWrapper {
-  width: 50vw;
-  overflow: hidden;
-}
+  #beforeImage img,
+  #afterImage img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+  }
 
-.mobile-mode #afterImage {
-  width: 100%;
-  height: 100%;
-}
+  #infoContainer {
+    flex-direction: column;
+    padding: 0 16px;
+    width: 100%;
+    font-size: 14px;
+    text-align: center;
+  }
 
-.mobile-mode #beforeImage img,
-.mobile-mode #afterImage img {
-  object-fit: contain;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.mobile-mode #infoContainer {
-  width: 100%;
-  padding: 0 16px;
-  flex-direction: column;
-  font-size: 14px;
-  text-align: center;
-}
-
-.mobile-mode #leftLabel,
-.mobile-mode #rightLabel {
-  width: 100%;
-  margin: 4px 0;
+  #leftLabel, #rightLabel {
+    width: 100%;
+    margin: 4px 0;
+  }
 }
