@@ -149,7 +149,7 @@ checkMobileClass();
 
 // Download PDF knop
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
-  const { jsPDF } = window.jspdf;
+  const jsPDF = window.jspdf.jsPDF;
 
   // 1. Capture beide beelden via canvas
   const beforeCanvas = await html2canvas(beforeImg, { useCORS: true });
