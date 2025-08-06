@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (VOLLEDIG, MET PDF FIXES EN NETTE LAYOUT) ======
+// ====== LENS COMPARISON TOOL SCRIPT (GEOPTIMALISEERD) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -18,7 +18,7 @@ const notes = {
 const lensImageMap = {
   "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
   "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg",
-  "ironglass_red_p_58mm_t2_8": "red_p_58mm_t2_8.jpg",
+  "ironglass_red_p_50mm_t2_8": "red_p_58mm_t2_8.jpg",
   "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg"
 };
 
@@ -57,6 +57,7 @@ function updateImages() {
   afterImgTag.src = imgLeft;
 
   const tStopFormatted = `T${tStopSelect.value}`;
+
   leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
   rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
 }
@@ -118,7 +119,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const pageHeight = pdf.internal.pageSize.getHeight();
 
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
-  const logoImg = await loadImage(logoUrl);
+  const logo = await loadImage(logoUrl);
 
   const lensDescriptions = {
     "IronGlass Red P": {
@@ -154,35 +155,38 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     return h;
   }
 
-  function drawLogoBottomRight() {
-    const logoWidth = 90;
-    const logoHeight = 40;
-    const x = pageWidth - logoWidth - 10;
-    const y = pageHeight - logoHeight - 10;
-    pdf.addImage(logoImg, "PNG", x, y, logoWidth, logoHeight);
-  }
-
   function drawTopLabel(text) {
     const barHeight = 40;
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, 0, pageWidth, barHeight, "F");
-    pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(16);
+    pdf.setTextColor(255, 255, 255);
     pdf.text(text, pageWidth / 2, 26, { align: "center" });
   }
 
-  function drawDescription(lens) {
+  function drawLogoBottomRight(logo) {
+    const logoHeight = 35;
+    const ratio = logo.width / logo.height;
+    const logoWidth = logoHeight * ratio;
+    const x = pageWidth - logoWidth - 12;
+    const y = pageHeight - logoHeight - 12;
+    pdf.addImage(logo, "PNG", x, y, logoWidth, logoHeight);
+  }
+
+  function drawDescriptionBox(lens) {
     const info = lensDescriptions[lens];
     if (!info) return;
+
     const boxHeight = 70;
     const margin = 20;
-    const logoSafeRight = 120;
+    const logoSafeRight = 140;
     const safeTextWidth = pageWidth - margin - logoSafeRight;
 
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
 
     const lines = pdf.splitTextToSize(info.text, safeTextWidth);
+
     pdf.setFontSize(10);
     pdf.setTextColor(255, 255, 255);
     pdf.text(lines, margin, pageHeight - boxHeight + 20);
@@ -202,29 +206,30 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const rightData = await renderImage(rightImg);
 
   // Page 1
+  pdf.addPage();
   fillBlack();
-  await drawFullWidth(splitData, 40);
   drawTopLabel(`${leftText}  vs  ${rightText}`);
-  drawLogoBottomRight();
+  await drawFullWidth(splitData, 40);
+  drawLogoBottomRight(logo);
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(10);
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 15, { align: "center" });
+  pdf.setFontSize(12);
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
   // Page 2
   pdf.addPage();
   fillBlack();
-  await drawFullWidth(leftData, 40);
   drawTopLabel(leftText);
-  drawDescription(left);
-  drawLogoBottomRight();
+  await drawFullWidth(leftData, 40);
+  drawDescriptionBox(left);
+  drawLogoBottomRight(logo);
 
   // Page 3
   pdf.addPage();
   fillBlack();
-  await drawFullWidth(rightData, 40);
   drawTopLabel(rightText);
-  drawDescription(right);
-  drawLogoBottomRight();
+  await drawFullWidth(rightData, 40);
+  drawDescriptionBox(right);
+  drawLogoBottomRight(logo);
 
   const safeLeft = left.replace(/\s+/g, "");
   const safeRight = right.replace(/\s+/g, "");
