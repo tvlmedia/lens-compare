@@ -443,7 +443,23 @@ html, body {
 @media (max-width: 767px) {
   #comparisonWrapper,
   #infoContainer {
-    transform: scale(0.33);
+    transform: scale(0.40);
     transform-origin: top center;
+  }
+}
+@media (max-width: 767px) {
+  #comparisonWrapper,
+  #infoContainer,
+  #explanationBox {
+    transform: scale(0.35);
+    transform-origin: top center;
+  }
+
+  #infoContainer {
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    margin: 0;
   }
 }
