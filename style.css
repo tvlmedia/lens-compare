@@ -24,19 +24,11 @@ html, body {
 .controls {
   margin: 20px;
   display: flex;
-  flex-direction: column;
   gap: 10px;
-  padding: 0 16px;
-  width: 100%;
-  max-width: 960px;
-}
-
-.button-row,
-.select-row {
-  display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
+  padding: 0 16px;
+  flex-direction: row;
 }
 
 select,
@@ -127,6 +119,7 @@ select:hover,
   background: white;
   cursor: ew-resize;
   z-index: 10;
+  touch-action: none;
 }
 
 /* ========== Labels onderin ========== */
@@ -268,33 +261,60 @@ select:hover,
   }
 
   .controls {
-    gap: 16px;
-  }
-
-  .button-row,
-  .select-row {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: 10px;
   }
 
-  .button-row button,
-  .select-row select {
-    flex: 1 1 45%;
-    min-width: 120px;
-    max-width: 200px;
+  .controls button {
+    width: 100%;
+  }
+
+  .controls select {
+    width: 100%;
+  }
+
+  .mobile-pair {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .mobile-pair select {
+    flex: 1;
   }
 }
 
-@media screen and (max-width: 480px) {
-  #infoContainer {
-    font-size: 13px;
-  }
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: black;
+  width: 100%;
+  max-width: 960px;
+}
 
-  #leftLabel,
-  #rightLabel {
-    font-size: 12.5px;
-    color: #ccc;
-  }
+.logo {
+  height: 40px;
+  object-fit: contain;
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.menu-toggle .bar {
+  width: 28px;
+  height: 3px;
+  background-color: white;
+  border-radius: 2px;
 }
