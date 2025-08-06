@@ -9,13 +9,6 @@ body {
   align-items: center;
   font-size: 14px;
   line-height: 1.6;
-  -webkit-user-drag: none;
-  user-select: none;
-}
-
-* {
-  -webkit-user-drag: none;
-  user-select: none;
 }
 
 .controls {
@@ -25,54 +18,55 @@ body {
   flex-wrap: wrap;
 }
 
-/* Buttons & select styling */
-select,
-#toggleButton,
-#fullscreenButton,
-#downloadPdfButton {
-  padding: 8px 14px;
+select, #toggleButton, #fullscreenButton, #downloadPdfButton {
+  padding: 8px 16px;
   background: #121212;
-  color: white;
+  color: #fff;
   border: 1px solid #333;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
+  outline: none;
+  transition: border 0.2s ease, background 0.2s ease;
   appearance: none;
   cursor: pointer;
-  transition: border 0.2s ease, background 0.2s ease;
 }
 
-select:hover,
-#toggleButton:hover,
-#fullscreenButton:hover,
-#downloadPdfButton:hover {
-  background: #1a1a1a;
+select:hover, #toggleButton:hover, #fullscreenButton:hover, #downloadPdfButton:hover {
   border-color: #ff8800;
+  background: #1a1a1a;
 }
 
 select:focus {
   border-color: #ff8800;
   box-shadow: 0 0 4px #ff8800;
-  outline: none;
 }
 
-/* Wrapper voor vergelijking */
+button:hover,
+#toggleButton:hover,
+#fullscreenButton:hover,
+#downloadPdfButton:hover {
+  background-color: #111;
+  border-color: #555;
+  transform: scale(1.03);
+}
+
 #comparisonWrapper {
   position: relative;
   width: 960px;
   height: 540px;
-  background: #000;
   overflow: hidden;
+  background: #000000;
+  user-select: none;
 }
 
-/* Afbeeldingen */
-#beforeImage,
-#afterImage {
+#beforeImage, #afterImage {
   position: absolute;
   top: 0;
   left: 0;
   width: 960px;
   height: 540px;
+  user-select: none;
 }
 
 #beforeImage img,
@@ -83,9 +77,10 @@ select:focus {
   object-fit: contain;
   top: 0;
   left: 0;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
-/* After wrapper */
 #afterWrapper {
   position: absolute;
   top: 0;
@@ -96,7 +91,6 @@ select:focus {
   z-index: 2;
 }
 
-/* Slider */
 #slider {
   position: absolute;
   top: 0;
@@ -106,6 +100,7 @@ select:focus {
   background: white;
   cursor: ew-resize;
   z-index: 10;
+  border-radius: 0;
 }
 
 #slider::before {
@@ -120,13 +115,16 @@ select:focus {
   transform: translate(-50%, -50%);
 }
 
-/* Labels */
+#slider::after {
+  display: none;
+}
+
 #infoContainer {
   display: flex;
   justify-content: space-between;
   width: 960px;
-  margin-top: 16px;
-  padding: 8px 20px;
+  margin-top: 12px;
+  padding: 8px 40px;
   box-sizing: border-box;
   font-size: 14px;
   color: #eee;
@@ -138,13 +136,13 @@ select:focus {
   letter-spacing: 0.2px;
 }
 
-#leftLabel,
-#rightLabel {
+#leftLabel, #rightLabel {
   width: 50%;
   text-align: center;
+  font-weight: normal;
+  text-transform: none;
 }
 
-/* Uitlegbox */
 #explanationBox {
   margin-top: 16px;
   max-width: 960px;
@@ -159,35 +157,7 @@ select:focus {
   box-shadow: 0 0 12px rgba(255, 136, 0, 0.1);
 }
 
-/* Print-styles */
-@media print {
-  body {
-    background: white !important;
-    color: black !important;
-  }
-
-  .controls,
-  #explanationBox {
-    display: none !important;
-  }
-
-  #comparisonWrapper {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: auto !important;
-  }
-
-  #infoContainer {
-    margin-top: 20px;
-    color: black !important;
-  }
-
-  #comparisonWrapper img {
-    object-fit: contain !important;
-  }
-}
-
-/* Fullscreen-styles */
+/* Fullscreen support */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -227,55 +197,40 @@ select:focus {
   object-fit: contain;
 }
 
-/* ✅ MOBILE FIX */
-@media screen and (max-width: 767px) {
+:fullscreen #afterWrapper img,
+:-webkit-full-screen #afterWrapper img {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  top: 0;
+  left: 0;
+}
+
+/* Print support */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .controls,
+  #explanationBox {
+    display: none !important;
+  }
+
   #comparisonWrapper {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-
-  #beforeImage,
-  #afterImage,
-  #afterWrapper {
-    width: 100%;
-    height: 100%;
-  }
-
-  #beforeImage img,
-  #afterImage img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  #afterWrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: 2;
-  }
-
-  #slider {
-    width: 2px;
-  }
-
-  #slider::before {
-    width: 12px;
-    height: 12px;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
   }
 
   #infoContainer {
-    flex-direction: column;
-    align-items: center;
-    font-size: 13px;
-    width: 100%;
+    margin-top: 20px;
+    color: black !important;
   }
 
-  #leftLabel,
-  #rightLabel {
-    width: 100%;
-    text-align: center;
+  #comparisonWrapper img {
+    object-fit: contain !important;
   }
-} 
+}
