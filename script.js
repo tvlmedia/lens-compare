@@ -146,3 +146,66 @@ function checkMobileClass() {
 window.addEventListener("resize", checkMobileClass);
 document.addEventListener("fullscreenchange", checkMobileClass);
 checkMobileClass();
+
+// Download PDF knop
+document.getElementById("downloadPdfButton").addEventListener("click", async () => {
+  const { jsPDF } = window.jspdf;
+
+  // 1. Capture beide beelden via canvas
+  const beforeCanvas = await html2canvas(beforeImg, { useCORS: true });
+  const afterCanvas = await html2canvas(afterImg, { useCORS: true });
+
+  // 2. Maak nieuwe PDF
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [960, 540] });
+
+  // 3. Voeg split-image toe op pagina 1
+  const combinedCanvas = document.createElement("canvas");
+  combinedCanvas.width = 960;
+  combinedCanvas.height = 540;
+  const ctx = combinedCanvas.getContext("2d");
+  ctx.drawImage(beforeCanvas, 0, 0, 480, 540);
+  ctx.drawImage(afterCanvas, 480, 0, 480, 540);
+
+  pdf.addImage(combinedCanvas.toDataURL("image/jpeg", 1.0), "JPEG", 0, 0, 960, 540);
+
+  // 4. Functie om losse pagina's toe te voegen
+  const addLensPage = async (img, title, description, link) => {
+    pdf.addPage([960, 540], "landscape");
+    const imgCanvas = await html2canvas(img, { useCORS: true });
+    const imgData = imgCanvas.toDataURL("image/jpeg", 1.0);
+    pdf.addImage(imgData, "JPEG", 0, 0, 960, 400);
+
+    // Zwarte balk
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 400, 960, 140, "F");
+
+    // Witte tekst
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(18);
+    pdf.text(title, 40, 430);
+    pdf.setFontSize(12);
+    pdf.text(description, 40, 460);
+
+    // Link
+    pdf.setTextColor(100, 180, 255);
+    pdf.textWithLink("Klik hier voor meer info", 40, 490, { url: link });
+
+    // Logo rechtsboven
+    const logo = new Image();
+    logo.src = "/images/logo_tvlrental.png"; // Pas aan naar jouw pad
+    await new Promise(resolve => logo.onload = resolve);
+    pdf.addImage(logo, "PNG", 840, 410, 80, 80);
+  };
+
+  // 5. Voeg lenspagina’s toe
+  const leftLens = leftSelect.value;
+  const rightLens = rightSelect.value;
+  const tStop = tStopSelect.value;
+  const focal = focalSelect.value;
+
+  await addLensPage(afterImg, `${leftLens} - ${focal} T${tStop}`, "Beschrijving lens", `https://tvlrental.nl/${leftLens.toLowerCase().replaceAll(" ", "")}`);
+  await addLensPage(beforeImg, `${rightLens} - ${focal} T${tStop}`, "Beschrijving lens", `https://tvlrental.nl/${rightLens.toLowerCase().replaceAll(" ", "")}`);
+
+  // 6. Download PDF
+  pdf.save("lens_comparison.pdf");
+});
