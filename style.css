@@ -246,3 +246,18 @@ select:hover,
     display: none !important;
   }
 }
+/* Zorg dat touch werkt */
+#slider {
+  touch-action: none;
+}
+
+/* Override de verkeerde vaste grootte op mobiel */
+@media screen and (max-width: 767px) {
+  #afterWrapper #afterImage,
+  #afterWrapper #afterImage img {
+    width: 100vw !important;
+    height: auto !important;
+    object-fit: cover;
+    object-position: center center;
+  }
+}
