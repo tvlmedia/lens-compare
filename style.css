@@ -44,11 +44,12 @@ select:hover,
 
 /* ========== Wrapper en afbeeldingen ========== */
 #comparisonWrapper {
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
   position: relative;
-  width: 960px;
-  height: 540px;
+  background: black;
   overflow: hidden;
-  background: #000;
 }
 
 #beforeImage, #afterImage {
