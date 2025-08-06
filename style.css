@@ -230,3 +230,22 @@ select:hover,
   width: 100%;
   margin: 4px 0;
 }
+@media screen and (max-width: 767px) {
+  body.mobile-mode:fullscreen #comparisonWrapper,
+  body.mobile-mode:-webkit-full-screen #comparisonWrapper {
+    width: 100vw;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    max-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #beforeImage img,
+  #afterImage img {
+    width: 100vw;
+    height: auto;
+    object-fit: contain;
+  }
+}
