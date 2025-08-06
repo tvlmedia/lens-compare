@@ -271,14 +271,24 @@ select:hover,
   body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
     width: 100%;
     height: 100%;
+    position: relative;
+    overflow: hidden;
   }
 
   body:not(.mobile-mode):not(:fullscreen) #beforeImage img,
   body:not(.mobile-mode):not(:fullscreen) #afterImage img {
-    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    pointer-events: none;
   }
-}
-body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
-  pointer-events: none;
-  z-index: 2;
+
+  body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
+    pointer-events: none;
+    z-index: 2;
+  }
 }
