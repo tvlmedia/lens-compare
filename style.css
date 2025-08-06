@@ -24,7 +24,10 @@ body {
   flex-wrap: wrap;
 }
 
-select, #toggleButton, #fullscreenButton, #downloadPdfButton {
+select,
+#toggleButton,
+#fullscreenButton,
+#downloadPdfButton {
   padding: 6px 12px;
   background: #1a1a1a;
   color: white;
@@ -52,7 +55,8 @@ select:hover,
   overflow: hidden;
 }
 
-#beforeImage, #afterImage {
+#beforeImage,
+#afterImage {
   position: absolute;
   top: 0;
   left: 0;
@@ -68,7 +72,6 @@ select:hover,
   object-position: center center;
   position: absolute;
   inset: 0;
-  display: block;
 }
 
 /* ========== AFTER WRAPPER voor split ========== */
@@ -87,13 +90,13 @@ select:hover,
   position: absolute;
   top: 0;
   left: 0;
-  width: 960px;
-  height: 540px;
+  width: 100%;
+  height: 100%;
 }
 
 #afterWrapper #afterImage img {
-  width: 960px;
-  height: 540px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center center;
 }
@@ -123,7 +126,8 @@ select:hover,
   color: #eee;
 }
 
-#leftLabel, #rightLabel {
+#leftLabel,
+#rightLabel {
   width: 50%;
   text-align: center;
 }
@@ -159,14 +163,14 @@ select:hover,
 
 :fullscreen #afterWrapper #afterImage,
 :-webkit-full-screen #afterWrapper #afterImage {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 }
 
 :fullscreen #afterWrapper #afterImage img,
 :-webkit-full-screen #afterWrapper #afterImage img {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center center;
 }
@@ -178,7 +182,8 @@ select:hover,
     color: black !important;
   }
 
-  .controls, #explanationBox {
+  .controls,
+  #explanationBox {
     display: none !important;
   }
 
@@ -232,7 +237,7 @@ select:hover,
   margin: 4px 0;
 }
 
-/* ========== Mobile fullscreen fix ========== */
+/* Mobiel fullscreen fix */
 @media screen and (max-width: 767px) {
   body.mobile-mode:fullscreen #comparisonWrapper,
   body.mobile-mode:-webkit-full-screen #comparisonWrapper {
@@ -261,5 +266,16 @@ select:hover,
 
   #afterWrapper {
     height: auto;
+  }
+
+  #afterWrapper #afterImage {
+    width: 100%;
+    height: auto;
+  }
+
+  #afterWrapper #afterImage img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 }
