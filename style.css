@@ -263,32 +263,37 @@ select:hover,
   body:not(.mobile-mode):not(:fullscreen) #comparisonWrapper {
     width: 960px;
     height: 540px;
-    aspect-ratio: auto;
   }
 
   body:not(.mobile-mode):not(:fullscreen) #beforeImage,
-  body:not(.mobile-mode):not(:fullscreen) #afterImage,
-  body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-  }
-
-  body:not(.mobile-mode):not(:fullscreen) #beforeImage img,
-  body:not(.mobile-mode):not(:fullscreen) #afterImage img {
+  body:not(.mobile-mode):not(:fullscreen) #afterImage {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: center center;
-    pointer-events: none;
   }
 
   body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
-    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%; /* cruciale fix */
+    height: 100%;
+    overflow: hidden;
     z-index: 2;
+    pointer-events: none;
+  }
+
+  body:not(.mobile-mode):not(:fullscreen) #beforeImage img,
+  body:not(.mobile-mode):not(:fullscreen) #afterImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
   }
 }
