@@ -119,13 +119,22 @@ flipBtn.addEventListener("click", () => {
 });
 
 // Fullscreen
-document.getElementById("fullscreenButton").addEventListener("click", () => {
-  if (!document.fullscreenElement) {
-    wrapper.requestFullscreen?.() || wrapper.webkitRequestFullscreen?.();
+const fullscreenBtn = document.getElementById("fullscreenButton");
+fullscreenBtn.addEventListener("click", () => {
+  const el = wrapper;
+  if (el.requestFullscreen) {
+    el.requestFullscreen();
+  } else if (el.webkitRequestFullscreen) {
+    el.webkitRequestFullscreen();
   } else {
-    document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+    alert("Fullscreen wordt niet ondersteund op dit apparaat.");
   }
 });
+
+// Verberg fullscreen knop als niet ondersteund
+if (!document.fullscreenEnabled && !document.webkitFullscreenEnabled) {
+  fullscreenBtn.style.display = "none";
+}
 
 // Mobile check
 function checkMobileClass() {
