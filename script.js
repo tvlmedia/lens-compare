@@ -136,34 +136,52 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     return canvas.toDataURL("image/jpeg", 1.0);
   }
 
-  async function drawFullWidth(imgData) {
-    const topMargin = 40;
-    const bottomMargin = 70;
-    const maxHeight = pageHeight - topMargin - bottomMargin;
-
+  async function drawFullWidthImage(imgData, top = 40, bottom = 70) {
     const img = new Image();
     img.src = imgData;
     await new Promise(resolve => img.onload = resolve);
-
     const aspect = img.width / img.height;
-    const imgHeight = Math.min(maxHeight, pageWidth / aspect);
+
+    const availableHeight = pageHeight - top - bottom;
+    const imgHeight = availableHeight;
     const imgWidth = imgHeight * aspect;
+
     const x = (pageWidth - imgWidth) / 2;
-    const y = topMargin;
+    const y = top;
 
     pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
   }
 
-  function drawTopLabel(text) {
+  function drawTopBar(text) {
     const barHeight = 40;
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, 0, pageWidth, barHeight, "F");
-    pdf.setFontSize(18);
     pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
     pdf.text(text, pageWidth / 2, 26, { align: "center" });
   }
 
-  function drawLogoBottomRight() {
+  function drawBottomBar(text, link = "") {
+    const barHeight = 70;
+    const margin = 20;
+    const logoSpace = 150;
+    const textWidth = pageWidth - margin - logoSpace;
+
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    const lines = pdf.splitTextToSize(text, textWidth);
+    pdf.text(lines, margin, pageHeight - barHeight + 20);
+
+    if (link) {
+      pdf.setTextColor(80, 160, 255);
+      pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, { url: link });
+    }
+  }
+
+  function drawBottomLogo() {
     const targetHeight = 50;
     const ratio = logo.width / logo.height;
     const targetWidth = targetHeight * ratio;
@@ -172,24 +190,10 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     pdf.addImage(logo, "PNG", x, y, targetWidth, targetHeight);
   }
 
-  function drawDescriptionBox(lens) {
-    const info = lensDescriptions[lens];
-    if (!info) return;
-    const boxHeight = 70;
-    const margin = 20;
-    const logoSafeRight = 160;
-    const safeTextWidth = pageWidth - margin - logoSafeRight;
-
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
-    const lines = pdf.splitTextToSize(info.text, safeTextWidth);
-
-    pdf.setFontSize(10);
+  function drawSiteURL() {
+    pdf.setFontSize(14);
     pdf.setTextColor(255, 255, 255);
-    pdf.text(lines, margin, pageHeight - boxHeight + 20);
-
-    pdf.setTextColor(80, 160, 255);
-    pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, { url: info.url });
+    pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 20, { align: "center" });
   }
 
   function fillBlack() {
@@ -204,27 +208,26 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
 
   // Page 1
   fillBlack();
-  drawTopLabel(`${leftText}  vs  ${rightText}`);
-  await drawFullWidth(splitData);
-  drawLogoBottomRight();
-  pdf.setFontSize(14);
-  pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 20, { align: "center" });
+  drawTopBar(`${leftText}  vs  ${rightText}`);
+  await drawFullWidthImage(splitData);
+  drawSiteURL();
+  drawBottomLogo();
 
   // Page 2
   pdf.addPage();
   fillBlack();
-  drawTopLabel(leftText);
-  await drawFullWidth(leftData);
-  drawDescriptionBox(left);
-  drawLogoBottomRight();
+  drawTopBar(leftText);
+  await drawFullWidthImage(leftData);
+  drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
+  drawBottomLogo();
 
   // Page 3
   pdf.addPage();
   fillBlack();
-  drawTopLabel(rightText);
-  await drawFullWidth(rightData);
-  drawDescriptionBox(right);
-  drawLogoBottomRight();
+  drawTopBar(rightText);
+  await drawFullWidthImage(rightData);
+  drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
+  drawBottomLogo();
 
   const safeLeft = left.replace(/\s+/g, "");
   const safeRight = right.replace(/\s+/g, "");
@@ -240,21 +243,6 @@ async function loadImage(url) {
     img.src = url;
   });
 }
-
-document.getElementById("fullscreenButton").addEventListener("click", () => {
-  const elem = document.getElementById("comparisonWrapper");
-
-  if (document.fullscreenElement || document.webkitFullscreenElement) {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
-  } else {
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen(); // Safari
-    }
-  }
-});
+slider.addEventListener("mousedown", () => isDragging = true);
+window.addEventListener("mouseup", () => isDragging = false);
+window.addEventListener("mousemove", e => { ... });
