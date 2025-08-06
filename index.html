@@ -10,30 +10,42 @@
 
   <!-- === Controls === -->
   <div class="controls">
-    <button id="toggleButton">↔ Flip</button>
+
+    <!-- Rij 1: Flip + Download PDF -->
+    <div class="button-row">
+      <button id="toggleButton">↔ Flip</button>
+      <button id="downloadPdfButton">⤓ Download PDF</button>
+    </div>
+
+    <!-- Rij 2: Lens 1 + Lens 2 onder elkaar -->
+    <div class="select-column">
+      <select id="leftLens"></select>
+      <select id="rightLens"></select>
+    </div>
+
+    <!-- Rij 3: T-stop + Focal Length naast elkaar -->
+    <div class="select-row">
+      <select id="tStop">
+        <option value="1.4">T1.4</option>
+        <option value="2">T2</option>
+        <option value="2.8" selected>T2.8</option>
+        <option value="4">T4</option>
+        <option value="5.6">T5.6</option>
+        <option value="8">T8</option>
+      </select>
+
+      <select id="focalLength">
+        <option value="18mm">18mm</option>
+        <option value="25mm">25mm</option>
+        <option value="35mm" selected>35mm</option>
+        <option value="50mm">50mm</option>
+        <option value="80mm">80mm</option>
+        <option value="135mm">135mm</option>
+      </select>
+    </div>
+
+    <!-- Rij 4: Fullscreen (wordt verborgen op mobiel via CSS) -->
     <button id="fullscreenButton">⛶ Fullscreen</button>
-    <button id="downloadPdfButton">⤓ Download PDF</button>
-
-    <select id="leftLens"></select>
-    <select id="rightLens"></select>
-
-    <select id="tStop">
-      <option value="1.4">T1.4</option>
-      <option value="2">T2</option>
-      <option value="2.8" selected>T2.8</option>
-      <option value="4">T4</option>
-      <option value="5.6">T5.6</option>
-      <option value="8">T8</option>
-    </select>
-
-    <select id="focalLength">
-      <option value="18mm">18mm</option>
-      <option value="25mm">25mm</option>
-      <option value="35mm" selected>35mm</option>
-      <option value="50mm">50mm</option>
-      <option value="80mm">80mm</option>
-      <option value="135mm">135mm</option>
-    </select>
   </div>
 
   <!-- === Comparison Area === -->
