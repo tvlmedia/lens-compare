@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (vanaf 0) ======
+// ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -22,7 +22,6 @@ const customFilenames = {
   "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg"
 };
 
-// Elements
 const leftSelect = document.getElementById("leftLens");
 const rightSelect = document.getElementById("rightLens");
 const tStopSelect = document.getElementById("tStop");
@@ -35,13 +34,11 @@ const wrapper = document.getElementById("comparisonWrapper");
 const leftLabel = document.getElementById("leftLabel");
 const rightLabel = document.getElementById("rightLabel");
 
-// Populate selects
 lenses.forEach(lens => {
   leftSelect.add(new Option(lens, lens));
   rightSelect.add(new Option(lens, lens));
 });
 
-// Update function
 function updateComparison() {
   const left = leftSelect.value.toLowerCase().replaceAll(" ", "_");
   const right = rightSelect.value.toLowerCase().replaceAll(" ", "_");
@@ -51,21 +48,17 @@ function updateComparison() {
   const lKey = `${left}_${focal}_t${tStop}`;
   const rKey = `${right}_${focal}_t${tStop}`;
 
-  const lPath = `images/${customFilenames[lKey] || lKey + ".jpg"}`;
-  const rPath = `images/${customFilenames[rKey] || rKey + ".jpg"}`;
+  afterImg.src = `images/${customFilenames[lKey] || lKey + ".jpg"}`;
+  beforeImg.src = `images/${customFilenames[rKey] || rKey + ".jpg"}`;
 
-  afterImg.src = lPath;
-  beforeImg.src = rPath;
-
-  const tStopText = `T${tStopSelect.value}`;
-  leftLabel.textContent = `Lens: ${leftSelect.value} ${lensNotes[`${left}_${focal}`] || focal} ${tStopText}`;
-  rightLabel.textContent = `Lens: ${rightSelect.value} ${lensNotes[`${right}_${focal}`] || focal} ${tStopText}`;
+  const tText = `T${tStopSelect.value}`;
+  leftLabel.textContent = `Lens: ${leftSelect.value} ${lensNotes[`${left}_${focal}`] || focal} ${tText}`;
+  rightLabel.textContent = `Lens: ${rightSelect.value} ${lensNotes[`${right}_${focal}`] || focal} ${tText}`;
 
   afterWrapper.style.width = "50%";
   slider.style.left = "50%";
 }
 
-// Init
 leftSelect.value = lenses[0];
 rightSelect.value = lenses[1];
 tStopSelect.value = "2.8";
@@ -76,7 +69,6 @@ updateComparison();
   el.addEventListener("change", updateComparison)
 );
 
-// Drag
 let dragging = false;
 slider.addEventListener("mousedown", () => dragging = true);
 window.addEventListener("mouseup", () => dragging = false);
@@ -89,7 +81,6 @@ window.addEventListener("mousemove", e => {
   slider.style.left = `${percent}%`;
 });
 
-// Touch support
 slider.addEventListener("touchstart", (e) => {
   dragging = true;
   e.preventDefault();
@@ -105,7 +96,6 @@ window.addEventListener("touchmove", (e) => {
   slider.style.left = `${percent}%`;
 }, { passive: false });
 
-// Flip
 document.getElementById("toggleButton").addEventListener("click", () => {
   const l = leftSelect.value;
   leftSelect.value = rightSelect.value;
@@ -113,9 +103,7 @@ document.getElementById("toggleButton").addEventListener("click", () => {
   updateComparison();
 });
 
-// Fullscreen
-const fullscreenBtn = document.getElementById("fullscreenButton");
-fullscreenBtn.addEventListener("click", () => {
+document.getElementById("fullscreenButton").addEventListener("click", () => {
   const el = wrapper;
   if (el.requestFullscreen) el.requestFullscreen();
   else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
@@ -126,7 +114,6 @@ if (!document.fullscreenEnabled && !document.webkitFullscreenEnabled) {
   fullscreenBtn.style.display = "none";
 }
 
-// Mobile class
 function checkMobileClass() {
   const isMobile = window.innerWidth <= 768;
   const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
@@ -136,8 +123,7 @@ window.addEventListener("resize", checkMobileClass);
 document.addEventListener("fullscreenchange", checkMobileClass);
 checkMobileClass();
 
-// ========== PDF DOWNLOAD FIX ==========
-
+// ========== PDF DOWNLOAD BUTTON ==========
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
   const jsPDF = window.jspdf?.jsPDF;
   if (!jsPDF || !html2canvas) {
