@@ -27,7 +27,7 @@ body {
 
 /* Buttons & select styling */
 select,
-#toggleButton,
+#flipButton,
 #fullscreenButton,
 #downloadPdfButton {
   padding: 8px 14px;
@@ -43,7 +43,7 @@ select,
 }
 
 select:hover,
-#toggleButton:hover,
+#flipButton:hover,
 #fullscreenButton:hover,
 #downloadPdfButton:hover {
   background: #1a1a1a;
@@ -71,8 +71,8 @@ select:focus {
   position: absolute;
   top: 0;
   left: 0;
-  width: 960px;
-  height: 540px;
+  width: 100%;
+  height: 100%;
 }
 
 #beforeImage img,
@@ -227,57 +227,11 @@ select:focus {
   object-fit: contain;
 }
 
-/* ✅ MOBILE FIX */
+/* Mobile styles */
 @media screen and (max-width: 767px) {
   #comparisonWrapper {
     width: 100%;
-    height: auto;
     aspect-ratio: 16 / 9;
-    position: relative;
-    overflow: hidden;
-  }
-
-  #beforeImage {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  #afterWrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 50%;
-    height: 100%;
-    overflow: hidden;
-    z-index: 2;
-  }
-
-  #afterImage {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  #beforeImage img,
-  #afterImage img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  #slider {
-    width: 2px;
-    z-index: 10;
-  }
-
-  #slider::before {
-    width: 12px;
-    height: 12px;
   }
 
   #infoContainer {
