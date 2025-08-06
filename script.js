@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (NETJES, FIXED PDF & UI) ======
+// ====== LENS COMPARISON TOOL SCRIPT (VOLLEDIG, MET PDF FIXES EN NETTE LAYOUT) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -57,7 +57,6 @@ function updateImages() {
   afterImgTag.src = imgLeft;
 
   const tStopFormatted = `T${tStopSelect.value}`;
-
   leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
   rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
 }
@@ -155,38 +154,35 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     return h;
   }
 
-  function drawTopLabel(text) {
-    const barHeight = 20;
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, barHeight, "F");
-    pdf.setFontSize(12);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(text, pageWidth / 2, 14, { align: "center" });
+  function drawLogoBottomRight() {
+    const logoWidth = 90;
+    const logoHeight = 40;
+    const x = pageWidth - logoWidth - 10;
+    const y = pageHeight - logoHeight - 10;
+    pdf.addImage(logoImg, "PNG", x, y, logoWidth, logoHeight);
   }
 
-  function drawLogoBottomRight() {
-    const maxWidth = 90;
-    const ratio = logoImg.width / logoImg.height;
-    const height = maxWidth / ratio;
-    const x = pageWidth - maxWidth - 10;
-    const y = pageHeight - height - 10;
-    pdf.addImage(logoImg, "PNG", x, y, maxWidth, height);
+  function drawTopLabel(text) {
+    const barHeight = 40;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, barHeight, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.text(text, pageWidth / 2, 26, { align: "center" });
   }
 
   function drawDescription(lens) {
     const info = lensDescriptions[lens];
     if (!info) return;
-
     const boxHeight = 70;
     const margin = 20;
-    const logoSafeRight = 70;
+    const logoSafeRight = 120;
+    const safeTextWidth = pageWidth - margin - logoSafeRight;
 
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
 
-    const safeTextWidth = pageWidth - margin * 2 - logoSafeRight;
     const lines = pdf.splitTextToSize(info.text, safeTextWidth);
-
     pdf.setFontSize(10);
     pdf.setTextColor(255, 255, 255);
     pdf.text(lines, margin, pageHeight - boxHeight + 20);
