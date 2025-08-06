@@ -1,281 +1,235 @@
-/* Algemene opmaak */
-body {
-  margin: 0;
-  background: #0f0f0f;
-  color: white;
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 14px;
-  line-height: 1.6;
-  -webkit-user-drag: none;
-  user-select: none;
+const lenses = [
+  "IronGlass Red P",
+  "IronGlass Zeiss Jena",
+  "DZO Vespid",
+  "DZO Arles",
+  "Cooke Panchro FF",
+  "Lomo Standard Speed"
+];
+
+const notes = {
+  "ironglass_red_p_35mm": "37mm",
+  "ironglass_zeiss_jena_35mm": "35mm",
+  "cooke_panchro_ff_25mm": "32mm"
+};
+
+const lensImageMap = {
+  "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
+  "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg"
+};
+
+const leftSelect = document.getElementById("leftLens");
+const rightSelect = document.getElementById("rightLens");
+const tStopSelect = document.getElementById("tStop");
+const focalLengthSelect = document.getElementById("focalLength");
+const beforeImgTag = document.getElementById("beforeImgTag");
+const afterImgTag = document.getElementById("afterImgTag");
+const afterWrapper = document.getElementById("afterWrapper");
+const slider = document.getElementById("slider");
+const comparisonWrapper = document.getElementById("comparisonWrapper");
+const leftLabel = document.getElementById("leftLabel");
+const rightLabel = document.getElementById("rightLabel");
+
+lenses.forEach(lens => {
+  leftSelect.add(new Option(lens, lens));
+  rightSelect.add(new Option(lens, lens));
+});
+
+function updateImages() {
+  const leftLens = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
+  const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
+  const tStop = tStopSelect.value.replace(".", "_");
+  const focalLength = focalLengthSelect.value;
+
+  const leftBaseKey = `${leftLens}_${focalLength}`;
+  const rightBaseKey = `${rightLens}_${focalLength}`;
+  const leftKey = `${leftLens}_${focalLength}_t${tStop}`;
+  const rightKey = `${rightLens}_${focalLength}_t${tStop}`;
+
+  const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
+  const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
+
+  // correcte volgorde:
+  beforeImgTag.src = imgRight;
+  afterImgTag.src = imgLeft;
+
+  const tStopRaw = tStopSelect.value;
+  const tStopFormatted = `T${tStopRaw}`;
+
+  leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
+  rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
 }
 
-* {
-  -webkit-user-drag: none;
-  user-select: none;
-}
+[leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
+  el.addEventListener("change", updateImages)
+);
+leftSelect.value = "IronGlass Red P";
+rightSelect.value = "IronGlass Zeiss Jena";
+tStopSelect.value = "2.8";
+focalLengthSelect.value = "35mm";
 
-.controls {
-  margin: 20px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+let isDragging = false;
 
-/* Buttons & select styling */
-select,
-#toggleButton,
-#fullscreenButton,
-#downloadPdfButton {
-  padding: 8px 14px;
-  background: #121212;
-  color: white;
-  border: 1px solid #333;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  appearance: none;
-  cursor: pointer;
-  transition: border 0.2s ease, background 0.2s ease;
-}
+slider.addEventListener("mousedown", () => isDragging = true);
+window.addEventListener("mouseup", () => isDragging = false);
+window.addEventListener("mousemove", e => {
+  if (!isDragging) return;
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const offset = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+  const percent = (offset / rect.width) * 100;
+  afterWrapper.style.width = `${percent}%`;
+  slider.style.left = `${percent}%`;
+});
 
-select:hover,
-#toggleButton:hover,
-#fullscreenButton:hover,
-#downloadPdfButton:hover {
-  background: #1a1a1a;
-  border-color: #ff8800;
-}
+updateImages();
 
-select:focus {
-  border-color: #ff8800;
-  box-shadow: 0 0 4px #ff8800;
-  outline: none;
-}
+document.getElementById("toggleButton").addEventListener("click", () => {
+  const leftValue = leftSelect.value;
+  const rightValue = rightSelect.value;
+  leftSelect.value = rightValue;
+  rightSelect.value = leftValue;
+  updateImages();
+});
+document.getElementById("fullscreenButton").addEventListener("click", () => {
+  const wrapper = document.getElementById("comparisonWrapper");
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    if (wrapper.requestFullscreen) {
+      wrapper.requestFullscreen();
+    } else if (wrapper.webkitRequestFullscreen) {
+      wrapper.webkitRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+});
+document.getElementById("downloadPdfButton").addEventListener("click", async () => {
+  const comparison = document.getElementById("comparisonWrapper");
+  const leftImg = document.getElementById("afterImgTag");
+  const rightImg = document.getElementById("beforeImgTag");
+  const leftLabel = document.getElementById("leftLabel").textContent;
+  const rightLabel = document.getElementById("rightLabel").textContent;
 
-/* Wrapper voor vergelijking */
-#comparisonWrapper {
-  position: relative;
-  width: 960px;
-  height: 540px;
-  background: #000;
-  overflow: hidden;
-}
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
 
-/* Afbeeldingen */
-#beforeImage,
-#afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 960px;
-  height: 540px;
-}
+  const logoUrl = "Logo PDF.png";
 
-#beforeImage img,
-#afterImage img {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  top: 0;
-  left: 0;
-}
+  const lensDescriptions = {
+    "IronGlass Red P": {
+      text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series Sovjet-lenzen met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – puur vintage glasoptiek.",
+      url: "https://tvlrental.nl/ironglassredp/"
+    },
+    "IronGlass Zeiss Jena": {
+      text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
+      url: "https://tvlrental.nl/ironglasszeissjena/"
+    }
+  };
 
-/* After wrapper */
-#afterWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 2;
-}
-
-/* Slider */
-#slider {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 2px;
-  height: 100%;
-  background: white;
-  cursor: ew-resize;
-  z-index: 10;
-}
-
-#slider::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 12px;
-  height: 12px;
-  background: white;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Labels */
-#infoContainer {
-  display: flex;
-  justify-content: space-between;
-  width: 960px;
-  margin-top: 16px;
-  padding: 8px 20px;
-  box-sizing: border-box;
-  font-size: 14px;
-  color: #eee;
-  background-color: #111;
-  border-top: 1px solid #333;
-  border-bottom: 1px solid #333;
-  border-radius: 6px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-}
-
-#leftLabel,
-#rightLabel {
-  width: 50%;
-  text-align: center;
-}
-
-/* Uitlegbox */
-#explanationBox {
-  margin-top: 16px;
-  max-width: 960px;
-  font-size: 13px;
-  color: #ddd;
-  padding: 16px 20px;
-  background: #111;
-  border-left: 4px solid #ff8800;
-  border-radius: 6px;
-  line-height: 1.6;
-  font-weight: 400;
-  box-shadow: 0 0 12px rgba(255, 136, 0, 0.1);
-}
-
-/* Print-styles */
-@media print {
-  body {
-    background: white !important;
-    color: black !important;
+  function fillBlack() {
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
-  .controls,
-  #explanationBox {
-    display: none !important;
+  async function loadImage(url) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.src = url;
+    });
   }
 
-  #comparisonWrapper {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: auto !important;
+  async function renderImageData(imgEl) {
+    return new Promise(resolve => {
+      const canvas = document.createElement("canvas");
+      canvas.width = imgEl.naturalWidth || 1920;
+      canvas.height = imgEl.naturalHeight || 1080;
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 1.0));
+      };
+      img.src = imgEl.src;
+    });
   }
 
-  #infoContainer {
-    margin-top: 20px;
-    color: black !important;
+  async function drawImageFullWidth(imageData, yOffset = 0) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        const aspectRatio = img.width / img.height;
+        const targetWidth = pageWidth;
+        const targetHeight = targetWidth / aspectRatio;
+        pdf.addImage(imageData, "JPEG", 0, yOffset, targetWidth, targetHeight);
+        resolve(yOffset + targetHeight);
+      };
+      img.src = imageData;
+    });
   }
 
-  #comparisonWrapper img {
-    object-fit: contain !important;
-  }
-}
-
-/* Fullscreen-styles */
-:fullscreen #comparisonWrapper,
-:-webkit-full-screen #comparisonWrapper {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  max-height: none;
-}
-
-:fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage,
-:fullscreen #afterImage,
-:-webkit-full-screen #afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-:fullscreen #afterWrapper,
-:-webkit-full-screen #afterWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 50vw;
-  overflow: hidden;
-  z-index: 2;
-}
-
-:fullscreen #beforeImage img,
-:-webkit-full-screen #beforeImage img,
-:fullscreen #afterImage img,
-:-webkit-full-screen #afterImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* ✅ MOBILE FIX */
-@media screen and (max-width: 767px) {
-  #comparisonWrapper {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
+  function drawLogo(x, y, maxW = 90) {
+    const ratio = logo.width / logo.height;
+    const h = maxW / ratio;
+    pdf.addImage(logo, "PNG", x, y, maxW, h);
   }
 
-  #beforeImage,
-  #afterImage,
-  #afterWrapper {
-    width: 100%;
-    height: 100%;
+  function drawDescriptionBlock(lensName, yStart) {
+    const info = lensDescriptions[lensName];
+    if (!info) return;
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
+    pdf.text(lines, 50, yStart + 10);
+
+    pdf.setTextColor(80, 160, 255);
+    pdf.textWithLink("Klik hier voor meer info", 50, yStart + lines.length * 12 + 4, { url: info.url });
   }
 
-  #beforeImage img,
-  #afterImage img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
+  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+  const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
+  const leftData = await renderImageData(leftImg);
+  const rightData = await renderImageData(rightImg);
+  const logo = await loadImage(logoUrl);
 
-  #afterWrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: 2;
-  }
+  // Pagina 1: splitscreen
+  fillBlack();
+  await drawImageFullWidth(splitData, 40);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(12);
+  pdf.setTextColor(255, 255, 255);
+pdf.setFontSize(14);
+pdf.text(`${leftLabel}  vs  ${rightLabel}`, pageWidth / 2, 30, { align: "center" });
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  #slider {
-    width: 2px;
-  }
+  // Pagina 2: Left lens
+  pdf.addPage();
+  fillBlack();
+  const yLeftEnd = await drawImageFullWidth(leftData, 40);
+  drawLogo(pageWidth - 100, 0, 70);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(14);
+  pdf.text(leftLabel, pageWidth / 2, 30, { align: "center" });
+ drawDescriptionBlock(leftSelect.value, yLeftEnd + 10);
 
-  #slider::before {
-    width: 12px;
-    height: 12px;
-  }
+  // Pagina 3: Right lens
+  pdf.addPage();
+  fillBlack();
+  const yRightEnd = await drawImageFullWidth(rightData, 40);
+  drawLogo(pageWidth - 100, 0, 70);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(14);
+  pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
+ drawDescriptionBlock(rightSelect.value, yRightEnd + 10);
 
-  #infoContainer {
-    flex-direction: column;
-    align-items: center;
-    font-size: 13px;
-    width: 100%;
-  }
-
-  #leftLabel,
-  #rightLabel {
-    width: 100%;
-    text-align: center;
-  }
-} 
+  const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
+  pdf.save(filename);
+});
