@@ -154,17 +154,28 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   }
 
   async function drawFullWidthImage(imgData, top = 40, bottom = 70) {
-    const img = new Image();
-    img.src = imgData;
-    await new Promise(resolve => img.onload = resolve);
-    const aspect = img.width / img.height;
-    const availableHeight = pageHeight - top - bottom;
-    const imgHeight = availableHeight;
-    const imgWidth = imgHeight * aspect;
-    const x = (pageWidth - imgWidth) / 2;
-    const y = top;
+  const img = new Image();
+  img.src = imgData;
+  await new Promise(resolve => img.onload = resolve);
+  const aspect = img.width / img.height;
+
+  const imgWidth = pageWidth; // Volledige breedte gebruiken
+  const imgHeight = imgWidth / aspect; // Hoogte automatisch berekenen
+
+  const x = 0;
+  const y = top;
+
+  // Als de afbeelding te hoog wordt voor de pagina, pas dan de hoogte aan
+  const availableHeight = pageHeight - top - bottom;
+  if (imgHeight > availableHeight) {
+    const newImgHeight = availableHeight;
+    const newImgWidth = newImgHeight * aspect;
+    const newX = (pageWidth - newImgWidth) / 2;
+    pdf.addImage(imgData, "JPEG", newX, y, newImgWidth, newImgHeight);
+  } else {
     pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
   }
+}
 
   function drawTopBar(text) {
     const barHeight = 40;
@@ -204,7 +215,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   function drawSiteURL() {
     pdf.setFontSize(14);
     pdf.setTextColor(255, 255, 255);
-    pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 20, { align: "center" });
+    pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 40, { align: "center" });
   }
 
   function fillBlack() {
