@@ -209,7 +209,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Page 2
   pdf.addPage();
   fillBlack();
-  const hLeft = await drawFullWidth(leftData, 20);
+  const hLeft = await drawFullWidth(leftData, 40);
   drawLogo(pageWidth - 100, 0, logo);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
@@ -219,7 +219,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Page 3
   pdf.addPage();
   fillBlack();
-  const hRight = await drawFullWidth(rightData, 10);
+  const hRight = await drawFullWidth(rightData, 40);
   drawLogo(pageWidth - 100, 0, logo);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
