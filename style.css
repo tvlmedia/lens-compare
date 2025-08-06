@@ -1,4 +1,4 @@
-/* ========== Algemene opmaak ========== */
+/* ========== Algemene reset ========== */
 * {
   -webkit-user-drag: none;
   user-select: none;
@@ -16,7 +16,7 @@ body {
   line-height: 1.6;
 }
 
-/* ========== Controls ========== */
+/* ========== Controls bovenaan ========== */
 .controls {
   margin: 20px;
   display: flex;
@@ -42,13 +42,14 @@ select:hover,
   border-color: #666;
 }
 
-/* ========== Wrapper en afbeeldingen ========== */
+/* ========== Wrapper en sliderstructuur ========== */
 #comparisonWrapper {
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
   position: relative;
-  width: 960px;
-  height: 540px;
+  background: black;
   overflow: hidden;
-  background: #000;
 }
 
 #beforeImage, #afterImage {
@@ -63,12 +64,13 @@ select:hover,
 #afterImage img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center center;
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
 }
 
+/* ========== AFTER WRAPPER voor split ========== */
 #afterWrapper {
   position: absolute;
   top: 0;
@@ -77,9 +79,25 @@ select:hover,
   height: 100%;
   overflow: hidden;
   z-index: 2;
+  pointer-events: none;
 }
 
-/* ========== Slider ========== */
+#afterWrapper #afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 960px;
+  height: 540px;
+}
+
+#afterWrapper #afterImage img {
+  width: 960px;
+  height: 540px;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* ========== Slider lijn ========== */
 #slider {
   position: absolute;
   top: 0;
@@ -90,15 +108,9 @@ select:hover,
   background: white;
   cursor: ew-resize;
   z-index: 10;
-  border-radius: 0;
 }
 
-#slider::before,
-#slider::after {
-  display: none;
-}
-
-/* ========== Info labels ========== */
+/* ========== Labels onderin ========== */
 #infoContainer {
   display: flex;
   justify-content: space-between;
@@ -115,7 +127,7 @@ select:hover,
   text-align: center;
 }
 
-/* ========== Uitlegtekst ========== */
+/* ========== Extra uitlegtekst ========== */
 #explanationBox {
   margin-top: 12px;
   max-width: 960px;
@@ -128,67 +140,44 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ========== Fullscreen scaling ========== */
+/* ========== Fullscreen ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
   height: 100vh;
-  position: relative;
   max-width: none;
   max-height: none;
 }
 
-:fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
-
 :fullscreen #afterWrapper,
 :-webkit-full-screen #afterWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 50%;
   height: 100%;
   overflow: hidden;
-  z-index: 2;
 }
 
-:fullscreen #afterImage,
-:-webkit-full-screen #afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
+:fullscreen #afterWrapper #afterImage,
+:-webkit-full-screen #afterWrapper #afterImage {
   width: 100vw;
   height: 100vh;
 }
 
-:fullscreen #beforeImage img,
-:fullscreen #afterImage img,
-:-webkit-full-screen #beforeImage img,
-:-webkit-full-screen #afterImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  position: absolute;
-  top: 0;
-  left: 0;
+:fullscreen #afterWrapper #afterImage img,
+:-webkit-full-screen #afterWrapper #afterImage img {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center center;
 }
 
-/* ========== Print styling ========== */
+/* ========== Print ========== */
 @media print {
   body {
     background: white !important;
     color: black !important;
   }
 
-  .controls,
-  #explanationBox {
+  .controls, #explanationBox {
     display: none !important;
   }
 
@@ -199,7 +188,6 @@ select:hover,
   }
 
   #infoContainer {
-    margin-top: 20px;
     color: black !important;
   }
 
@@ -208,35 +196,25 @@ select:hover,
   }
 }
 
-/* ========== Mobile scaling via JS class ========== */
+/* ========== Mobile mode ========== */
 .mobile-mode #comparisonWrapper {
   width: 100vw;
-  height: auto;
   aspect-ratio: 16 / 9;
-}
-
-.mobile-mode #beforeImage,
-.mobile-mode #afterImage,
-.mobile-mode #afterWrapper {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  position: relative;
 }
 
 .mobile-mode #afterWrapper {
   width: 50vw;
 }
 
-.mobile-mode #beforeImage img,
-.mobile-mode #afterImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  position: absolute;
-  top: 0;
-  left: 0;
+.mobile-mode #afterWrapper #afterImage {
+  width: 100vw;
+  height: auto;
+}
+
+.mobile-mode #afterWrapper #afterImage img {
+  width: 100vw;
+  height: auto;
+  object-fit: cover;
 }
 
 .mobile-mode #infoContainer {
