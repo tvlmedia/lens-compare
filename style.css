@@ -97,13 +97,13 @@ select:hover,
   position: absolute;
   top: 0;
   left: 0;
-  width: 960px;
-  height: 540px;
+  width: 100%;
+  height: 100%;
 }
 
 #afterWrapper #afterImage img {
-  width: 960px;
-  height: 540px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center center;
 }
@@ -214,7 +214,7 @@ select:hover,
   }
 }
 
-/* ========== Mobiele weergave ========== */
+/* ========== Mobiele weergave (<=767px) ========== */
 @media screen and (max-width: 767px) {
   .controls {
     display: flex;
@@ -246,68 +246,7 @@ select:hover,
     display: none !important;
   }
 
-  #afterWrapper #afterImage,
-  #afterWrapper #afterImage img {
-    width: 100vw !important;
-    height: auto !important;
-    object-fit: cover;
-    object-position: center center;
-  }
-}
-
-@media screen and (max-width: 767px) {
   #comparisonWrapper {
     width: 100vw !important;
-    max-width: 100vw;
     height: auto !important;
-    aspect-ratio: 16 / 9 !important;
-    position: relative;
-  }
-
-  #beforeImage,
-  #afterImage {
-    position: absolute;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  #beforeImage img,
-  #afterImage img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center center !important;
-  }
-
-  #afterWrapper {
-    width: 50% !important;
-    height: 100% !important;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  #afterWrapper #afterImage {
-    width: 100% !important;
-    height: 100% !important;
-    position: relative;
-  }
-
-  #afterWrapper #afterImage img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center center !important;
-  }
-
-  #slider {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    touch-action: none;
-    z-index: 10;
-  }
-}
+    aspect-ratio: 16 /
