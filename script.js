@@ -103,11 +103,16 @@ document.getElementById("toggleButton").addEventListener("click", () => {
   updateComparison();
 });
 
-document.getElementById("fullscreenButton").addEventListener("click", () => {
-  const el = wrapper;
-  if (el.requestFullscreen) el.requestFullscreen();
-  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else alert("Fullscreen wordt niet ondersteund.");
+document.getElementById("downloadPdfButton").addEventListener("click", async () => {
+  if (!window.jspdf || !html2canvas) {
+    alert("PDF tools niet geladen.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [960, 540] });
+
+  // ... rest van je code blijft hetzelfde
 });
 
 if (!document.fullscreenEnabled && !document.webkitFullscreenEnabled) {
