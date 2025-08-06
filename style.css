@@ -227,6 +227,7 @@ select:focus {
   object-fit: contain;
 }
 
+/* ✅ MOBILE FIX */
 @media screen and (max-width: 767px) {
   #comparisonWrapper {
     position: relative;
@@ -236,17 +237,16 @@ select:focus {
   }
 
   #beforeImage,
-  #afterWrapper,
-  #afterImage {
+  #afterWrapper {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
     height: 100%;
+    width: 100%;
   }
 
   #afterWrapper {
-    width: 50% !important;
+    width: 50% !important; /* <- KEY: Split alleen deze helft */
     overflow: hidden;
     z-index: 2;
   }
@@ -255,17 +255,27 @@ select:focus {
   #afterImage img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    display: block;
   }
 
   #slider {
-    width: 2px;
     z-index: 3;
+    width: 2px;
+    background: white;
   }
 
   #slider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -6px;
+    transform: translateY(-50%);
     width: 14px;
     height: 14px;
+    background: white;
+    border-radius: 50%;
+    z-index: 4;
   }
 
   #infoContainer {
@@ -273,6 +283,8 @@ select:focus {
     align-items: center;
     font-size: 13px;
     width: 100%;
+    gap: 4px;
+    padding: 6px 0;
   }
 
   #leftLabel,
