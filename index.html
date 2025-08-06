@@ -10,21 +10,17 @@
 
   <!-- === Controls === -->
   <div class="controls">
-
-    <!-- Rij 1: Flip + Download PDF -->
     <div class="button-row">
       <button id="toggleButton">↔ Flip</button>
       <button id="downloadPdfButton">⤓ Download PDF</button>
     </div>
 
-    <!-- Rij 2: Lens 1 + Lens 2 onder elkaar -->
-    <div class="select-column">
+    <div class="lens-select-row">
       <select id="leftLens"></select>
       <select id="rightLens"></select>
     </div>
 
-    <!-- Rij 3: T-stop + Focal Length naast elkaar -->
-    <div class="select-row">
+    <div class="settings-row">
       <select id="tStop">
         <option value="1.4">T1.4</option>
         <option value="2">T2</option>
@@ -44,7 +40,7 @@
       </select>
     </div>
 
-    <!-- Rij 4: Fullscreen (wordt verborgen op mobiel via CSS) -->
+    <!-- Verborgen fullscreen knop op mobiel -->
     <button id="fullscreenButton">⛶ Fullscreen</button>
   </div>
 
@@ -74,11 +70,10 @@
     <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
   </div>
 
-  <!-- === External Scripts (Correct Order) === -->
+  <!-- === Scripts === -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    // Fix jsPDF global (nodig voor sommige browsers)
     window.jspdf = window.jspdf || window.jspdf;
   </script>
   <script src="script.js"></script>
