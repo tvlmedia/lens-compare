@@ -22,9 +22,15 @@ body {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
-select, #toggleButton, #fullscreenButton, #downloadPdfButton {
+select,
+#toggleButton,
+#fullscreenButton,
+#downloadPdfButton {
   padding: 6px 12px;
   background: #1a1a1a;
   color: white;
@@ -52,7 +58,8 @@ select:hover,
   overflow: hidden;
 }
 
-#beforeImage, #afterImage {
+#beforeImage,
+#afterImage {
   position: absolute;
   top: 0;
   left: 0;
@@ -114,17 +121,23 @@ select:hover,
 #infoContainer {
   display: flex;
   justify-content: space-between;
-  width: 960px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 960px;
   margin-top: 12px;
-  padding: 0 40px;
+  padding: 0 16px;
   box-sizing: border-box;
   font-size: 16px;
   color: #eee;
 }
 
-#leftLabel, #rightLabel {
-  width: 50%;
+#leftLabel,
+#rightLabel {
+  width: 48%;
   text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* ========== Extra uitlegtekst ========== */
@@ -177,7 +190,8 @@ select:hover,
     color: black !important;
   }
 
-  .controls, #explanationBox {
+  .controls,
+  #explanationBox {
     display: none !important;
   }
 
@@ -199,6 +213,7 @@ select:hover,
 /* ========== Mobile mode ========== */
 .mobile-mode #comparisonWrapper {
   width: 100vw;
+  height: auto;
   aspect-ratio: 16 / 9;
 }
 
@@ -218,18 +233,24 @@ select:hover,
 }
 
 .mobile-mode #infoContainer {
-  width: 100%;
-  padding: 0 16px;
   flex-direction: column;
+  align-items: center;
   font-size: 14px;
   text-align: center;
+  width: 100%;
+  max-width: 100%;
+  padding: 0 12px;
 }
 
 .mobile-mode #leftLabel,
 .mobile-mode #rightLabel {
   width: 100%;
   margin: 4px 0;
+  white-space: normal;
+  word-wrap: break-word;
 }
+
+/* ========== Fullscreen fix op mobiel ========== */
 @media screen and (max-width: 767px) {
   body.mobile-mode:fullscreen #afterWrapper {
     pointer-events: auto;
@@ -238,5 +259,10 @@ select:hover,
   body.mobile-mode:fullscreen #slider {
     z-index: 20;
     pointer-events: auto;
+  }
+
+  #explanationBox {
+    margin: 16px;
+    font-size: 12.5px;
   }
 }
