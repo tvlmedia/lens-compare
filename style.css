@@ -1,8 +1,5 @@
 /* ========== Algemene opmaak ========== */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+* {
   -webkit-user-drag: none;
   user-select: none;
 }
@@ -54,23 +51,24 @@ select:hover,
   background: #000;
 }
 
-#beforeImage,
-#afterImage {
+#beforeImage, #afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 960px;
+  height: 540px;
+}
+
+#beforeImage img,
+#afterImage img {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-}
-
-#beforeImage img,
-#afterImage img {
-  width: 100%;
-  height: 100%;
   object-fit: contain;
 }
 
-/* ========== Masker voor halve overlay ========== */
 #afterWrapper {
   position: absolute;
   top: 0;
@@ -79,7 +77,7 @@ select:hover,
   height: 100%;
   overflow: hidden;
   z-index: 2;
-  pointer-events: none; /* zorgt dat slider goed reageert */
+  pointer-events: none;
 }
 
 /* ========== Slider ========== */
@@ -93,12 +91,6 @@ select:hover,
   background: white;
   cursor: ew-resize;
   z-index: 10;
-  border-radius: 0;
-}
-
-#slider::before,
-#slider::after {
-  display: none;
 }
 
 /* ========== Info labels ========== */
@@ -108,12 +100,12 @@ select:hover,
   width: 960px;
   margin-top: 12px;
   padding: 0 40px;
+  box-sizing: border-box;
   font-size: 16px;
   color: #eee;
 }
 
-#leftLabel,
-#rightLabel {
+#leftLabel, #rightLabel {
   width: 50%;
   text-align: center;
 }
@@ -131,7 +123,7 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ========== Fullscreen scaling ========== */
+/* ========== Fullscreen fix ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -139,10 +131,10 @@ select:hover,
 }
 
 :fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage,
 :fullscreen #afterImage,
-:-webkit-full-screen #afterImage,
 :fullscreen #afterWrapper,
+:-webkit-full-screen #beforeImage,
+:-webkit-full-screen #afterImage,
 :-webkit-full-screen #afterWrapper {
   width: 100%;
   height: 100%;
@@ -151,15 +143,13 @@ select:hover,
 :fullscreen #afterWrapper {
   width: 50vw;
   overflow: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
   z-index: 2;
+  pointer-events: none;
 }
 
 :fullscreen #beforeImage img,
-:-webkit-full-screen #beforeImage img,
 :fullscreen #afterImage img,
+:-webkit-full-screen #beforeImage img,
 :-webkit-full-screen #afterImage img {
   width: 100%;
   height: 100%;
@@ -173,34 +163,6 @@ select:hover,
   cursor: ew-resize;
 }
 
-/* ========== Print styling ========== */
-@media print {
-  body {
-    background: white !important;
-    color: black !important;
-  }
-
-  .controls,
-  #explanationBox {
-    display: none !important;
-  }
-
-  #comparisonWrapper {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: auto !important;
-  }
-
-  #infoContainer {
-    margin-top: 20px;
-    color: black !important;
-  }
-
-  #comparisonWrapper img {
-    object-fit: contain !important;
-  }
-}
-
 /* ========== Mobile scaling ========== */
 .mobile-mode #comparisonWrapper {
   width: 100vw;
@@ -211,7 +173,7 @@ select:hover,
 .mobile-mode #beforeImage,
 .mobile-mode #afterImage,
 .mobile-mode #afterWrapper {
-  width: 100%;
+  width: 100vw;
   height: auto;
   aspect-ratio: 16 / 9;
   overflow: hidden;
