@@ -390,3 +390,22 @@ select:focus {
   border-color: #ff8800;
   box-shadow: 0 0 4px #ff8800;
 }
+.lens-frame-wrapper {
+  width: 100vw;
+  height: 92vh;
+  margin-top: 60px;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+@media (max-width: 768px) {
+  .lens-frame-wrapper {
+    height: 80vh; /* of bijvoorbeeld 600px */
+    margin-top: 100px; /* iets extra ruimte boven op mobiel */
+  }
+}
