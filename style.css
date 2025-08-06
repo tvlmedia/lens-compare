@@ -259,7 +259,6 @@ select:hover,
   margin: 4px 0;
 }
 
-/* ========== Desktop-only fix: stilstaand beeld bij slider ========== */
 @media screen and (min-width: 961px) {
   body:not(.mobile-mode):not(:fullscreen) #comparisonWrapper {
     width: 960px;
@@ -279,6 +278,17 @@ select:hover,
     overflow: hidden;
   }
 
+  body:not(.mobile-mode):not(:fullscreen) #beforeImage img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    z-index: 1;
+  }
+
   body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
     position: absolute;
     top: 0;
@@ -290,25 +300,26 @@ select:hover,
     pointer-events: none;
   }
 
-  body:not(.mobile-mode):not(:fullscreen) #beforeImage img,
-  body:not(.mobile-mode):not(:fullscreen) #afterImage img {
+  body:not(.mobile-mode):not(:fullscreen) #afterWrapper #afterImage {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 960px;
+    height: 540px;
+    overflow: hidden;
+  }
+
+  body:not(.mobile-mode):not(:fullscreen) #afterWrapper #afterImage img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 960px;
+    height: 540px;
     object-fit: cover;
     object-position: center center;
-    z-index: 1;
   }
-}
-body:not(.mobile-mode):not(:fullscreen) #afterWrapper #afterImage img {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  width: 960px;
-  height: 540px;
-  object-fit: cover;
-  object-position: center center;
-  pointer-events: none;
+
+  body:not(.mobile-mode):not(:fullscreen) #infoContainer {
+    width: 960px;
+  }
 }
