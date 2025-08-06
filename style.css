@@ -42,7 +42,7 @@ select:hover,
   border-color: #666;
 }
 
-/* ========== Wrapper en afbeeldingen ========== */
+/* ========== Comparison layout ========== */
 #comparisonWrapper {
   position: relative;
   width: 960px;
@@ -51,32 +51,13 @@ select:hover,
   background: #000;
 }
 
-/* Achtergrondbeeld: always visible */
+/* Achtergrondbeeld */
 #afterImage {
   position: absolute;
   inset: 0;
   z-index: 1;
 }
 
-/* Reveal laag erboven */
-#afterWrapper {
-  position: absolute;
-  inset: 0;
-  width: 50%; /* Dynamisch via JS */
-  overflow: hidden;
-  z-index: 2;
-  pointer-events: none;
-}
-
-/* Bovenliggende afbeelding (die wordt gerevealed) */
-#beforeImage {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-}
-
-/* Beide afbeeldingen */
-#beforeImage img,
 #afterImage img {
   position: absolute;
   inset: 0;
@@ -85,7 +66,32 @@ select:hover,
   object-fit: contain;
 }
 
-/* ========== Slider ========== */
+/* Reveal masker */
+#afterWrapper {
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Voorgrondbeeld */
+#beforeImage {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+#beforeImage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ========== Slider lijn ========== */
 #slider {
   position: absolute;
   top: 0;
@@ -96,12 +102,6 @@ select:hover,
   background: white;
   cursor: ew-resize;
   z-index: 10;
-  border-radius: 0;
-}
-
-#slider::before,
-#slider::after {
-  display: none;
 }
 
 /* ========== Info labels ========== */
@@ -143,28 +143,41 @@ select:hover,
   max-height: none;
 }
 
-:fullscreen #afterImage,
-:-webkit-full-screen #afterImage,
-:fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage {
-  inset: 0;
-  position: absolute;
-}
-
-:fullscreen #afterWrapper,
-:-webkit-full-screen #afterWrapper {
-  inset: 0;
-  width: 50%;
-  height: 100%;
-  overflow: hidden;
-  position: absolute;
-  z-index: 2;
-}
-
 :fullscreen #afterImage img,
 :fullscreen #beforeImage img,
 :-webkit-full-screen #afterImage img,
 :-webkit-full-screen #beforeImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  inset: 0;
+}
+
+/* ========== Mobile scaling ========== */
+.mobile-mode #comparisonWrapper {
+  width: 100vw;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.mobile-mode #afterImage,
+.mobile-mode #beforeImage,
+.mobile-mode #afterWrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mobile-mode #afterWrapper {
+  width: 50vw;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.mobile-mode #afterImage img,
+.mobile-mode #beforeImage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -198,50 +211,4 @@ select:hover,
   #comparisonWrapper img {
     object-fit: contain !important;
   }
-}
-
-/* ========== Mobile scaling via JS class ========== */
-.mobile-mode #comparisonWrapper {
-  width: 100vw;
-  height: auto;
-  aspect-ratio: 16 / 9;
-}
-
-.mobile-mode #afterImage,
-.mobile-mode #beforeImage,
-.mobile-mode #afterWrapper {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  position: absolute;
-  inset: 0;
-}
-
-.mobile-mode #afterWrapper {
-  width: 50vw;
-  overflow: hidden;
-  z-index: 2;
-}
-
-.mobile-mode #afterImage img,
-.mobile-mode #beforeImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  position: absolute;
-  inset: 0;
-}
-
-.mobile-mode #infoContainer {
-  width: 100%;
-  padding: 0 16px;
-  flex-direction: column;
-  font-size: 14px;
-  text-align: center;
-}
-
-.mobile-mode #leftLabel,
-.mobile-mode #rightLabel {
-  width: 100%;
-  margin: 4px 0;
 }
