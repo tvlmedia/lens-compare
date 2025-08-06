@@ -232,3 +232,40 @@ select:focus {
     max-height: 60vh;
   }
 }
+#comparisonWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+  overflow: hidden;
+  background: #000;
+}
+
+#beforeImage,
+#afterWrapper,
+#afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#beforeImgTag,
+#afterImgTag {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: white;
+  z-index: 10;
+  cursor: ew-resize;
+}
