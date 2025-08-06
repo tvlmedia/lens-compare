@@ -302,3 +302,13 @@ select:hover,
     z-index: 1;
   }
 }
+body:not(.mobile-mode):not(:fullscreen) #afterWrapper #afterImage img {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 960px;
+  height: 540px;
+  object-fit: cover;
+  object-position: center center;
+  pointer-events: none;
+}
