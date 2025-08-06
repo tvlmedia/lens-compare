@@ -1,3 +1,5 @@
+// ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF LOGO) ======
+
 const lenses = [
   "IronGlass Red P",
   "IronGlass Zeiss Jena",
@@ -68,7 +70,6 @@ tStopSelect.value = "2.8";
 focalLengthSelect.value = "35mm";
 
 let isDragging = false;
-
 slider.addEventListener("mousedown", () => isDragging = true);
 window.addEventListener("mouseup", () => isDragging = false);
 window.addEventListener("mousemove", e => {
@@ -114,12 +115,12 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const leftLabel = document.getElementById("leftLabel").textContent;
   const rightLabel = document.getElementById("rightLabel").textContent;
 
+  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
+
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-
- logo.src = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
 
   const lensDescriptions = {
     "IronGlass Red P": {
@@ -176,7 +177,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     });
   }
 
-  function drawLogo(x, y, maxW = 90) {
+  function drawLogo(x, y, maxW = 90, logo) {
     const ratio = logo.width / logo.height;
     const h = maxW / ratio;
     pdf.addImage(logo, "PNG", x, y, maxW, h);
@@ -201,7 +202,6 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const rightData = await renderImageData(rightImg);
   const logo = await loadImage(logoUrl);
 
-  // Pagina 1: splitscreen
   fillBlack();
   await drawImageFullWidth(splitData, 40);
   pdf.setTextColor(255, 255, 255);
@@ -209,21 +209,19 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   pdf.text(`${leftLabel}  vs  ${rightLabel}`, pageWidth / 2, 30, { align: "center" });
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Pagina 2: Left lens
   pdf.addPage();
   fillBlack();
   const yLeftEnd = await drawImageFullWidth(leftData, 40);
-  drawLogo(pageWidth - 100, 0, 70);
+  drawLogo(pageWidth - 100, 0, 70, logo);
   pdf.setFontSize(14);
   pdf.setTextColor(255, 255, 255);
   pdf.text(leftLabel, pageWidth / 2, 30, { align: "center" });
   drawDescriptionBlock(leftSelect.value, yLeftEnd + 10);
 
-  // Pagina 3: Right lens
   pdf.addPage();
   fillBlack();
   const yRightEnd = await drawImageFullWidth(rightData, 40);
-  drawLogo(pageWidth - 100, 0, 70);
+  drawLogo(pageWidth - 100, 0, 70, logo);
   pdf.setFontSize(14);
   pdf.setTextColor(255, 255, 255);
   pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
