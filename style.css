@@ -1,9 +1,6 @@
-/* ========================
-   Algemene stijlen
-   ======================== */
+/* Algemene opmaak */
 body {
   margin: 0;
-  padding: 0;
   background: #0f0f0f;
   color: white;
   font-family: Arial, sans-serif;
@@ -15,32 +12,14 @@ body {
   overflow-x: hidden;
 }
 
-html {
-  overflow-x: hidden;
-}
-
-* {
-  -webkit-user-drag: none;
-  user-select: none;
-  box-sizing: border-box;
-}
-
-/* ========================
-   Controls
-   ======================== */
 .controls {
   margin: 20px;
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
-  justify-content: center;
+  flex-wrap: wrap;
 }
 
-button,
-select,
-#toggleButton,
-#fullscreenButton,
-#downloadPdfButton {
+select, button {
   padding: 8px 14px;
   background: #000;
   color: white;
@@ -51,38 +30,24 @@ select,
   transition: all 0.2s ease-in-out;
 }
 
-button:hover,
-select:hover,
-#toggleButton:hover,
-#fullscreenButton:hover,
-#downloadPdfButton:hover {
-  background-color: #111;
+select:hover, button:hover {
+  background: #1a1a1a;
   border-color: #555;
   transform: scale(1.03);
 }
 
-select {
-  background: #121212;
-  border: 1px solid #333;
-  appearance: none;
-  font-weight: 500;
-  outline: none;
-}
-
 select:focus {
+  outline: none;
   border-color: #ff8800;
   box-shadow: 0 0 4px #ff8800;
 }
 
-/* ========================
-   Vergelijkingsvlak
-   ======================== */
 #comparisonWrapper {
   position: relative;
   width: 960px;
   height: 540px;
-  background: #000;
   overflow: hidden;
+  background: #000;
   user-select: none;
 }
 
@@ -94,8 +59,7 @@ select:focus {
   height: 540px;
 }
 
-#beforeImage img,
-#afterImage img {
+#beforeImage img, #afterImage img {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -123,7 +87,7 @@ select:focus {
   background: white;
   cursor: ew-resize;
   z-index: 10;
-  border-radius: 0;
+  transform: translateX(-50%);
 }
 
 #slider::before {
@@ -138,23 +102,22 @@ select:focus {
   transform: translate(-50%, -50%);
 }
 
-/* ========================
-   Informatie en uitleg
-   ======================== */
 #infoContainer {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   width: 960px;
-  margin-top: 16px;
-  padding: 8px 40px;
+  margin-top: 12px;
+  padding: 0 40px;
+  box-sizing: border-box;
+  font-size: 12px;
+  color: #eee;
   background-color: #111;
   border-top: 1px solid #333;
   border-bottom: 1px solid #333;
+  padding-top: 8px;
+  padding-bottom: 8px;
   border-radius: 6px;
   font-weight: 500;
-  font-size: 14px;
-  color: #ddd;
   letter-spacing: 0.2px;
 }
 
@@ -167,21 +130,18 @@ select:focus {
 #explanationBox {
   margin-top: 16px;
   max-width: 960px;
-  font-size: 13px;
-  color: #ddd;
-  padding: 16px 20px;
+  font-size: 12px;
+  color: #bbb;
+  padding: 12px 16px;
   background: #111;
-  border-left: 4px solid #ff8800;
+  border-left: 3px solid orange;
   border-radius: 6px;
-  line-height: 1.6;
+  line-height: 1.5;
   font-weight: 400;
   box-shadow: 0 0 12px rgba(255, 136, 0, 0.1);
-  text-align: center;
 }
 
-/* ========================
-   Fullscreen
-   ======================== */
+/* Fullscreen */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -193,20 +153,26 @@ select:focus {
 :fullscreen #beforeImage,
 :-webkit-full-screen #beforeImage,
 :fullscreen #afterImage,
-:-webkit-full-screen #afterImage,
-:fullscreen #afterWrapper img,
-:-webkit-full-screen #afterWrapper img {
+:-webkit-full-screen #afterImage {
+  width: 100%;
+  height: 100%;
+}
+
+:fullscreen #afterWrapper,
+:-webkit-full-screen #afterWrapper {
+  width: 50vw;
+  height: 100%;
+}
+
+:fullscreen #beforeImage img,
+:fullscreen #afterImage img,
+:fullscreen #afterWrapper img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 
-/* ========================
-   Mobiel scaling fix
-   ======================== */
+/* Mobiel */
 @media (max-width: 767px) {
   #scaledContent {
     transform: scale(0.35);
@@ -219,54 +185,21 @@ select:focus {
   #afterWrapper,
   #beforeImage,
   #afterImage {
-    height: auto !important;
-    max-height: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: block;
+    width: 960px;
+    height: 540px;
   }
 
   #infoContainer,
   #explanationBox {
-    margin-top: 10px;
+    margin-top: 8px;
     padding: 0 12px;
     text-align: center;
   }
 
-  #leftLabel, #rightLabel {
-    font-size: 12px;
-  }
-
-  .controls {
-    padding: 12px;
-  }
-}
-
-/* ========================
-   Print
-   ======================== */
-@media print {
-  body {
-    background: white !important;
-    color: black !important;
-  }
-
-  .controls,
-  #explanationBox {
-    display: none !important;
-  }
-
-  #comparisonWrapper {
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  #infoContainer {
-    margin-top: 20px;
-    color: black !important;
-  }
-
-  #comparisonWrapper img {
-    object-fit: contain !important;
+  html, body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    background-color: #000;
   }
 }
