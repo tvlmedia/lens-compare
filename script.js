@@ -233,3 +233,26 @@ pdf.text(`${leftLabel}  vs  ${rightLabel}`, pageWidth / 2, 30, { align: "center"
   const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
 });
+function updateMobileClass() {
+  const isFullscreen =
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement;
+
+  const isMobile = window.innerWidth <= 768;
+
+  if (isMobile && !isFullscreen) {
+    document.body.classList.add("mobile-mode");
+  } else {
+    document.body.classList.remove("mobile-mode");
+  }
+}
+
+window.addEventListener("resize", updateMobileClass);
+document.addEventListener("fullscreenchange", updateMobileClass);
+document.addEventListener("webkitfullscreenchange", updateMobileClass);
+document.addEventListener("mozfullscreenchange", updateMobileClass);
+document.addEventListener("MSFullscreenChange", updateMobileClass);
+
+updateMobileClass();
