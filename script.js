@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (GEFIXT MET PDF LOGO, TEKST EN BESTANDSNAAM) ======
+// ====== LENS COMPARISON TOOL SCRIPT (NETJES, MET RECHTSONDER LOGO & GEFIXTE PDF) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -95,17 +95,9 @@ document.getElementById("toggleButton").addEventListener("click", () => {
 document.getElementById("fullscreenButton").addEventListener("click", () => {
   const wrapper = document.getElementById("comparisonWrapper");
   if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    if (wrapper.requestFullscreen) {
-      wrapper.requestFullscreen();
-    } else if (wrapper.webkitRequestFullscreen) {
-      wrapper.webkitRequestFullscreen();
-    }
+    wrapper.requestFullscreen?.() || wrapper.webkitRequestFullscreen?.();
   } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
+    document.exitFullscreen?.() || document.webkitExitFullscreen?.();
   }
 });
 
@@ -127,7 +119,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const pageHeight = pdf.internal.pageSize.getHeight();
 
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
-  const logo = await loadImage(logoUrl);
+  const logoImg = await loadImage(logoUrl);
 
   const lensDescriptions = {
     "IronGlass Red P": {
@@ -163,28 +155,28 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     return h;
   }
 
-  function drawLogo(x, y, logo) {
-    const ratio = logo.width / logo.height;
-    const w = 90;
-    const h = w / ratio;
-    pdf.addImage(logo, "PNG", x, y, w, h);
+  function drawLogoBottomRight() {
+    const logoWidth = 90;
+    const logoHeight = 40;
+    const x = pageWidth - logoWidth - 10;
+    const y = pageHeight - logoHeight - 10;
+    pdf.addImage(logoImg, "PNG", x, y, logoWidth, logoHeight);
   }
 
   function drawDescription(lens) {
-  const info = lensDescriptions[lens];
-  if (!info) return;
+    const info = lensDescriptions[lens];
+    if (!info) return;
+    const boxHeight = 70;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
 
-  const boxHeight = 70;
-  pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
+    pdf.text(lines, 50, pageHeight - boxHeight + 20);
 
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(10);
-  const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
-  pdf.text(lines, 50, pageHeight - boxHeight + 20);
-
-  pdf.setTextColor(80, 160, 255);
-  pdf.textWithLink("Klik hier voor meer info", 50, pageHeight - 15, { url: info.url });
+    pdf.setTextColor(80, 160, 255);
+    pdf.textWithLink("Klik hier voor meer info", 50, pageHeight - 15, { url: info.url });
   }
 
   function fillBlack() {
@@ -197,34 +189,31 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
 
-  // Page 1
   fillBlack();
   await drawFullWidth(splitData, 40);
-  drawLogo(pageWidth - 100, pageHeight - 70, logo);
+  drawLogoBottomRight();
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(`${leftText}  vs  ${rightText}`, pageWidth / 2, 30, { align: "center" });
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
 
-  // Page 2
   pdf.addPage();
   fillBlack();
-  const hLeft = await drawFullWidth(leftData, 40);
-  drawLogo(pageWidth - 100, 0, logo);
+  await drawFullWidth(leftData, 40);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(leftText, pageWidth / 2, 30, { align: "center" });
-  drawDescription(left, 40 + hLeft);
+  drawDescription(left);
+  drawLogoBottomRight();
 
-  // Page 3
   pdf.addPage();
   fillBlack();
-  const hRight = await drawFullWidth(rightData, 40);
-  drawLogo(pageWidth - 100, 0, logo);
+  await drawFullWidth(rightData, 40);
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text(rightText, pageWidth / 2, 30, { align: "center" });
-  drawDescription(right, 40 + hRight);
+  drawDescription(right);
+  drawLogoBottomRight();
 
   const safeLeft = left.replace(/\s+/g, "");
   const safeRight = right.replace(/\s+/g, "");
