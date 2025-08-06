@@ -55,8 +55,8 @@ select:hover,
   position: absolute;
   top: 0;
   left: 0;
-  width: 960px;
-  height: 540px;
+  width: 100%;
+  height: 100%;
 }
 
 #beforeImage img,
@@ -128,7 +128,7 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ========== Fullscreen scaling ========== */
+/* ========== Fullscreen scaling (gefixt) ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -140,19 +140,11 @@ select:hover,
 :fullscreen #beforeImage,
 :-webkit-full-screen #beforeImage,
 :fullscreen #afterImage,
-:-webkit-full-screen #afterImage {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
+:-webkit-full-screen #afterImage,
 :fullscreen #afterWrapper,
 :-webkit-full-screen #afterWrapper {
-  width: 50vw;
+  width: 100%;
   height: 100%;
-  overflow: hidden;
-  z-index: 2;
 }
 
 :fullscreen #beforeImage img,
