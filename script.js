@@ -215,7 +215,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   function drawSiteURL() {
     pdf.setFontSize(14);
     pdf.setTextColor(255, 255, 255);
-    pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 40, { align: "center" });
+    pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 30, { align: "center" });
   }
 
   function fillBlack() {
