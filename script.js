@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (GEOPTIMALISEERD) ======
+// ====== LENS COMPARISON TOOL SCRIPT (GEFIXT MET PDF LOGO, TEKST EN BESTANDSNAAM) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -18,8 +18,8 @@ const notes = {
 const lensImageMap = {
   "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
   "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg",
-  "ironglass_red_p_58mm_t2_1": "red_p_58mm_t2_8.jpg",
-  "ironglass_zeiss_jena_50mm_t1_9": "zeiss_jena_50mm_t2_8.jpg"
+  "ironglass_red_p_50mm_t2_8": "red_p_58mm_t2_8.jpg",
+  "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg"
 };
 
 const leftSelect = document.getElementById("leftLens");
@@ -95,15 +95,22 @@ document.getElementById("toggleButton").addEventListener("click", () => {
 document.getElementById("fullscreenButton").addEventListener("click", () => {
   const wrapper = document.getElementById("comparisonWrapper");
   if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    if (wrapper.requestFullscreen) wrapper.requestFullscreen();
-    else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+    if (wrapper.requestFullscreen) {
+      wrapper.requestFullscreen();
+    } else if (wrapper.webkitRequestFullscreen) {
+      wrapper.webkitRequestFullscreen();
+    }
   } else {
-    if (document.exitFullscreen) document.exitFullscreen();
-    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
   }
 });
 
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
+  const { jsPDF } = window.jspdf;
   const comparison = document.getElementById("comparisonWrapper");
   const leftImg = afterImgTag;
   const rightImg = beforeImgTag;
@@ -115,11 +122,12 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const focal = focalLengthSelect.value;
   const t = tStopSelect.value;
 
-  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
-  const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
+
+  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
+  const logo = await loadImage(logoUrl);
 
   const lensDescriptions = {
     "IronGlass Red P": {
@@ -131,11 +139,6 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
       url: "https://tvlrental.nl/ironglasszeissjena/"
     }
   };
-
-  function fillBlack() {
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, pageHeight, "F");
-  }
 
   async function renderImage(imgEl) {
     const canvas = document.createElement("canvas");
@@ -157,7 +160,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     const aspect = img.width / img.height;
     const h = pageWidth / aspect;
     pdf.addImage(imgData, "JPEG", 0, yOffset, pageWidth, h);
-    return yOffset + h;
+    return h;
   }
 
   function drawLogo(x, y, logo) {
@@ -170,50 +173,54 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   function drawDescription(lens, yStart) {
     const info = lensDescriptions[lens];
     if (!info) return;
-
-    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
     const topMargin = 30;
+    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
     const spacing = lines.length * 12 + 14;
-
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(10);
     pdf.text(lines, 50, yStart + topMargin);
-
     pdf.setTextColor(80, 160, 255);
     pdf.textWithLink("Klik hier voor meer info", 50, yStart + topMargin + spacing, { url: info.url });
-    pdf.setTextColor(255, 255, 255);
   }
 
-  const logoImg = await loadImage(logoUrl);
+  function fillBlack() {
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  }
+
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
   const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
 
-  // Page 1 - splitscreen
+  // Page 1
   fillBlack();
   await drawFullWidth(splitData, 40);
-  pdf.setFontSize(14);
+  drawLogo(pageWidth - 100, pageHeight - 70, logo);
   pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(14);
   pdf.text(`${leftText}  vs  ${rightText}`, pageWidth / 2, 30, { align: "center" });
   pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
-  drawLogo(pageWidth - 100, pageHeight - 50, logoImg); // extra logo rechts onderin
 
-  // Page 2 - left lens
+  // Page 2
   pdf.addPage();
   fillBlack();
-  const yLeft = await drawFullWidth(leftData, 40);
-  drawLogo(pageWidth - 100, 0, logoImg);
+  const hLeft = await drawFullWidth(leftData, 40);
+  drawLogo(pageWidth - 100, 0, logo);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(14);
   pdf.text(leftText, pageWidth / 2, 30, { align: "center" });
-  drawDescription(left, yLeft + 10);
+  drawDescription(left, 40 + hLeft);
 
-  // Page 3 - right lens
+  // Page 3
   pdf.addPage();
   fillBlack();
-  const yRight = await drawFullWidth(rightData, 40);
-  drawLogo(pageWidth - 100, 0, logoImg);
+  const hRight = await drawFullWidth(rightData, 40);
+  drawLogo(pageWidth - 100, 0, logo);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(14);
   pdf.text(rightText, pageWidth / 2, 30, { align: "center" });
-  drawDescription(right, yRight + 10);
+  drawDescription(right, 40 + hRight);
 
   const safeLeft = left.replace(/\s+/g, "");
   const safeRight = right.replace(/\s+/g, "");
