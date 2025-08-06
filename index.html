@@ -8,6 +8,7 @@
 </head>
 <body>
 
+  <!-- === Controls === -->
   <div class="controls">
     <button id="toggleButton">↔ Flip</button>
     <button id="fullscreenButton">⛶ Fullscreen</button>
@@ -35,6 +36,7 @@
     </select>
   </div>
 
+  <!-- === Comparison Area === -->
   <div id="comparisonWrapper">
     <div id="beforeImage">
       <img id="beforeImgTag" alt="Right lens preview">
@@ -49,20 +51,22 @@
     <div id="slider"></div>
   </div>
 
+  <!-- === Lens Labels === -->
   <div id="infoContainer">
     <div id="leftLabel"></div>
     <div id="rightLabel"></div>
   </div>
 
+  <!-- === Explanation Box === -->
   <div id="explanationBox">
     <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
   </div>
 
-  <!-- ========== External libraries (volgorde is belangrijk!) ========== -->
+  <!-- === External Scripts (Correct Order) === -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    // Fix for jsPDF in modern browsers
+    // Fix jsPDF global (nodig voor sommige browsers)
     window.jspdf = window.jspdf || window.jspdf;
   </script>
   <script src="script.js"></script>
