@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Lens Comparison</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ voor mobiel -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ mobile scaling -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -36,15 +36,19 @@
     </select>
   </div>
 
-  <!-- === Comparison area === -->
+  <!-- === Comparison Area === -->
   <div id="comparisonWrapper">
     <div id="beforeImage">
-      <img id="beforeImgTag" alt="Right lens preview">
+      <img id="beforeImgTag" 
+           src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQI12NgYGBgAAAABAABJzQnCgAAAABJRU5ErkJggg==" 
+           alt="Right lens preview">
     </div>
 
     <div id="afterWrapper">
       <div id="afterImage">
-        <img id="afterImgTag" alt="Left lens preview">
+        <img id="afterImgTag" 
+             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQI12NgYGBgAAAABAABJzQnCgAAAABJRU5ErkJggg==" 
+             alt="Left lens preview">
       </div>
     </div>
 
