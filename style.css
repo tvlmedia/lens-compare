@@ -458,11 +458,19 @@ html, body {
   }
 
   #infoContainer {
-    height: auto;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    height: auto;
     padding: 0;
-    margin: 0 auto;
+    margin: 20px auto 0 auto;
     width: fit-content;
+    background-color: #000; /* behoud zwarte achtergrond */
+  }
+
+  #leftLabel, #rightLabel {
+    white-space: nowrap;
+    padding: 4px 8px;
+    font-size: 12px;
   }
 }
