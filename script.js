@@ -1,5 +1,3 @@
-// ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF) ======
-
 const lenses = [
   "IronGlass Red P",
   "IronGlass Zeiss Jena",
@@ -9,12 +7,6 @@ const lenses = [
   "Lomo Standard Speed"
 ];
 
-const lensNotes = {
-  "ironglass_red_p_35mm": "37mm",
-  "ironglass_zeiss_jena_35mm": "35mm",
-  "cooke_panchro_ff_25mm": "32mm"
-};
-
 const customFilenames = {
   "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
   "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg",
@@ -22,6 +14,13 @@ const customFilenames = {
   "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg"
 };
 
+const lensNotes = {
+  "ironglass_red_p_35mm": "37mm",
+  "ironglass_zeiss_jena_35mm": "35mm",
+  "cooke_panchro_ff_25mm": "32mm"
+};
+
+// Elements
 const leftSelect = document.getElementById("leftLens");
 const rightSelect = document.getElementById("rightLens");
 const tStopSelect = document.getElementById("tStop");
@@ -45,11 +44,11 @@ function updateComparison() {
   const tStop = tStopSelect.value.replace(".", "_");
   const focal = focalSelect.value;
 
-  const lKey = `${left}_${focal}_t${tStop}`;
-  const rKey = `${right}_${focal}_t${tStop}`;
+  const leftKey = `${left}_${focal}_t${tStop}`;
+  const rightKey = `${right}_${focal}_t${tStop}`;
 
-  afterImg.src = `images/${customFilenames[lKey] || lKey + ".jpg"}`;
-  beforeImg.src = `images/${customFilenames[rKey] || rKey + ".jpg"}`;
+  afterImg.src = `images/${customFilenames[leftKey] || leftKey + ".jpg"}`;
+  beforeImg.src = `images/${customFilenames[rightKey] || rightKey + ".jpg"}`;
 
   const tText = `T${tStopSelect.value}`;
   leftLabel.textContent = `Lens: ${leftSelect.value} ${lensNotes[`${left}_${focal}`] || focal} ${tText}`;
@@ -59,16 +58,17 @@ function updateComparison() {
   slider.style.left = "50%";
 }
 
+// Init
 leftSelect.value = lenses[0];
 rightSelect.value = lenses[1];
 tStopSelect.value = "2.8";
 focalSelect.value = "35mm";
 updateComparison();
-
 [leftSelect, rightSelect, tStopSelect, focalSelect].forEach(el =>
   el.addEventListener("change", updateComparison)
 );
 
+// Slider drag
 let dragging = false;
 slider.addEventListener("mousedown", () => dragging = true);
 window.addEventListener("mouseup", () => dragging = false);
@@ -80,12 +80,10 @@ window.addEventListener("mousemove", e => {
   afterWrapper.style.width = `${percent}%`;
   slider.style.left = `${percent}%`;
 });
-
 slider.addEventListener("touchstart", (e) => {
   dragging = true;
   e.preventDefault();
 }, { passive: false });
-
 window.addEventListener("touchend", () => dragging = false);
 window.addEventListener("touchmove", (e) => {
   if (!dragging) return;
@@ -96,6 +94,7 @@ window.addEventListener("touchmove", (e) => {
   slider.style.left = `${percent}%`;
 }, { passive: false });
 
+// Flip
 document.getElementById("toggleButton").addEventListener("click", () => {
   const l = leftSelect.value;
   leftSelect.value = rightSelect.value;
@@ -103,32 +102,13 @@ document.getElementById("toggleButton").addEventListener("click", () => {
   updateComparison();
 });
 
-document.getElementById("downloadPdfButton").addEventListener("click", async () => {
-  if (!window.jspdf || !html2canvas) {
-    alert("PDF tools niet geladen.");
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [960, 540] });
-
-  // ... rest van je code blijft hetzelfde
+// Fullscreen
+document.getElementById("fullscreenButton").addEventListener("click", () => {
+  if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+  else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
 });
 
-if (!document.fullscreenEnabled && !document.webkitFullscreenEnabled) {
-  fullscreenBtn.style.display = "none";
-}
-
-function checkMobileClass() {
-  const isMobile = window.innerWidth <= 768;
-  const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-  document.body.classList.toggle("mobile-mode", isMobile && !isFullscreen);
-}
-window.addEventListener("resize", checkMobileClass);
-document.addEventListener("fullscreenchange", checkMobileClass);
-checkMobileClass();
-
-// ========== PDF DOWNLOAD BUTTON ==========
+// PDF
 document.getElementById("downloadPdfButton").addEventListener("click", async () => {
   const jsPDF = window.jspdf?.jsPDF;
   if (!jsPDF || !html2canvas) {
@@ -189,4 +169,3 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     alert("Fout bij genereren PDF.");
   }
 });
-const logoUrl = "Logo PDF.png";
