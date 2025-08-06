@@ -90,6 +90,25 @@ window.addEventListener("mousemove", e => {
   slider.style.left = `${percent}%`;
 });
 
+// Touch support (werkt ook fullscreen op mobiel)
+slider.addEventListener("touchstart", (e) => {
+  dragging = true;
+  e.preventDefault();
+}, { passive: false });
+
+window.addEventListener("touchend", () => {
+  dragging = false;
+});
+
+window.addEventListener("touchmove", (e) => {
+  if (!dragging) return;
+  const rect = wrapper.getBoundingClientRect();
+  const pos = Math.min(Math.max(0, e.touches[0].clientX - rect.left), rect.width);
+  const percent = (pos / rect.width) * 100;
+  afterWrapper.style.width = `${percent}%`;
+  slider.style.left = `${percent}%`;
+}, { passive: false });
+
 // Flip
 const flipBtn = document.getElementById("toggleButton");
 flipBtn.addEventListener("click", () => {
