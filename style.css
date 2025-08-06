@@ -230,25 +230,16 @@ select:focus {
 /* ✅ MOBILE FIX */
 @media screen and (max-width: 767px) {
   #comparisonWrapper {
-    position: relative;
     width: 100%;
+    height: auto;
     aspect-ratio: 16 / 9;
-    overflow: hidden;
   }
 
   #beforeImage,
+  #afterImage,
   #afterWrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
     width: 100%;
-  }
-
-  #afterWrapper {
-    width: 50% !important; /* <- KEY: Split alleen deze helft */
-    overflow: hidden;
-    z-index: 2;
+    height: 100%;
   }
 
   #beforeImage img,
@@ -256,26 +247,23 @@ select:focus {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    display: block;
+  }
+
+  #afterWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    z-index: 2;
   }
 
   #slider {
-    z-index: 3;
     width: 2px;
-    background: white;
   }
 
   #slider::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: -6px;
-    transform: translateY(-50%);
-    width: 14px;
-    height: 14px;
-    background: white;
-    border-radius: 50%;
-    z-index: 4;
+    width: 12px;
+    height: 12px;
   }
 
   #infoContainer {
@@ -283,8 +271,6 @@ select:focus {
     align-items: center;
     font-size: 13px;
     width: 100%;
-    gap: 4px;
-    padding: 6px 0;
   }
 
   #leftLabel,
@@ -292,4 +278,7 @@ select:focus {
     width: 100%;
     text-align: center;
   }
-}
+} 
+
+
+
