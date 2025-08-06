@@ -17,7 +17,10 @@ const lensNotes = {
 
 const customFilenames = {
   "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
-  "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg"
+  "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg",
+
+  "ironglass_red_p_50mm_t2_8": "red_p_58mm_t2_8.jpg",
+  "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg"
 };
 
 // Elements
