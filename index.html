@@ -72,36 +72,3 @@
 </body>
 </html>
 
-document.getElementById("downloadPdfButton").addEventListener("click", async () => {
-  const { jsPDF } = window.jspdf;
-
-  // Screenshot van de vergelijking
-  const comparison = document.getElementById("comparisonWrapper");
-  const canvas = await html2canvas(comparison, {
-    scale: 2,
-    useCORS: true
-  });
-
-  const imgData = canvas.toDataURL("image/jpeg", 1.0);
-  const pdf = new jsPDF({
-    orientation: "landscape",
-    unit: "px",
-    format: [canvas.width, canvas.height]
-  });
-
-  // Voeg screenshot toe
-  pdf.addImage(imgData, "JPEG", 0, 0, canvas.width, canvas.height);
-
-  // Optioneel: lenslabels onderaan
-  const leftText = leftLabel.textContent;
-  const rightText = rightLabel.textContent;
-  pdf.setFontSize(14);
-  pdf.setTextColor(255);
-  pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, canvas.height - 40, canvas.width, 40, 'F');
-  pdf.text(leftText, 30, canvas.height - 15);
-  pdf.text(rightText, canvas.width - 250, canvas.height - 15);
-
-  // Downloaden
-  pdf.save("lens_comparison.pdf");
-});
