@@ -136,15 +136,21 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     return canvas.toDataURL("image/jpeg", 1.0);
   }
 
-  async function drawFullWidth(imgData, yOffset = 0) {
-    const img = new Image();
-    img.src = imgData;
-    await new Promise(resolve => img.onload = resolve);
-    const aspect = img.width / img.height;
-    const h = pageWidth / aspect;
-    pdf.addImage(imgData, "JPEG", 0, yOffset, pageWidth, h);
-    return h;
-  }
+ async function drawFullWidth(imgData, reserveBottom = 70) {
+  const img = new Image();
+  img.src = imgData;
+  await new Promise(resolve => img.onload = resolve);
+  
+  const aspect = img.width / img.height;
+  const maxHeight = pageHeight - reserveBottom;
+  const imgHeight = Math.min(maxHeight, pageWidth / aspect);
+  const imgWidth = imgHeight * aspect;
+
+  const x = (pageWidth - imgWidth) / 2;
+  const y = 40; // bovenmarge (zoals op splitpagina)
+
+  pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
+}
 
   function drawTopLabel(text) {
     const barHeight = 40;
