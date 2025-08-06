@@ -1,3 +1,5 @@
+// ====== LENS COMPARISON TOOL SCRIPT (vanaf 0) ======
+
 const lenses = [
   "IronGlass Red P",
   "IronGlass Zeiss Jena",
@@ -7,130 +9,109 @@ const lenses = [
   "Lomo Standard Speed"
 ];
 
-const notes = {
+const lensNotes = {
   "ironglass_red_p_35mm": "37mm",
   "ironglass_zeiss_jena_35mm": "35mm",
   "cooke_panchro_ff_25mm": "32mm"
 };
 
-const lensImageMap = {
+const customFilenames = {
   "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
   "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg"
 };
 
-// DOM Elements
+// Elements
 const leftSelect = document.getElementById("leftLens");
 const rightSelect = document.getElementById("rightLens");
 const tStopSelect = document.getElementById("tStop");
-const focalLengthSelect = document.getElementById("focalLength");
-const beforeImgTag = document.getElementById("beforeImgTag");
-const afterImgTag = document.getElementById("afterImgTag");
-const afterWrapper = document.getElementById("afterWrapper");
+const focalSelect = document.getElementById("focalLength");
+const beforeImg = document.getElementById("beforeImgTag");
+const afterImg = document.getElementById("afterImgTag");
 const slider = document.getElementById("slider");
-const comparisonWrapper = document.getElementById("comparisonWrapper");
+const afterWrapper = document.getElementById("afterWrapper");
+const wrapper = document.getElementById("comparisonWrapper");
 const leftLabel = document.getElementById("leftLabel");
 const rightLabel = document.getElementById("rightLabel");
 
-// Vul dropdowns
+// Populate selects
 lenses.forEach(lens => {
   leftSelect.add(new Option(lens, lens));
   rightSelect.add(new Option(lens, lens));
 });
 
-// Update afbeelding en tekst
-function updateImages() {
-  const leftLens = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
-  const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
+// Main update function
+function updateComparison() {
+  const left = leftSelect.value.toLowerCase().replaceAll(" ", "_");
+  const right = rightSelect.value.toLowerCase().replaceAll(" ", "_");
   const tStop = tStopSelect.value.replace(".", "_");
-  const focalLength = focalLengthSelect.value;
+  const focal = focalSelect.value;
 
-  const leftBaseKey = `${leftLens}_${focalLength}`;
-  const rightBaseKey = `${rightLens}_${focalLength}`;
-  const leftKey = `${leftLens}_${focalLength}_t${tStop}`;
-  const rightKey = `${rightLens}_${focalLength}_t${tStop}`;
+  const lKey = `${left}_${focal}_t${tStop}`;
+  const rKey = `${right}_${focal}_t${tStop}`;
 
-  const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
-  const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
+  const lPath = `images/${customFilenames[lKey] || lKey + ".jpg"}`;
+  const rPath = `images/${customFilenames[rKey] || rKey + ".jpg"}`;
 
-  beforeImgTag.src = imgRight;
-  afterImgTag.src = imgLeft;
+  afterImg.src = lPath;
+  beforeImg.src = rPath;
 
-  const tStopFormatted = `T${tStopSelect.value}`;
-  leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
-  rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
+  const tStopText = `T${tStopSelect.value}`;
+  leftLabel.textContent = `Lens: ${leftSelect.value} ${lensNotes[`${left}_${focal}`] || focal} ${tStopText}`;
+  rightLabel.textContent = `Lens: ${rightSelect.value} ${lensNotes[`${right}_${focal}`] || focal} ${tStopText}`;
 
-  // Zet slider terug in het midden
+  // Reset slider
   afterWrapper.style.width = "50%";
   slider.style.left = "50%";
 }
 
-// Initieel waarden instellen
-leftSelect.value = "IronGlass Red P";
-rightSelect.value = "IronGlass Zeiss Jena";
+// Initial state
+leftSelect.value = lenses[0];
+rightSelect.value = lenses[1];
 tStopSelect.value = "2.8";
-focalLengthSelect.value = "35mm";
-updateImages();
+focalSelect.value = "35mm";
+updateComparison();
 
-// Event listeners voor dropdowns
-[leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
-  el.addEventListener("change", updateImages)
-);
+// Change listeners
+[leftSelect, rightSelect, tStopSelect, focalSelect].forEach(el => el.addEventListener("change", updateComparison));
 
-// Drag functionaliteit
-let isDragging = false;
-
-slider.addEventListener("mousedown", () => isDragging = true);
-window.addEventListener("mouseup", () => isDragging = false);
+// Slider drag logic
+let dragging = false;
+slider.addEventListener("mousedown", () => dragging = true);
+window.addEventListener("mouseup", () => dragging = false);
 window.addEventListener("mousemove", e => {
-  if (!isDragging) return;
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const offset = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-  const percent = (offset / rect.width) * 100;
+  if (!dragging) return;
+  const rect = wrapper.getBoundingClientRect();
+  const pos = Math.min(Math.max(0, e.clientX - rect.left), rect.width);
+  const percent = (pos / rect.width) * 100;
   afterWrapper.style.width = `${percent}%`;
   slider.style.left = `${percent}%`;
 });
 
-// Flip knop
-document.getElementById("toggleButton").addEventListener("click", () => {
-  const leftValue = leftSelect.value;
-  const rightValue = rightSelect.value;
-  leftSelect.value = rightValue;
-  rightSelect.value = leftValue;
-  updateImages();
+// Flip
+const flipBtn = document.getElementById("toggleButton");
+flipBtn.addEventListener("click", () => {
+  const l = leftSelect.value;
+  leftSelect.value = rightSelect.value;
+  rightSelect.value = l;
+  updateComparison();
 });
 
-// Fullscreen knop
+// Fullscreen
 document.getElementById("fullscreenButton").addEventListener("click", () => {
-  const wrapper = document.getElementById("comparisonWrapper");
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    if (wrapper.requestFullscreen) wrapper.requestFullscreen();
-    else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+  if (!document.fullscreenElement) {
+    wrapper.requestFullscreen?.() || wrapper.webkitRequestFullscreen?.();
   } else {
-    if (document.exitFullscreen) document.exitFullscreen();
-    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    document.exitFullscreen?.() || document.webkitExitFullscreen?.();
   }
 });
 
-// Responsieve styling (mobile-mode)
-function updateMobileClass() {
-  const isFullscreen =
-    document.fullscreenElement ||
-    document.webkitFullscreenElement ||
-    document.mozFullScreenElement ||
-    document.msFullscreenElement;
-
+// Mobile check
+function checkMobileClass() {
   const isMobile = window.innerWidth <= 768;
-
-  if (isMobile && !isFullscreen) {
-    document.body.classList.add("mobile-mode");
-  } else {
-    document.body.classList.remove("mobile-mode");
-  }
+  const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+  document.body.classList.toggle("mobile-mode", isMobile && !isFullscreen);
 }
 
-window.addEventListener("resize", updateMobileClass);
-document.addEventListener("fullscreenchange", updateMobileClass);
-document.addEventListener("webkitfullscreenchange", updateMobileClass);
-document.addEventListener("mozfullscreenchange", updateMobileClass);
-document.addEventListener("MSFullscreenChange", updateMobileClass);
-updateMobileClass();
+window.addEventListener("resize", checkMobileClass);
+document.addEventListener("fullscreenchange", checkMobileClass);
+checkMobileClass();
