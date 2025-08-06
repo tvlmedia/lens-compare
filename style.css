@@ -245,14 +245,7 @@ select:hover,
   #fullscreenButton {
     display: none !important;
   }
-}
-/* Zorg dat touch werkt */
-#slider {
-  touch-action: none;
-}
 
-/* Override de verkeerde vaste grootte op mobiel */
-@media screen and (max-width: 767px) {
   #afterWrapper #afterImage,
   #afterWrapper #afterImage img {
     width: 100vw !important;
@@ -261,17 +254,10 @@ select:hover,
     object-position: center center;
   }
 }
-/* Verberg fullscreen op mobiel */
-@media screen and (max-width: 767px) {
-  #fullscreenButton {
-    display: none !important;
-  }
-}
 
-/* Toon fullscreen op desktop */
+/* Toon fullscreen button alleen op desktop */
 @media screen and (min-width: 768px) {
   #fullscreenButton {
     display: inline-block;
   }
 }
-
