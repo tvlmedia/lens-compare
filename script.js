@@ -157,24 +157,26 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const img = new Image();
   img.src = imgData;
   await new Promise(resolve => img.onload = resolve);
+
   const aspect = img.width / img.height;
+  const imgWidth = pageWidth;
+  const imgHeight = imgWidth / aspect;
 
-  const imgWidth = pageWidth; // Volledige breedte gebruiken
-  const imgHeight = imgWidth / aspect; // Hoogte automatisch berekenen
-
-  const x = 0;
-  const y = top;
-
-  // Als de afbeelding te hoog wordt voor de pagina, pas dan de hoogte aan
   const availableHeight = pageHeight - top - bottom;
+
+  let finalWidth = imgWidth;
+  let finalHeight = imgHeight;
+  let x = 0;
+  let y = top;
+
+  // Als de afbeelding te hoog is, verklein en centreer horizontaal
   if (imgHeight > availableHeight) {
-    const newImgHeight = availableHeight;
-    const newImgWidth = newImgHeight * aspect;
-    const newX = (pageWidth - newImgWidth) / 2;
-    pdf.addImage(imgData, "JPEG", newX, y, newImgWidth, newImgHeight);
-  } else {
-    pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
+    finalHeight = availableHeight;
+    finalWidth = finalHeight * aspect;
+    x = (pageWidth - finalWidth) / 2;
   }
+
+  pdf.addImage(imgData, "JPEG", x, y, finalWidth, finalHeight);
 }
 
   function drawTopBar(text) {
