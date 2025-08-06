@@ -1,4 +1,4 @@
-/* ========== Algemene opmaak ========== */
+/* ========== 🌍 Algemene opmaak ========== */
 * {
   -webkit-user-drag: none;
   user-select: none;
@@ -16,7 +16,7 @@ body {
   line-height: 1.6;
 }
 
-/* ========== Controls ========== */
+/* ========== 🕹 Controls ========== */
 .controls {
   margin: 20px;
   display: flex;
@@ -42,7 +42,7 @@ select:hover,
   border-color: #666;
 }
 
-/* ========== Wrapper en afbeeldingen ========== */
+/* ========== 🎞 Viewer wrapper & image layers ========== */
 #comparisonWrapper {
   position: relative;
   width: 960px;
@@ -51,7 +51,8 @@ select:hover,
   background: #000;
 }
 
-#beforeImage, #afterImage {
+#beforeImage,
+#afterImage {
   position: absolute;
   top: 0;
   left: 0;
@@ -79,7 +80,7 @@ select:hover,
   z-index: 2;
 }
 
-/* ========== Slider ========== */
+/* ========== 🎚 Slider ========== */
 #slider {
   position: absolute;
   top: 0;
@@ -98,7 +99,7 @@ select:hover,
   display: none;
 }
 
-/* ========== Info labels ========== */
+/* ========== 🏷 Labels onder de viewer ========== */
 #infoContainer {
   display: flex;
   justify-content: space-between;
@@ -115,7 +116,7 @@ select:hover,
   text-align: center;
 }
 
-/* ========== Uitlegtekst ========== */
+/* ========== 📌 Waarschuwingsbox onderaan ========== */
 #explanationBox {
   margin-top: 12px;
   max-width: 960px;
@@ -128,26 +129,24 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ========== Fullscreen scaling (met correcte overlap) ========== */
+/* ========== 🖥️ Fullscreen scaling (met overlap-fix) ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
-  position: relative;
   width: 100vw;
   height: 100vh;
   max-width: none;
   max-height: none;
-  background: #000;
-  overflow: hidden;
 }
 
 :fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage {
+:-webkit-full-screen #beforeImage,
+:fullscreen #afterImage,
+:-webkit-full-screen #afterImage {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;
 }
 
 :fullscreen #afterWrapper,
@@ -161,30 +160,19 @@ select:hover,
   z-index: 2;
 }
 
-:fullscreen #afterImage,
-:-webkit-full-screen #afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
 :fullscreen #beforeImage img,
-:fullscreen #afterImage img,
 :-webkit-full-screen #beforeImage img,
+:fullscreen #afterImage img,
 :-webkit-full-screen #afterImage img {
+  position: absolute;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  top: 0;
+  left: 0;
 }
 
-:fullscreen #slider,
-:-webkit-full-screen #slider {
-  z-index: 10;
-}
-
-/* ========== Print styling ========== */
+/* ========== 🖨️ Print styling ========== */
 @media print {
   body {
     background: white !important;
@@ -212,7 +200,7 @@ select:hover,
   }
 }
 
-/* ========== Mobile scaling via JS class ========== */
+/* ========== 📱 Mobile scaling via JS class ========== */
 .mobile-mode #comparisonWrapper {
   width: 100vw;
   height: auto;
@@ -237,7 +225,6 @@ select:hover,
   width: 50vw;
   height: auto;
   aspect-ratio: 16 / 9;
-  overflow: hidden;
 }
 
 .mobile-mode #infoContainer {
