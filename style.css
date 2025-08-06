@@ -51,54 +51,38 @@ select:hover,
   background: #000;
 }
 
-#beforeImage,
+/* Achtergrondbeeld: always visible */
 #afterImage {
   position: absolute;
   inset: 0;
   z-index: 1;
 }
 
-#beforeImage img,
-#afterImage img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* De bovenste helft (die je wegschuift) */
+/* Reveal laag erboven */
 #afterWrapper {
   position: absolute;
   inset: 0;
-  width: 50%;
+  width: 50%; /* Dynamisch via JS */
   overflow: hidden;
   z-index: 2;
   pointer-events: none;
 }
 
-#afterWrapper #beforeImage {
+/* Bovenliggende afbeelding (die wordt gerevealed) */
+#beforeImage {
+  position: absolute;
+  inset: 0;
   z-index: 3;
 }
 
+/* Beide afbeeldingen */
 #beforeImage img,
 #afterImage img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-#afterWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 2;
 }
 
 /* ========== Slider ========== */
@@ -155,51 +139,37 @@ select:hover,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
   height: 100vh;
-  position: relative;
   max-width: none;
   max-height: none;
 }
 
+:fullscreen #afterImage,
+:-webkit-full-screen #afterImage,
 :fullscreen #beforeImage,
 :-webkit-full-screen #beforeImage {
+  inset: 0;
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
 }
 
 :fullscreen #afterWrapper,
 :-webkit-full-screen #afterWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 50%;
   height: 100%;
   overflow: hidden;
+  position: absolute;
   z-index: 2;
 }
 
-:fullscreen #afterImage,
-:-webkit-full-screen #afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-}
-
-:fullscreen #beforeImage img,
 :fullscreen #afterImage img,
-:-webkit-full-screen #beforeImage img,
-:-webkit-full-screen #afterImage img {
+:fullscreen #beforeImage img,
+:-webkit-full-screen #afterImage img,
+:-webkit-full-screen #beforeImage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
 }
 
 /* ========== Print styling ========== */
@@ -237,28 +207,29 @@ select:hover,
   aspect-ratio: 16 / 9;
 }
 
-.mobile-mode #beforeImage,
 .mobile-mode #afterImage,
+.mobile-mode #beforeImage,
 .mobile-mode #afterWrapper {
   width: 100%;
   height: auto;
   aspect-ratio: 16 / 9;
-  overflow: hidden;
-  position: relative;
+  position: absolute;
+  inset: 0;
 }
 
 .mobile-mode #afterWrapper {
   width: 50vw;
+  overflow: hidden;
+  z-index: 2;
 }
 
-.mobile-mode #beforeImage img,
-.mobile-mode #afterImage img {
+.mobile-mode #afterImage img,
+.mobile-mode #beforeImage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
 }
 
 .mobile-mode #infoContainer {
