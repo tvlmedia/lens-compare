@@ -159,22 +159,23 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   await new Promise(resolve => img.onload = resolve);
 
   const aspect = img.width / img.height;
-  const imgWidth = pageWidth;
-  const imgHeight = imgWidth / aspect;
+
+  let imgWidth = pageWidth;
+  let imgHeight = imgWidth / aspect;
+  let x = 0;
+  const y = top;
 
   const availableHeight = pageHeight - top - bottom;
 
-  let finalWidth = imgWidth;
-  let finalHeight = imgHeight;
-  let x = 0;
-  let y = top;
-
-  // Als de afbeelding te hoog is, verklein en centreer horizontaal
   if (imgHeight > availableHeight) {
-    finalHeight = availableHeight;
-    finalWidth = finalHeight * aspect;
-    x = (pageWidth - finalWidth) / 2;
+    // hoogte is te groot → schaal af op hoogte
+    imgHeight = availableHeight;
+    imgWidth = imgHeight * aspect;
+    x = (pageWidth - imgWidth) / 2;
   }
+
+  pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
+}
 
   pdf.addImage(imgData, "JPEG", x, y, finalWidth, finalHeight);
 }
