@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (GEOPTIMALISEERD) ======
+// ====== LENS COMPARISON TOOL SCRIPT (GEOPTIMALISEERD - GELIJK AFGESTEMDE PAGINA'S) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -136,21 +136,23 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     return canvas.toDataURL("image/jpeg", 1.0);
   }
 
- async function drawFullWidth(imgData, reserveBottom = 70) {
-  const img = new Image();
-  img.src = imgData;
-  await new Promise(resolve => img.onload = resolve);
-  
-  const aspect = img.width / img.height;
-  const maxHeight = pageHeight - reserveBottom;
-  const imgHeight = Math.min(maxHeight, pageWidth / aspect);
-  const imgWidth = imgHeight * aspect;
+  async function drawFullWidth(imgData) {
+    const topMargin = 40;
+    const bottomMargin = 70;
+    const maxHeight = pageHeight - topMargin - bottomMargin;
 
-  const x = (pageWidth - imgWidth) / 2;
-  const y = 40; // bovenmarge (zoals op splitpagina)
+    const img = new Image();
+    img.src = imgData;
+    await new Promise(resolve => img.onload = resolve);
 
-  pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
-}
+    const aspect = img.width / img.height;
+    const imgHeight = Math.min(maxHeight, pageWidth / aspect);
+    const imgWidth = imgHeight * aspect;
+    const x = (pageWidth - imgWidth) / 2;
+    const y = topMargin;
+
+    pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
+  }
 
   function drawTopLabel(text) {
     const barHeight = 40;
@@ -173,7 +175,6 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   function drawDescriptionBox(lens) {
     const info = lensDescriptions[lens];
     if (!info) return;
-
     const boxHeight = 70;
     const margin = 20;
     const logoSafeRight = 160;
@@ -181,8 +182,8 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
 
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
-
     const lines = pdf.splitTextToSize(info.text, safeTextWidth);
+
     pdf.setFontSize(10);
     pdf.setTextColor(255, 255, 255);
     pdf.text(lines, margin, pageHeight - boxHeight + 20);
@@ -204,9 +205,8 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   // Page 1
   fillBlack();
   drawTopLabel(`${leftText}  vs  ${rightText}`);
-  await drawFullWidth(splitData, 40);
+  await drawFullWidth(splitData);
   drawLogoBottomRight();
-  pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);
   pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 20, { align: "center" });
 
@@ -214,7 +214,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   pdf.addPage();
   fillBlack();
   drawTopLabel(leftText);
-  await drawFullWidth(leftData, 40);
+  await drawFullWidth(leftData);
   drawDescriptionBox(left);
   drawLogoBottomRight();
 
@@ -222,7 +222,7 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   pdf.addPage();
   fillBlack();
   drawTopLabel(rightText);
-  await drawFullWidth(rightData, 40);
+  await drawFullWidth(rightData);
   drawDescriptionBox(right);
   drawLogoBottomRight();
 
@@ -240,6 +240,7 @@ async function loadImage(url) {
     img.src = url;
   });
 }
+
 document.getElementById("fullscreenButton").addEventListener("click", () => {
   const elem = document.getElementById("comparisonWrapper");
 
