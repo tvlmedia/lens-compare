@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
   <title>Lens Comparison</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ voor mobiel -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- === Controls === -->
   <div class="controls">
     <button id="toggleButton">↔ Flip</button>
     <button id="fullscreenButton">⛶ Fullscreen</button>
@@ -35,30 +36,41 @@
     </select>
   </div>
 
+  <!-- === Comparison area === -->
   <div id="comparisonWrapper">
     <div id="beforeImage">
-      <img id="beforeImgTag" src="" alt="Right image" />
+      <img id="beforeImgTag" alt="Right lens preview">
     </div>
+
     <div id="afterWrapper">
       <div id="afterImage">
-        <img id="afterImgTag" src="" alt="Left image" />
+        <img id="afterImgTag" alt="Left lens preview">
       </div>
     </div>
+
     <div id="slider"></div>
   </div>
 
+  <!-- === Lens labels === -->
   <div id="infoContainer">
     <div id="leftLabel"></div>
     <div id="rightLabel"></div>
   </div>
 
+  <!-- === Explanation box === -->
   <div id="explanationBox">
     <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
   </div>
 
-  <!-- External scripts -->
+  <!-- === External libraries === -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- === Main script === -->
   <script src="script.js"></script>
+
 </body>
 </html>
+
+
+Wat moet erbij bij de Index?
