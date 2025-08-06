@@ -266,3 +266,8 @@ select:hover,
     color: #ccc;
   }
 }
+@media screen and (max-width: 767px) {
+  #fullscreenButton {
+    display: none !important;
+  }
+}
