@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (NETJES, MET RECHTSONDER LOGO & GEFIXTE PDF) ======
+// ====== LENS COMPARISON TOOL SCRIPT (NETJES, FIXED PDF & UI) ======
 
 const lenses = [
   "IronGlass Red P",
@@ -18,7 +18,7 @@ const notes = {
 const lensImageMap = {
   "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
   "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg",
-  "ironglass_red_p_50mm_t2_8": "red_p_58mm_t2_8.jpg",
+  "ironglass_red_p_58mm_t2_8": "red_p_58mm_t2_8.jpg",
   "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg"
 };
 
@@ -155,28 +155,44 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     return h;
   }
 
+  function drawTopLabel(text) {
+    const barHeight = 20;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, barHeight, "F");
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, pageWidth / 2, 14, { align: "center" });
+  }
+
   function drawLogoBottomRight() {
-    const logoWidth = 90;
-    const logoHeight = 40;
-    const x = pageWidth - logoWidth - 10;
-    const y = pageHeight - logoHeight - 10;
-    pdf.addImage(logoImg, "PNG", x, y, logoWidth, logoHeight);
+    const maxWidth = 90;
+    const ratio = logoImg.width / logoImg.height;
+    const height = maxWidth / ratio;
+    const x = pageWidth - maxWidth - 10;
+    const y = pageHeight - height - 10;
+    pdf.addImage(logoImg, "PNG", x, y, maxWidth, height);
   }
 
   function drawDescription(lens) {
     const info = lensDescriptions[lens];
     if (!info) return;
+
     const boxHeight = 70;
+    const margin = 20;
+    const logoSafeRight = 120;
+
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - boxHeight, pageWidth, boxHeight, "F");
 
-    pdf.setTextColor(255, 255, 255);
+    const safeTextWidth = pageWidth - margin * 2 - logoSafeRight;
+    const lines = pdf.splitTextToSize(info.text, safeTextWidth);
+
     pdf.setFontSize(10);
-    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
-    pdf.text(lines, 50, pageHeight - boxHeight + 20);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(lines, margin, pageHeight - boxHeight + 20);
 
     pdf.setTextColor(80, 160, 255);
-    pdf.textWithLink("Klik hier voor meer info", 50, pageHeight - 15, { url: info.url });
+    pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, { url: info.url });
   }
 
   function fillBlack() {
@@ -189,29 +205,28 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
 
+  // Page 1
   fillBlack();
   await drawFullWidth(splitData, 40);
+  drawTopLabel(`${leftText}  vs  ${rightText}`);
   drawLogoBottomRight();
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(14);
-  pdf.text(`${leftText}  vs  ${rightText}`, pageWidth / 2, 30, { align: "center" });
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  pdf.setFontSize(10);
+  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 15, { align: "center" });
 
+  // Page 2
   pdf.addPage();
   fillBlack();
   await drawFullWidth(leftData, 40);
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(14);
-  pdf.text(leftText, pageWidth / 2, 30, { align: "center" });
+  drawTopLabel(leftText);
   drawDescription(left);
   drawLogoBottomRight();
 
+  // Page 3
   pdf.addPage();
   fillBlack();
   await drawFullWidth(rightData, 40);
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(14);
-  pdf.text(rightText, pageWidth / 2, 30, { align: "center" });
+  drawTopLabel(rightText);
   drawDescription(right);
   drawLogoBottomRight();
 
