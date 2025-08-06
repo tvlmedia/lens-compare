@@ -97,8 +97,15 @@ select:hover,
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 960px;
+  height: 540px;
+}
+
+#afterWrapper #afterImage img {
+  width: 960px;
+  height: 540px;
+  object-fit: cover;
+  object-position: center center;
 }
 
 /* ========== Slider lijn ========== */
@@ -207,46 +214,10 @@ select:hover,
   }
 }
 
-/* ========== Mobiele weergave FIXED ========== */
+/* ========== Mobiele weergave ========== */
 @media screen and (max-width: 767px) {
-  #comparisonWrapper {
-    width: 100vw !important;
-    aspect-ratio: 16 / 9 !important;
-    max-width: 100vw !important;
-    height: auto !important;
-  }
-
-  #afterWrapper {
-    width: 50vw !important;
-    height: auto !important;
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  #afterWrapper #afterImage,
-  #afterWrapper #afterImage img,
-  #beforeImage,
-  #beforeImage img {
-    width: 100vw !important;
-    aspect-ratio: 16 / 9 !important;
-    height: auto !important;
-    object-fit: cover;
-    object-position: center center;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  #slider {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-  }
-
   .controls {
+    display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 0 16px;
@@ -273,5 +244,33 @@ select:hover,
 
   #fullscreenButton {
     display: none !important;
+  }
+}
+/* Zorg dat touch werkt */
+#slider {
+  touch-action: none;
+}
+
+/* Override de verkeerde vaste grootte op mobiel */
+@media screen and (max-width: 767px) {
+  #afterWrapper #afterImage,
+  #afterWrapper #afterImage img {
+    width: 100vw !important;
+    height: auto !important;
+    object-fit: cover;
+    object-position: center center;
+  }
+}
+/* Verberg fullscreen op mobiel */
+@media screen and (max-width: 767px) {
+  #fullscreenButton {
+    display: none !important;
+  }
+}
+
+/* Toon fullscreen op desktop */
+@media screen and (min-width: 768px) {
+  #fullscreenButton {
+    display: inline-block;
   }
 }
