@@ -269,13 +269,13 @@ select:hover,
   }
 
   body:not(.mobile-mode):not(:fullscreen) #beforeImage,
-  body:not(.mobile-mode):not(:fullscreen) #afterImage,
-  body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
-    width: 100%;
-    height: 100%;
+  body:not(.mobile-mode):not(:fullscreen) #afterImage {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
 
   body:not(.mobile-mode):not(:fullscreen) #beforeImage img,
@@ -286,11 +286,20 @@ select:hover,
     width: 100%;
     height: 100%;
     object-fit: cover;
+    z-index: 1;
   }
 
   body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
-    pointer-events: none;
-    z-index: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
     overflow: hidden;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  body:not(.mobile-mode):not(:fullscreen) #afterWrapper #afterImage {
+    width: 960px; /* Vastzetten zodat img blijft staan */
   }
 }
