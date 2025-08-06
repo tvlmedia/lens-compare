@@ -24,7 +24,10 @@ body {
   flex-wrap: wrap;
 }
 
-select, #toggleButton, #fullscreenButton, #downloadPdfButton {
+select,
+#toggleButton,
+#fullscreenButton,
+#downloadPdfButton {
   padding: 6px 12px;
   background: #1a1a1a;
   color: white;
@@ -52,7 +55,8 @@ select:hover,
   overflow: hidden;
 }
 
-#beforeImage, #afterImage {
+#beforeImage,
+#afterImage {
   position: absolute;
   top: 0;
   left: 0;
@@ -117,7 +121,8 @@ select:hover,
   color: #eee;
 }
 
-#leftLabel, #rightLabel {
+#leftLabel,
+#rightLabel {
   width: 50%;
   text-align: center;
 }
@@ -140,13 +145,15 @@ select:hover,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
   height: 100vh;
-  position: relative;
   max-width: none;
   max-height: none;
+  position: relative;
 }
 
 :fullscreen #beforeImage,
-:-webkit-full-screen #beforeImage {
+:fullscreen #afterImage,
+:-webkit-full-screen #beforeImage,
+:-webkit-full-screen #afterImage {
   position: absolute;
   top: 0;
   left: 0;
@@ -166,15 +173,6 @@ select:hover,
   z-index: 2;
 }
 
-:fullscreen #afterImage,
-:-webkit-full-screen #afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-}
-
 :fullscreen #beforeImage img,
 :fullscreen #afterImage img,
 :-webkit-full-screen #beforeImage img,
@@ -182,6 +180,7 @@ select:hover,
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center center;
   position: absolute;
   top: 0;
   left: 0;
@@ -259,6 +258,8 @@ select:hover,
   width: 100%;
   margin: 4px 0;
 }
+
+/* ========== Desktop-only fix: stilstaand beeld bij slider ========== */
 @media screen and (min-width: 961px) {
   body:not(.mobile-mode):not(:fullscreen) #comparisonWrapper {
     width: 960px;
@@ -278,6 +279,17 @@ select:hover,
     overflow: hidden;
   }
 
+  body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 2;
+    pointer-events: none;
+  }
+
   body:not(.mobile-mode):not(:fullscreen) #beforeImage img,
   body:not(.mobile-mode):not(:fullscreen) #afterImage img {
     position: absolute;
@@ -286,33 +298,7 @@ select:hover,
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
     z-index: 1;
   }
-
-  body:not(.mobile-mode):not(:fullscreen) #afterWrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    overflow: hidden;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  body:not(.mobile-mode):not(:fullscreen) #afterWrapper #afterImage {
-    width: 960px; /* Vastzetten zodat img blijft staan */
-  }
 }
-body:not(.mobile-mode):not(:fullscreen) #beforeImage img,
-body:not(.mobile-mode):not(:fullscreen) #afterImage img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center; /* 🔧 Deze regel zorgt voor strakke uitlijning */
-  z-index: 1;
-}
-
-
