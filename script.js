@@ -258,8 +258,7 @@ const splitData = scaledCanvas.toDataURL("image/jpeg", 1.0);
  fillBlack();
 drawTopBar(`${leftText} vs ${rightText}`);
 await drawFullWidthImage(splitData);
-drawBottomBar("", ""); // zelfde zwarte onderbalk, maar zonder tekst
-drawBottomLogo();
+drawBottomBar("Vergelijk meer lenzen op TVLRENTAL.NL", "https://tvlrental.nl");drawBottomLogo();
 
   pdf.addPage();
   fillBlack();
