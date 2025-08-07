@@ -230,10 +230,36 @@ pdf.textWithLink(displayText, x, y, { url: link });
     pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   }
 
+  function drawBottomBarPage1() {
+  const barHeight = 80;
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+  const text = "Benieuwd naar alle lenzen? Klik hier";
+  const y = pageHeight - barHeight + 50;
+
+  pdf.setFontSize(18); // groter dan standaard
+  pdf.setTextColor(255, 255, 255); // wit
+  pdf.textWithLink(text, pageWidth / 2, y, {
+    url: "https://tvlrental.nl/lenses/",
+    align: "center"
+  });
+
+  // Logo rechtsonder
+  const targetHeight = 50;
+  const ratio = logo.width / logo.height;
+  const targetWidth = targetHeight * ratio;
+  const xLogo = pageWidth - targetWidth - 12;
+  const yLogo = pageHeight - targetHeight - 12;
+  pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+}
+
   function fillBlack() {
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
+
+  
 
   // Screenshot maken
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
