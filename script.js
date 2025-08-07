@@ -143,10 +143,6 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
   const logo = await loadImage(logoUrl);
 
-  const splitData = await renderImage(comparison);
-  const leftData = await renderImage(leftImg);
-  const rightData = await renderImage(rightImg);
-
   const lensDescriptions = {
     "IronGlass Red P": {
       text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series Sovjet-lenzen met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – puur vintage glasoptiek.",
@@ -156,12 +152,19 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
       text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
       url: "https://tvlrental.nl/ironglasszeissjena/"
     }
-    // voeg meer lenzen toe indien nodig
   };
 
-  function fillBlack() {
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  async function renderImage(imgEl) {
+    const canvas = document.createElement("canvas");
+    canvas.width = imgEl.naturalWidth || 1920;
+    canvas.height = imgEl.naturalHeight || 1080;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imgEl.src;
+    await new Promise(resolve => img.onload = resolve);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 1.0);
   }
 
   async function drawFullWidthImage(imgData, top = 40, bottom = 70) {
@@ -198,47 +201,27 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.text(text, pageWidth / 2, 26, { align: "center" });
   }
 
-  function drawBottomBar(text, link = "") {
+  function drawBottomBar(text = "", link = "") {
     const barHeight = 70;
-    const margin = 20;
-    const logoSpace = 150;
-    const textWidth = pageWidth - margin - logoSpace;
-
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-    if (text) {
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(10);
-      const lines = pdf.splitTextToSize(text, textWidth);
-      pdf.text(lines, margin, pageHeight - barHeight + 20);
-    }
+    // Beschrijvingstekst
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 200 });
 
+    // Link
     if (link) {
-      pdf.setTextColor(80, 160, 255);
-      pdf.setFontSize(10);
-      pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, {
-        url: link
-      });
-    }
-  }
-
-  function drawBottomBarCenteredLink(link = "") {
-    const barHeight = 70;
-
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
-
-    if (link) {
-      pdf.setFontSize(14);
-      pdf.setTextColor(255, 255, 255);
-      const displayText = "Vergelijk meer lenzen op TVLRENTAL.NL";
+      const displayText = "Klik hier voor meer info";
       const textWidth = pdf.getTextWidth(displayText);
       const x = (pageWidth - textWidth) / 2;
-      const y = pageHeight - barHeight / 2 + 5;
+      const y = pageHeight - barHeight / 2 + 20;
+      pdf.setFontSize(14);
       pdf.textWithLink(displayText, x, y, { url: link });
     }
 
+    // Logo
     const targetHeight = 50;
     const ratio = logo.width / logo.height;
     const targetWidth = targetHeight * ratio;
@@ -247,36 +230,42 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   }
 
-  function drawBottomLogo() {
-    const targetHeight = 50;
-    const ratio = logo.width / logo.height;
-    const targetWidth = targetHeight * ratio;
-    const x = pageWidth - targetWidth - 12;
-    const y = pageHeight - targetHeight - 12;
-    pdf.addImage(logo, "PNG", x, y, targetWidth, targetHeight);
+  function fillBlack() {
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
-  // PAGINA 1
+  // Screenshot maken
+  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+  const scaledCanvas = document.createElement("canvas");
+  scaledCanvas.width = 1920;
+  scaledCanvas.height = 1080;
+  const ctx = scaledCanvas.getContext("2d");
+  ctx.drawImage(splitCanvas, 0, 0, 1920, 1080);
+  const splitData = scaledCanvas.toDataURL("image/jpeg", 1.0);
+
+  const leftData = await renderImage(leftImg);
+  const rightData = await renderImage(rightImg);
+
+  // PAGINA 1 – vergelijking
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
   await drawFullWidthImage(splitData);
-  drawBottomBarCenteredLink("https://tvlrental.nl/lenses/");
+  drawBottomBar("", "https://tvlrental.nl/lenses/");
 
-  // PAGINA 2
+  // PAGINA 2 – linker lens
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
   await drawFullWidthImage(leftData);
   drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
-  drawBottomLogo();
 
-  // PAGINA 3
+  // PAGINA 3 – rechter lens
   pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
   await drawFullWidthImage(rightData);
   drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
-  drawBottomLogo();
 
   const safeLeft = left.replace(/\s+/g, "");
   const safeRight = right.replace(/\s+/g, "");
@@ -284,19 +273,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   pdf.save(filename);
 });
 
-async function renderImage(imgEl) {
-  const canvas = document.createElement("canvas");
-  canvas.width = imgEl.naturalWidth || 1920;
-  canvas.height = imgEl.naturalHeight || 1080;
-  const ctx = canvas.getContext("2d");
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = imgEl.src;
-  await new Promise(resolve => img.onload = resolve);
-  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/jpeg", 1.0);
-}
-
+// HELPER
 async function loadImage(url) {
   return new Promise(resolve => {
     const img = new Image();
