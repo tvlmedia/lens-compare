@@ -194,39 +194,30 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
 }
 
-  function drawTopBar(text) {
-    const barHeight = 40;
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, barHeight, "F");
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(16);
-    pdf.text(text, pageWidth / 2, 26, { align: "center" });
-  }
-
   function drawBottomBar(text, link = "") {
-    const barHeight = 70;
-    const margin = 20;
-    const logoSpace = 150;
-    const textWidth = pageWidth - margin - logoSpace;
+  const barHeight = 70;
+  const margin = 20;
+  const logoSpace = 150;
+  const textWidth = pageWidth - margin - logoSpace;
 
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-    if (text) {
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(10);
-      const lines = pdf.splitTextToSize(text, textWidth);
-      pdf.text(lines, margin, pageHeight - barHeight + 20);
-    }
-
-    if (link) {
-      pdf.setTextColor(80, 160, 255);
-      pdf.setFontSize(10);
-      pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, {
-        url: link
-      });
-    }
+  if (text) {
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    const lines = pdf.splitTextToSize(text, textWidth);
+    pdf.text(lines, margin, pageHeight - barHeight + 20);
   }
+
+  if (link) {
+    pdf.setTextColor(80, 160, 255);
+    pdf.setFontSize(10);
+    pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, {
+      url: link
+    });
+  }
+}
 
   function drawBottomBarCenteredLink(link = "") {
     const barHeight = 70;
