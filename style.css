@@ -1,8 +1,8 @@
 /* ========== Algemene reset ========== */
 * {
+  box-sizing: border-box;
   -webkit-user-drag: none;
   user-select: none;
-  box-sizing: border-box;
 }
 
 html, body {
@@ -24,11 +24,11 @@ html, body {
 /* ========== Controls bovenaan ========== */
 .controls {
   margin: 20px;
+  padding: 0 16px;
   display: flex;
-  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 0 16px;
+  gap: 10px;
 }
 
 select,
@@ -67,8 +67,7 @@ select:hover,
 #beforeImage,
 #afterImage {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
 }
@@ -95,8 +94,7 @@ select:hover,
 
 #afterWrapper #afterImage {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
 }
@@ -132,8 +130,6 @@ select:hover,
 #rightLabel {
   width: 48%;
   text-align: center;
-  white-space: normal;
-  overflow-wrap: break-word;
   word-break: break-word;
 }
 
@@ -170,18 +166,14 @@ select:hover,
 :-webkit-full-screen #afterWrapper #afterImage,
 :fullscreen #afterWrapper #afterImage img,
 :-webkit-full-screen #afterWrapper #afterImage img {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center center;
 }
 
-/* ========== Mobiel fix ========== */
+/* ========== Mobiele weergave ========== */
 @media screen and (max-width: 767px) {
-  html, body {
-    overflow-x: hidden;
-  }
-
   .controls {
     flex-direction: column;
     gap: 10px;
@@ -202,27 +194,17 @@ select:hover,
 
   #comparisonWrapper {
     width: 100vw;
-    height: auto;
-    aspect-ratio: 16 / 9;
     max-width: 100vw;
+    aspect-ratio: 16 / 9;
+    height: auto;
   }
 
   #beforeImage,
-  #afterImage {
-    width: 100%;
-    height: 100%;
-  }
-
-  #afterWrapper {
-    width: 50%;
-    height: 100%;
-  }
-
+  #afterImage,
+  #afterWrapper,
   #afterWrapper #afterImage,
   #afterWrapper #afterImage img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: center center;
   }
 }
