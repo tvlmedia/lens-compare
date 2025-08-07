@@ -204,21 +204,29 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   }
 
   function drawBottomBar(text, link = "") {
-    const barHeight = 70;
-    const margin = 20;
-    const logoSpace = 150;
-    const textWidth = pageWidth - margin - logoSpace;
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  const barHeight = 70;
+  const margin = 20;
+  const logoSpace = 150;
+  const textWidth = pageWidth - margin - logoSpace;
+
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+  if (text) {
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(10);
     const lines = pdf.splitTextToSize(text, textWidth);
     pdf.text(lines, margin, pageHeight - barHeight + 20);
-    if (link) {
-      pdf.setTextColor(80, 160, 255);
-      pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, { url: link });
-    }
   }
+
+  if (link) {
+    pdf.setTextColor(80, 160, 255);
+    pdf.setFontSize(10);
+    pdf.textWithLink("Vergelijk meer lenzen op TVLRENTAL.NL", margin, pageHeight - 15, {
+      url: link
+    });
+  }
+}
 
   function drawBottomLogo() {
     const targetHeight = 50;
@@ -258,8 +266,8 @@ const splitData = scaledCanvas.toDataURL("image/jpeg", 1.0);
  fillBlack();
 drawTopBar(`${leftText} vs ${rightText}`);
 await drawFullWidthImage(splitData);
-drawBottomBar("Vergelijk meer lenzen op TVLRENTAL.NL", "https://tvlrental.nl");drawBottomLogo();
-
+drawBottomBar("", "https://tvlrental.nl/lenses/");
+  
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
