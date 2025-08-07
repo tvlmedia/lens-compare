@@ -239,7 +239,7 @@ pdf.textWithLink(displayText, x, y, { url: link });
   const y = pageHeight - barHeight + 40;
 
   const fontSize = 22;
-const textY = pageHeight - barHeight / 2 + fontSize / 2 - 500;
+const textY = pageHeight - barHeight / 2 + fontSize / 2 - 10;
 
 pdf.setFontSize(fontSize);
 pdf.setTextColor(255, 255, 255);
@@ -248,7 +248,7 @@ pdf.text(text, pageWidth / 2, textY, { align: "center" });
 // Onzichtbare link over de tekst heen
 const textWidth = pdf.getTextWidth(text);
 const linkX = (pageWidth - textWidth) / 2;
-const linkY = textY - fontSize + 5;
+const linkY = textY - fontSize + 5 - 10;
 const linkHeight = fontSize + 6;
 pdf.link(linkX, linkY, textWidth, linkHeight, {
   url: "https://tvlrental.nl/lenses/"
