@@ -8,7 +8,8 @@
 </head>
 <body>
 
-  <div class="controls">
+  <!-- === DESKTOP TOOL === -->
+  <div class="controls desktop-only">
     <div class="controls-row">
       <button id="toggleButton">↔ Flip</button>
       <button id="downloadPdfButton">⤓ Download PDF</button>
@@ -40,8 +41,7 @@
     </div>
   </div>
 
-  <!-- === Comparison Area === -->
-  <div id="comparisonWrapper">
+  <div id="comparisonWrapper" class="desktop-only">
     <div id="beforeImage">
       <img id="beforeImgTag" alt="Right lens preview">
     </div>
@@ -55,36 +55,35 @@
     <div id="slider"></div>
   </div>
 
-  <!-- === Lens Labels === -->
-  <div id="infoContainer">
+  <div id="infoContainer" class="desktop-only">
     <div id="leftLabel"></div>
     <div id="rightLabel"></div>
   </div>
 
-  <!-- === Lens Info Box === -->
-  <div id="lensInfo"></div>
+  <div id="lensInfo" class="desktop-only"></div>
 
-  <!-- === Explanation Box === -->
-  <div id="explanationBox">
+  <div id="explanationBox" class="desktop-only">
     <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
   </div>
 
-  <!-- === External Scripts === -->
+  <!-- === MOBILE VIEW ONLY: Embedded fullscreen iframe === -->
+  <div class="lens-frame-outer mobile-only">
+    <div class="lens-frame-wrapper">
+      <iframe 
+        src="https://tvlmedia.github.io/lens-compare/" 
+        allowfullscreen 
+        loading="lazy">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- === Scripts === -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     window.jspdf = window.jspdf || window.jspdf;
   </script>
   <script src="script.js"></script>
-<div class="lens-frame-outer mobile-only">
-  <div class="lens-frame-wrapper">
-    <iframe 
-      src="https://tvlmedia.github.io/lens-compare/" 
-      allowfullscreen 
-      loading="lazy">
-    </iframe>
-  </div>
-</div>
-  
+
 </body>
 </html>
