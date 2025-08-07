@@ -8,7 +8,7 @@ body {
   margin: 0;
   background: #0f0f0f;
   color: white;
-  font-family: Arial, sans-serif;
+  font-family: "Inter", "Helvetica Neue", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -239,4 +239,32 @@ select:hover,
     z-index: 20;
     pointer-events: auto;
   }
+}
+#slider:hover {
+  background: #fff;
+  box-shadow: 0 0 8px #fff;
+}
+#comparisonWrapper {
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
+}
+@media (max-width: 767px) {
+  #slider {
+    width: 10px;
+  }
+}
+#beforeImage img,
+#afterImage img {
+  transition: opacity 0.3s ease-in-out;
+}
+.loading::after {
+  content: "Bezig met laden...";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: white;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.6);
+  padding: 12px 16px;
+  border-radius: 4px;
+  z-index: 20;
 }
