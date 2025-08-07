@@ -257,14 +257,14 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
-await drawFullWidthImage(leftData, 140, 240);  // op pagina 2
+await drawFullWidthImage(leftData, 40, 240);  // op pagina 2
   drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
 
   // PAGINA 3 – rechter lens
   pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
-  await drawFullWidthImage(rightData, 140, 240); // op pagina 3
+  await drawFullWidthImage(rightData, 100, 240); // op pagina 3
   drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
 
   const safeLeft = left.replace(/\s+/g, "");
