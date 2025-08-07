@@ -108,19 +108,40 @@ document.getElementById("fullscreenButton").addEventListener("click", () => {
   }
 });
 
-document.getElementById("downloadPdfButton").addEventListener("click", async () => {
-  const comparison = document.getElementById("comparisonWrapper");
-  const leftImg = document.getElementById("afterImgTag");
-  const rightImg = document.getElementById("beforeImgTag");
-  const leftLabel = document.getElementById("leftLabel").textContent;
-  const rightLabel = document.getElementById("rightLabel").textContent;
 
-  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
+document.getElementById("toggleButton").addEventListener("click", () => {
+  const left = leftSelect.value;
+  const right = rightSelect.value;
+  leftSelect.value = right;
+  rightSelect.value = left;
+  updateImages();
+});
 
+document.getElementById("fullscreenButton")?.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    comparisonWrapper.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+
+document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
+  const comparison = document.getElementById("comparisonWrapper");
+  const leftImg = afterImgTag;
+  const rightImg = beforeImgTag;
+  const leftText = leftLabel.textContent;
+  const rightText = rightLabel.textContent;
+  const left = leftSelect.value;
+  const right = rightSelect.value;
+  const focal = focalLengthSelect.value;
+  const t = tStopSelect.value;
+
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
+  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
+  const logo = await loadImage(logoUrl);
 
   const lensDescriptions = {
     "IronGlass Red P": {
@@ -133,100 +154,122 @@ document.getElementById("downloadPdfButton").addEventListener("click", async () 
     }
   };
 
+  async function renderImage(imgEl) {
+    const canvas = document.createElement("canvas");
+    canvas.width = imgEl.naturalWidth || 1920;
+    canvas.height = imgEl.naturalHeight || 1080;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imgEl.src;
+    await new Promise(resolve => img.onload = resolve);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 1.0);
+  }
+
+  async function drawFullWidthImage(imgData, top = 40, bottom = 70) {
+    const img = new Image();
+    img.src = imgData;
+    await new Promise(resolve => img.onload = resolve);
+
+    const aspect = img.width / img.height;
+    let imgWidth = pageWidth;
+    let imgHeight = imgWidth / aspect;
+    let x = 0;
+    const y = top;
+
+    const availableHeight = pageHeight - top - bottom;
+    if (imgHeight > availableHeight) {
+      imgHeight = availableHeight;
+      imgWidth = imgHeight * aspect;
+      x = (pageWidth - imgWidth) / 2;
+    }
+
+    pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
+  }
+
+  function drawTopBar(text) {
+    const barHeight = 40;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, barHeight, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.text(text, pageWidth / 2, 26, { align: "center" });
+  }
+
+  function drawBottomBar(text, link = "") {
+    const barHeight = 70;
+    const margin = 20;
+    const logoSpace = 150;
+    const textWidth = pageWidth - margin - logoSpace;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    const lines = pdf.splitTextToSize(text, textWidth);
+    pdf.text(lines, margin, pageHeight - barHeight + 20);
+    if (link) {
+      pdf.setTextColor(80, 160, 255);
+      pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, { url: link });
+    }
+  }
+
+  function drawBottomLogo() {
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const x = pageWidth - targetWidth - 12;
+    const y = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", x, y, targetWidth, targetHeight);
+  }
+
+  function drawSiteURL() {
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 30, { align: "center" });
+  }
+
   function fillBlack() {
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
-  async function loadImage(url) {
-    return new Promise(resolve => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => resolve(img);
-      img.src = url;
-    });
-  }
-
-  async function renderImageData(imgEl) {
-    return new Promise(resolve => {
-      const canvas = document.createElement("canvas");
-      canvas.width = imgEl.naturalWidth || 1920;
-      canvas.height = imgEl.naturalHeight || 1080;
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", 1.0));
-      };
-      img.src = imgEl.src;
-    });
-  }
-
-  async function drawImageFullWidth(imageData, yOffset = 0) {
-    return new Promise(resolve => {
-      const img = new Image();
-      img.onload = () => {
-        const aspectRatio = img.width / img.height;
-        const targetWidth = pageWidth;
-        const targetHeight = targetWidth / aspectRatio;
-        pdf.addImage(imageData, "JPEG", 0, yOffset, targetWidth, targetHeight);
-        resolve(yOffset + targetHeight);
-      };
-      img.src = imageData;
-    });
-  }
-
-  function drawLogo(x, y, maxW = 90, logo) {
-    const ratio = logo.width / logo.height;
-    const h = maxW / ratio;
-    pdf.addImage(logo, "PNG", x, y, maxW, h);
-  }
-
-  function drawDescriptionBlock(lensName, yStart) {
-    const info = lensDescriptions[lensName];
-    if (!info) return;
-
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(10);
-    const lines = pdf.splitTextToSize(info.text, pageWidth - 100);
-    pdf.text(lines, 50, yStart + 10);
-
-    pdf.setTextColor(80, 160, 255);
-    pdf.textWithLink("Klik hier voor meer info", 50, yStart + lines.length * 12 + 4, { url: info.url });
-  }
-
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
   const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
-  const leftData = await renderImageData(leftImg);
-  const rightData = await renderImageData(rightImg);
-  const logo = await loadImage(logoUrl);
+  const leftData = await renderImage(leftImg);
+  const rightData = await renderImage(rightImg);
 
   fillBlack();
-  await drawImageFullWidth(splitData, 40);
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(14);
-  pdf.text(`${leftLabel}  vs  ${rightLabel}`, pageWidth / 2, 30, { align: "center" });
-  pdf.text("tvlrental.nl", pageWidth / 2, pageHeight - 20, { align: "center" });
+  drawTopBar(`${leftText} vs ${rightText}`);
+  await drawFullWidthImage(splitData);
+  drawSiteURL();
+  drawBottomLogo();
 
   pdf.addPage();
   fillBlack();
-  const yLeftEnd = await drawImageFullWidth(leftData, 40);
-  drawLogo(pageWidth - 100, 0, 70, logo);
-  pdf.setFontSize(14);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(leftLabel, pageWidth / 2, 30, { align: "center" });
-  drawDescriptionBlock(leftSelect.value, yLeftEnd + 10);
+  drawTopBar(leftText);
+  await drawFullWidthImage(leftData);
+  drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
+  drawBottomLogo();
 
   pdf.addPage();
   fillBlack();
-  const yRightEnd = await drawImageFullWidth(rightData, 40);
-  drawLogo(pageWidth - 100, 0, 70, logo);
-  pdf.setFontSize(14);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(rightLabel, pageWidth / 2, 30, { align: "center" });
-  drawDescriptionBlock(rightSelect.value, yRightEnd + 10);
+  drawTopBar(rightText);
+  await drawFullWidthImage(rightData);
+  drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
+  drawBottomLogo();
 
-  const filename = `lens-comparison-${new Date().toISOString().slice(0, 10)}.pdf`;
+  const safeLeft = left.replace(/\s+/g, "");
+  const safeRight = right.replace(/\s+/g, "");
+  const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
   pdf.save(filename);
 });
+
+async function loadImage(url) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.src = url;
+  });
+}
