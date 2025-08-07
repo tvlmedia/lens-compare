@@ -202,71 +202,39 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   }
 
   function drawBottomBar(text = "", link = "") {
-    const barHeight = 70;
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  const barHeight = 70;
+  const margin = 20;
+  const logoSpace = 150;
+  const textWidth = pageWidth - margin - logoSpace;
 
-    // Beschrijvingstekst
-    pdf.setFontSize(12);
+  // Zwarte balk onderaan
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+  // Beschrijvingstekst (wit, bovenin balk)
+  if (text) {
+    pdf.setFontSize(10);
     pdf.setTextColor(255, 255, 255);
-    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 200 });
-
-    // Link
-    if (link) {
-      const displayText = "Klik hier voor meer info";
-      const textWidth = pdf.getTextWidth(displayText);
-      const x = (pageWidth - textWidth) / 2;
-      const y = pageHeight - barHeight / 2 + 20;
-      pdf.setFontSize(14);
-      pdf.textWithLink(displayText, x, y, { url: link });
-    }
-
-    // Logo
-    const targetHeight = 50;
-    const ratio = logo.width / logo.height;
-    const targetWidth = targetHeight * ratio;
-    const xLogo = pageWidth - targetWidth - 12;
-    const yLogo = pageHeight - targetHeight - 12;
-    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+    const lines = pdf.splitTextToSize(text, textWidth);
+    pdf.text(lines, margin, pageHeight - barHeight + 20);
   }
 
-  function fillBlack() {
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  // Link (klein, blauw, linksonder)
+  if (link) {
+    const displayText = "Klik hier voor meer info";
+    pdf.setFontSize(8);
+    pdf.setTextColor(80, 160, 255);
+    pdf.textWithLink(displayText, margin, pageHeight - 10, { url: link });
   }
 
-  // Screenshot maken
-  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const scaledCanvas = document.createElement("canvas");
-  scaledCanvas.width = 1920;
-  scaledCanvas.height = 1080;
-  const ctx = scaledCanvas.getContext("2d");
-  ctx.drawImage(splitCanvas, 0, 0, 1920, 1080);
-  const splitData = scaledCanvas.toDataURL("image/jpeg", 1.0);
-
-  const leftData = await renderImage(leftImg);
-  const rightData = await renderImage(rightImg);
-
-  // PAGINA 1 – vergelijking
-  fillBlack();
-  drawTopBar(`${leftText} vs ${rightText}`);
-  await drawFullWidthImage(splitData);
-  drawBottomBar("", "https://tvlrental.nl/lenses/");
-
-  // PAGINA 2 – linker lens
-  pdf.addPage();
-  fillBlack();
-  drawTopBar(leftText);
-  await drawFullWidthImage(leftData);
-  drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
-
-  // PAGINA 3 – rechter lens
-  pdf.addPage();
-  fillBlack();
-  drawTopBar(rightText);
-  await drawFullWidthImage(rightData);
-  drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
-
+  // Logo (rechtsonder)
+  const targetHeight = 50;
+  const ratio = logo.width / logo.height;
+  const targetWidth = targetHeight * ratio;
+  const xLogo = pageWidth - targetWidth - 12;
+  const yLogo = pageHeight - targetHeight - 12;
+  pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+}
   const safeLeft = left.replace(/\s+/g, "");
   const safeRight = right.replace(/\s+/g, "");
   const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
