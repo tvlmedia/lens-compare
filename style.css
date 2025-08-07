@@ -249,7 +249,7 @@ select:hover,
 }
 @media (max-width: 767px) {
   #slider {
-    width: 3px;
+    width: 4px;
   }
 }
 #beforeImage img,
