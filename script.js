@@ -43,22 +43,22 @@ function updateImages() {
   const tStop = tStopSelect.value.replace(".", "_");
   const focalLength = focalLengthSelect.value;
 
-  const leftBaseKey = ${leftLens}_${focalLength};
-  const rightBaseKey = ${rightLens}_${focalLength};
-  const leftKey = ${leftLens}_${focalLength}_t${tStop};
-  const rightKey = ${rightLens}_${focalLength}_t${tStop};
+  const leftBaseKey = `${leftLens}_${focalLength}`;
+  const rightBaseKey = `${rightLens}_${focalLength}`;
+  const leftKey = `${leftLens}_${focalLength}_t${tStop}`;
+  const rightKey = `${rightLens}_${focalLength}_t${tStop}`;
 
-  const imgLeft = images/${lensImageMap[leftKey] || leftKey + ".jpg"};
-  const imgRight = images/${lensImageMap[rightKey] || rightKey + ".jpg"};
+  const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
+  const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
   beforeImgTag.src = imgRight;
   afterImgTag.src = imgLeft;
 
   const tStopRaw = tStopSelect.value;
-  const tStopFormatted = T${tStopRaw};
+  const tStopFormatted = `T${tStopRaw}`;
 
-  leftLabel.textContent = Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted};
-  rightLabel.textContent = Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted};
+  leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
+  rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
 }
 
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
@@ -77,8 +77,8 @@ window.addEventListener("mousemove", e => {
   const rect = comparisonWrapper.getBoundingClientRect();
   const offset = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
   const percent = (offset / rect.width) * 100;
-  afterWrapper.style.width = ${percent}%;
-  slider.style.left = ${percent}%;
+  afterWrapper.style.width = `${percent}%`;
+  slider.style.left = `${percent}%`;
 });
 
 updateImages();
@@ -107,6 +107,7 @@ document.getElementById("fullscreenButton").addEventListener("click", () => {
     }
   }
 });
+
 
 document.getElementById("toggleButton").addEventListener("click", () => {
   const left = leftSelect.value;
@@ -248,7 +249,7 @@ pdf.textWithLink(displayText, x, y, { url: link });
 
   // PAGINA 1 – vergelijking
   fillBlack();
-  drawTopBar(${leftText} vs ${rightText});
+  drawTopBar(`${leftText} vs ${rightText}`);
   await drawFullWidthImage(splitData);
   drawBottomBar("", "https://tvlrental.nl/lenses/");
 
@@ -268,7 +269,7 @@ pdf.textWithLink(displayText, x, y, { url: link });
 
   const safeLeft = left.replace(/\s+/g, "");
   const safeRight = right.replace(/\s+/g, "");
-  const filename = TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf;
+  const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
   pdf.save(filename);
 });
 
