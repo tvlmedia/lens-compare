@@ -351,3 +351,8 @@ select:hover,
     height: calc(100vh - 60px);
   }
 }
+.lens-frame-outer {
+  width: 100%;
+  margin: 60px auto 80px auto;
+  z-index: 10;
+}
