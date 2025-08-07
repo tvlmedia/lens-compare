@@ -236,7 +236,7 @@ pdf.textWithLink(displayText, x, y, { url: link });
   pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
   const text = "Benieuwd naar alle lenzen? Klik hier";
-  const y = pageHeight - barHeight + 50;
+  const y = pageHeight - barHeight + 40;
 
   const fontSize = 22;
 const textY = pageHeight - barHeight / 2 + fontSize / 2;
