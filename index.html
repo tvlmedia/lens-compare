@@ -5,115 +5,71 @@
   <title>Lens Comparison</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Fix voor afbeeldingen in mobiele view */
-    @media screen and (max-width: 767px) {
-      #beforeImage img,
-      #afterImage img {
-        width: 100% !important;
-        height: auto !important;
-        object-fit: cover;
-      }
-      #afterWrapper #afterImage,
-      #afterWrapper #afterImage img {
-        width: 100% !important;
-        height: auto !important;
-      }
-    }
-  </style>
 </head>
 <body>
 
+  <!-- === Controls === -->
   <div class="controls">
-    <div class="button-row">
-      <button id="toggleButton">↔ Flip</button>
-      <button id="downloadPdfButton">⤓ Download PDF</button>
-      <button id="fullscreenButton">⛶ Fullscreen</button>
-    </div>
+    <button id="toggleButton">↔ Flip</button>
+    <button id="fullscreenButton">⛶ Fullscreen</button>
+    <button id="downloadPdfButton">⤓ Download PDF</button>
 
-    <div class="lens-select-row">
-      <select id="leftLens"></select>
-      <select id="rightLens"></select>
-    </div>
+    <select id="leftLens"></select>
+    <select id="rightLens"></select>
 
-    <div class="settings-row">
-      <select id="tStop">
-        <option value="1.4">T1.4</option>
-        <option value="2">T2</option>
-        <option value="2.8" selected>T2.8</option>
-        <option value="4">T4</option>
-        <option value="5.6">T5.6</option>
-        <option value="8">T8</option>
-      </select>
+    <select id="tStop">
+      <option value="1.4">T1.4</option>
+      <option value="2">T2</option>
+      <option value="2.8" selected>T2.8</option>
+      <option value="4">T4</option>
+      <option value="5.6">T5.6</option>
+      <option value="8">T8</option>
+    </select>
 
-      <select id="focalLength">
-        <option value="18mm">18mm</option>
-        <option value="25mm">25mm</option>
-        <option value="35mm" selected>35mm</option>
-        <option value="50mm">50mm</option>
-        <option value="80mm">80mm</option>
-        <option value="135mm">135mm</option>
-      </select>
-    </div>
+    <select id="focalLength">
+      <option value="18mm">18mm</option>
+      <option value="25mm">25mm</option>
+      <option value="35mm" selected>35mm</option>
+      <option value="50mm">50mm</option>
+      <option value="80mm">80mm</option>
+      <option value="135mm">135mm</option>
+    </select>
   </div>
 
+  <!-- === Comparison Area === -->
   <div id="comparisonWrapper">
     <div id="beforeImage">
       <img id="beforeImgTag" alt="Right lens preview">
     </div>
+
     <div id="afterWrapper">
       <div id="afterImage">
         <img id="afterImgTag" alt="Left lens preview">
       </div>
     </div>
+
     <div id="slider"></div>
   </div>
 
+  <!-- === Lens Labels === -->
   <div id="infoContainer">
     <div id="leftLabel"></div>
     <div id="rightLabel"></div>
   </div>
 
+  <!-- === Explanation Box === -->
   <div id="explanationBox">
     <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
   </div>
 
+  <!-- === External Scripts (Correct Order) === -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    document.getElementById("fullscreenButton").addEventListener("click", () => {
-      const elem = document.getElementById("comparisonWrapper");
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-      } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
-      }
-    });
+    // Fix jsPDF global (nodig voor sommige browsers)
+    window.jspdf = window.jspdf || window.jspdf;
   </script>
   <script src="script.js"></script>
-
-  <script>
-    // Touch support fix toevoegen (indien nog niet aanwezig)
-    let isDragging = false;
-
-    const slider = document.getElementById("slider");
-    const comparisonWrapper = document.getElementById("comparisonWrapper");
-    const afterWrapper = document.getElementById("afterWrapper");
-
-    slider.addEventListener("touchstart", () => isDragging = true);
-    window.addEventListener("touchend", () => isDragging = false);
-    window.addEventListener("touchmove", e => {
-      if (!isDragging) return;
-      const touch = e.touches[0];
-      const rect = comparisonWrapper.getBoundingClientRect();
-      const offset = Math.max(0, Math.min(touch.clientX - rect.left, rect.width));
-      const percent = (offset / rect.width) * 100;
-      afterWrapper.style.width = `${percent}%`;
-      slider.style.left = `${percent}%`;
-    });
-  </script>
 
 </body>
 </html>
