@@ -203,28 +203,20 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.text(text, pageWidth / 2, 26, { align: "center" });
   }
 
-  function drawBottomBar(text, link = "") {
+ function drawBottomBar(text, link = "") {
   const barHeight = 70;
-  const margin = 20;
-  const logoSpace = 150;
-  const textWidth = pageWidth - margin - logoSpace;
 
   pdf.setFillColor(0, 0, 0);
   pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  if (text) {
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(10);
-    const lines = pdf.splitTextToSize(text, textWidth);
-    pdf.text(lines, margin, pageHeight - barHeight + 20);
-  }
-
   if (link) {
-    pdf.setTextColor(80, 160, 255);
-    pdf.setFontSize(10);
-    pdf.textWithLink("Vergelijk meer lenzen op TVLRENTAL.NL", margin, pageHeight - 15, {
-      url: link
-    });
+    pdf.setFontSize(14); // Grotere tekst
+    pdf.setTextColor(255, 255, 255); // Witte tekst
+    const displayText = "Vergelijk meer lenzen op TVLRENTAL.NL";
+    const textWidth = pdf.getTextWidth(displayText);
+    const x = (pageWidth - textWidth) / 2;
+    const y = pageHeight - barHeight / 2 + 5; // Verticale centrering
+    pdf.textWithLink(displayText, x, y, { url: link });
   }
 }
 
