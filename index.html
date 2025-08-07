@@ -9,47 +9,37 @@
 <body>
 
   <div class="controls">
-  <div class="controls-row">
-    <button id="toggleButton">↔ Flip</button>
-    <button id="downloadPdfButton">⤓ Download PDF</button>
+    <div class="controls-row">
+      <button id="toggleButton">↔ Flip</button>
+      <button id="downloadPdfButton">⤓ Download PDF</button>
+    </div>
+
+    <div class="controls-column">
+      <select id="leftLens"></select>
+      <select id="rightLens"></select>
+    </div>
+
+    <div class="controls-row">
+      <select id="tStop">
+        <option value="1.4">T1.4</option>
+        <option value="2">T2</option>
+        <option value="2.8" selected>T2.8</option>
+        <option value="4">T4</option>
+        <option value="5.6">T5.6</option>
+        <option value="8">T8</option>
+      </select>
+
+      <select id="focalLength">
+        <option value="18mm">18mm</option>
+        <option value="25mm">25mm</option>
+        <option value="35mm" selected>35mm</option>
+        <option value="50mm">50mm</option>
+        <option value="80mm">80mm</option>
+        <option value="135mm">135mm</option>
+      </select>
+    </div>
   </div>
 
-  <select id="leftLens"></select>
-  <select id="rightLens"></select>
-
-  <div class="controls">
-  <div class="controls-row">
-    <button id="toggleButton">↔ Flip</button>
-    <button id="downloadPdfButton">⤓ Download PDF</button>
-  </div>
-
-  <select id="leftLens"></select>
-  <select id="rightLens"></select>
-
-  <div class="controls-row">
-    <select id="tStop">
-      <option value="1.4">T1.4</option>
-      <option value="2">T2</option>
-      <option value="2.8" selected>T2.8</option>
-      <option value="4">T4</option>
-      <option value="5.6">T5.6</option>
-      <option value="8">T8</option>
-    </select>
-
-    <select id="focalLength">
-      <option value="18mm">18mm</option>
-      <option value="25mm">25mm</option>
-      <option value="35mm" selected>35mm</option>
-      <option value="50mm">50mm</option>
-      <option value="80mm">80mm</option>
-      <option value="135mm">135mm</option>
-    </select>
-  </div>
-</div>
-
-   
-
-  
   <!-- === Comparison Area === -->
   <div id="comparisonWrapper">
     <div id="beforeImage">
@@ -73,24 +63,19 @@
 
   <!-- === Lens Info Box === -->
   <div id="lensInfo"></div>
-  
+
   <!-- === Explanation Box === -->
   <div id="explanationBox">
     <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
   </div>
 
-  
-
-
-  <!-- === External Scripts (Correct Order) === -->
+  <!-- === External Scripts === -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    // Fix jsPDF global (nodig voor sommige browsers)
     window.jspdf = window.jspdf || window.jspdf;
   </script>
   <script src="script.js"></script>
 
 </body>
 </html>
-
