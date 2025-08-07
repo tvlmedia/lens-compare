@@ -37,6 +37,19 @@ const comparisonWrapper = document.getElementById("comparisonWrapper");
 const leftLabel = document.getElementById("leftLabel");
 const rightLabel = document.getElementById("rightLabel");
 
+function updateLensInfo() {
+  const left = leftSelect.value;
+  const right = rightSelect.value;
+  const leftDesc = lensDescriptions[left]?.text || "";
+  const rightDesc = lensDescriptions[right]?.text || "";
+
+  const lensInfoDiv = document.getElementById("lensInfo");
+  lensInfoDiv.innerHTML = `
+    <p><strong>${left}:</strong> ${leftDesc}</p>
+    <p><strong>${right}:</strong> ${rightDesc}</p>
+  `;
+}
+
 lenses.forEach(lens => {
   leftSelect.add(new Option(lens, lens));
   rightSelect.add(new Option(lens, lens));
