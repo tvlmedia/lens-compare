@@ -203,57 +203,57 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.text(text, pageWidth / 2, 26, { align: "center" });
   }
 
-function drawBottomBar(text, link = "") {
-  const barHeight = 70;
+  function drawBottomBar(text, link = "") {
+    const barHeight = 70;
+    const margin = 20;
+    const logoSpace = 150;
+    const textWidth = pageWidth - margin - logoSpace;
 
-  // Zwarte achtergrondbalk
-  pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  // Linktekst: gecentreerd
-  if (link) {
-    pdf.setFontSize(14);
-    pdf.setTextColor(255, 255, 255);
-    const displayText = "Vergelijk meer lenzen op TVLRENTAL.NL";
-    const textWidth = pdf.getTextWidth(displayText);
-    const x = (pageWidth - textWidth) / 2;
-    const y = pageHeight - barHeight / 2 + 5;
-    pdf.textWithLink(displayText, x, y, { url: link });
-  }
-function drawBottomBarCenteredLink(link = "") {
-  const barHeight = 70;
+    if (text) {
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(10);
+      const lines = pdf.splitTextToSize(text, textWidth);
+      pdf.text(lines, margin, pageHeight - barHeight + 20);
+    }
 
-  // Zwarte balk
-  pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
-
-  // Gecentreerde klikbare tekst
-  if (link) {
-    pdf.setFontSize(14);
-    pdf.setTextColor(255, 255, 255);
-    const displayText = "Vergelijk meer lenzen op TVLRENTAL.NL";
-    const textWidth = pdf.getTextWidth(displayText);
-    const x = (pageWidth - textWidth) / 2;
-    const y = pageHeight - barHeight / 2 + 5;
-    pdf.textWithLink(displayText, x, y, { url: link });
+    if (link) {
+      pdf.setTextColor(80, 160, 255);
+      pdf.setFontSize(10);
+      pdf.textWithLink("Klik hier voor meer info", margin, pageHeight - 15, {
+        url: link
+      });
+    }
   }
 
-  // Logo rechtsonder
-  const targetHeight = 50;
-  const ratio = logo.width / logo.height;
-  const targetWidth = targetHeight * ratio;
-  const x = pageWidth - targetWidth - 12;
-  const y = pageHeight - targetHeight - 12;
-  pdf.addImage(logo, "PNG", x, y, targetWidth, targetHeight);
-}
-  // Logo: rechts onderin
-  const targetHeight = 50;
-  const ratio = logo.width / logo.height;
-  const targetWidth = targetHeight * ratio;
-  const logoX = pageWidth - targetWidth - 12;
-  const logoY = pageHeight - targetHeight - 12;
-  pdf.addImage(logo, "PNG", logoX, logoY, targetWidth, targetHeight);
-}
+  function drawBottomBarCenteredLink(link = "") {
+    const barHeight = 70;
+
+    // Zwarte balk
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+    // Gecentreerde klikbare tekst
+    if (link) {
+      pdf.setFontSize(14);
+      pdf.setTextColor(255, 255, 255);
+      const displayText = "Vergelijk meer lenzen op TVLRENTAL.NL";
+      const textWidth = pdf.getTextWidth(displayText);
+      const x = (pageWidth - textWidth) / 2;
+      const y = pageHeight - barHeight / 2 + 5;
+      pdf.textWithLink(displayText, x, y, { url: link });
+    }
+
+    // Logo rechtsonder
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
 
   function drawBottomLogo() {
     const targetHeight = 50;
@@ -264,37 +264,13 @@ function drawBottomBarCenteredLink(link = "") {
     pdf.addImage(logo, "PNG", x, y, targetWidth, targetHeight);
   }
 
-  function drawSiteURL() {
-    pdf.setFontSize(14);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text("TVLRENTAL.NL", pageWidth / 2, pageHeight - 30, { align: "center" });
-  }
+  // ===== PAGINA 1 =====
+  fillBlack();
+  drawTopBar(`${leftText} vs ${rightText}`);
+  await drawFullWidthImage(splitData);
+  drawBottomBarCenteredLink("https://tvlrental.nl/lenses/");
 
-  function fillBlack() {
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, pageHeight, "F");
-  }
-
-  // Maak screenshot van comparisonWrapper
-const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-
-// Converteer naar exact 1920x1080 voor uniforme schaal (zoals losse lensbeelden)
-const scaledCanvas = document.createElement("canvas");
-scaledCanvas.width = 1920;
-scaledCanvas.height = 1080;
-const ctx = scaledCanvas.getContext("2d");
-ctx.drawImage(splitCanvas, 0, 0, 1920, 1080);
-
-// Gebruik deze versie als afbeelding voor de PDF
-const splitData = scaledCanvas.toDataURL("image/jpeg", 1.0);
-  const leftData = await renderImage(leftImg);
-  const rightData = await renderImage(rightImg);
-
- fillBlack();
-drawTopBar(`${leftText} vs ${rightText}`);
-await drawFullWidthImage(splitData);
-drawBottomBar("", "https://tvlrental.nl/lenses/");
-  
+  // ===== PAGINA 2 =====
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
@@ -302,6 +278,7 @@ drawBottomBar("", "https://tvlrental.nl/lenses/");
   drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
   drawBottomLogo();
 
+  // ===== PAGINA 3 =====
   pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
