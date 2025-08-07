@@ -214,7 +214,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     // Link
     if (link) {
       const displayText = "Klik hier voor alle info over deze lens";
-      const x = 10; // exact zelfde als witte tekst
+      const x = 20; // exact zelfde als witte tekst
 const y = pageHeight - barHeight + 55; // visueel net onder de witte regel
 pdf.setFontSize(10);
 pdf.setTextColor(0, 102, 255); // blauw
