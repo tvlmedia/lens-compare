@@ -323,3 +323,11 @@ async function loadImage(url) {
     img.src = url;
   });
 }
+updateImages();
+updateLensInfo(); // ← deze was vergeten
+
+// Force update after short delay to fix initial mismatch
+setTimeout(() => {
+  updateImages();
+  updateLensInfo();
+}, 50);
