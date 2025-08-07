@@ -123,6 +123,11 @@ rightSelect.value = "IronGlass Zeiss Jena";
 tStopSelect.value = "2.8";
 focalLengthSelect.value = "35mm";
 
+updateImages();
+updateLensInfo();
+
+
+
 updateImages(); // ← staat er al
 
 // Force update to fix initial load issue
@@ -323,11 +328,3 @@ async function loadImage(url) {
     img.src = url;
   });
 }
-updateImages();
-updateLensInfo(); // ← deze was vergeten
-
-// Force update after short delay to fix initial mismatch
-setTimeout(() => {
-  updateImages();
-  updateLensInfo();
-}, 50);
