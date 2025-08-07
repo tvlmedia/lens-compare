@@ -209,16 +209,17 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     // Beschrijvingstekst
     pdf.setFontSize(12);
     pdf.setTextColor(255, 255, 255);
-    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 200 });
+    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 100 });
 
     // Link
     if (link) {
-      const displayText = "Klik hier voor meer info";
+      const displayText = "Klik hier voor alle info over deze lens";
       const textWidth = pdf.getTextWidth(displayText);
       const x = (pageWidth - textWidth) / 2;
       const y = pageHeight - barHeight / 2 + 20;
-      pdf.setFontSize(14);
-      pdf.textWithLink(displayText, x, y, { url: link });
+      pdf.setFontSize(9);
+      pdf.setTextColor(0, 102, 255); // mooie klikbare blauw
+     pdf.textWithLink("Klik hier voor meer info", 30, pageHeight - barHeight + 55, { url: link });
     }
 
     // Logo
