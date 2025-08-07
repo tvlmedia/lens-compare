@@ -279,3 +279,9 @@ select:hover,
   border-radius: 6px;
   line-height: 1.5;
 }
+.mobile-mode #beforeImage img {
+  width: 100vw;
+  height: auto;
+  object-fit: cover;
+  object-position: center center;
+}
