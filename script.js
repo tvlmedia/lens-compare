@@ -238,13 +238,22 @@ pdf.textWithLink(displayText, x, y, { url: link });
   const text = "Benieuwd naar alle lenzen? Klik hier";
   const y = pageHeight - barHeight + 50;
 
-  pdf.setFontSize(18); // groter dan standaard
-  pdf.setTextColor(255, 255, 255); // wit
-  pdf.textWithLink(text, pageWidth / 2, y, {
-    url: "https://tvlrental.nl/lenses/",
-    align: "center"
-  });
+  const fontSize = 22;
+const textY = pageHeight - barHeight / 2 + fontSize / 2;
 
+pdf.setFontSize(fontSize);
+pdf.setTextColor(255, 255, 255);
+pdf.text(text, pageWidth / 2, textY, { align: "center" });
+
+// Onzichtbare link over de tekst heen
+const textWidth = pdf.getTextWidth(text);
+const linkX = (pageWidth - textWidth) / 2;
+const linkY = textY - fontSize + 5;
+const linkHeight = fontSize + 6;
+pdf.link(linkX, linkY, textWidth, linkHeight, {
+  url: "https://tvlrental.nl/lenses/"
+});
+    
   // Logo rechtsonder
   const targetHeight = 50;
   const ratio = logo.width / logo.height;
