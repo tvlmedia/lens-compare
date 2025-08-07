@@ -239,7 +239,7 @@ pdf.textWithLink(displayText, x, y, { url: link });
   const y = pageHeight - barHeight + 40;
 
   const fontSize = 22;
-const textY = pageHeight - barHeight / 2 + fontSize / 2 - 5;
+const textY = pageHeight - barHeight / 2 + fontSize / 2 - 500;
 
 pdf.setFontSize(fontSize);
 pdf.setTextColor(255, 255, 255);
