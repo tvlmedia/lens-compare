@@ -15,7 +15,7 @@ const notes = {
   "ironglass_red_p_50mm": "58mm",
   "ironglass_zeiss_jena_50mm": "50mm",
   "cooke_panchro_ff_25mm": "32mm",
-  "cooke_panchro_ff_50mm": "50mm" // ← nieuw
+  "cooke_panchro_ff_50mm": "50mm"
 };
 
 const lensImageMap = {
@@ -25,6 +25,34 @@ const lensImageMap = {
   "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg",
   "cooke_panchro_ff_50mm_t2_8": "cooke_panchro_ff_50mm_t2_8.jpg"
 };
+
+const lensDescriptions = {
+  "IronGlass Red P": {
+    text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series Sovjet-lenzen met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – puur vintage glasoptiek.",
+    url: "https://tvlrental.nl/ironglassredp/"
+  },
+  "IronGlass Zeiss Jena": {
+    text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
+    url: "https://tvlrental.nl/ironglasszeissjena/"
+  },
+  "Cooke Panchro FF": {
+    text: "Karakteristieke full frame lenzenset met een klassieke Cooke-look. Subtiele glow en zachte roll-off, perfect voor een romantische of authentieke sfeer.",
+    url: "https://tvlrental.nl/cookepanchro/"
+  },
+  "DZO Arles": {
+    text: "Scherpe en cleane full-frame cine primes met zachte bokeh en moderne flarecontrole. Ideaal voor commercials en high-end narratieve projecten.",
+    url: "https://tvlrental.nl/dzoarles/"
+  },
+  "DZO Vespid": {
+    text: "Betaalbare maar serieuze cine-lenzen met consistente look, lichte vintage feel en goede optische prestaties. Full frame coverage.",
+    url: "https://tvlrental.nl/dzovespid/"
+  },
+  "Lomo Standard Speed": {
+    text: "Zachte vintage lenzen met unieke glow en flare. Niet voor elk project, maar heerlijk voor rauwe of experimentele looks.",
+    url: "https://tvlrental.nl/lomostandardspeed/"
+  }
+};
+
 const leftSelect = document.getElementById("leftLens");
 const rightSelect = document.getElementById("rightLens");
 const tStopSelect = document.getElementById("tStop");
@@ -80,6 +108,7 @@ function updateImages() {
 }
 
 updateLensInfo();
+updateImages();
 
 [leftSelect, rightSelect].forEach(el =>
   el.addEventListener("change", updateLensInfo)
@@ -88,6 +117,7 @@ updateLensInfo();
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
   el.addEventListener("change", updateImages)
 );
+
 leftSelect.value = "IronGlass Red P";
 rightSelect.value = "IronGlass Zeiss Jena";
 tStopSelect.value = "2.8";
@@ -104,8 +134,6 @@ window.addEventListener("mousemove", e => {
   afterWrapper.style.width = `${percent}%`;
   slider.style.left = `${percent}%`;
 });
-
-updateImages();
 
 document.getElementById("toggleButton").addEventListener("click", () => {
   const left = leftSelect.value;
@@ -141,17 +169,6 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const pageHeight = pdf.internal.pageSize.getHeight();
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
   const logo = await loadImage(logoUrl);
-
-  const lensDescriptions = {
-    "IronGlass Red P": {
-      text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series Sovjet-lenzen met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – puur vintage glasoptiek.",
-      url: "https://tvlrental.nl/ironglassredp/"
-    },
-    "IronGlass Zeiss Jena": {
-      text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
-      url: "https://tvlrental.nl/ironglasszeissjena/"
-    }
-  };
 
   async function renderImage(imgEl) {
     const canvas = document.createElement("canvas");
@@ -259,7 +276,6 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
-  // Screenshot
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
   const scaledCanvas = document.createElement("canvas");
   scaledCanvas.width = 1920;
@@ -271,24 +287,21 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
 
-  // PAGINA 1 – vergelijking
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
-  await drawFullWidthImage(splitData, 60, 80); // op pagina 1
+  await drawFullWidthImage(splitData, 60, 80);
   drawBottomBarPage1(barHeight);
 
-  // PAGINA 2 – linker lens
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
-await drawFullWidthImage(leftData, 60, 80);  // op pagina 2
+  await drawFullWidthImage(leftData, 60, 80);
   drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
 
-  // PAGINA 3 – rechter lens
   pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
-  await drawFullWidthImage(rightData, 60, 80); // op pagina 3
+  await drawFullWidthImage(rightData, 60, 80);
   drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
 
   const safeLeft = left.replace(/\s+/g, "");
@@ -297,7 +310,6 @@ await drawFullWidthImage(leftData, 60, 80);  // op pagina 2
   pdf.save(filename);
 });
 
-// HELPER
 async function loadImage(url) {
   return new Promise(resolve => {
     const img = new Image();
