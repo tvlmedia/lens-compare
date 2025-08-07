@@ -145,17 +145,30 @@ updateImages(); // ← staat er al
 setTimeout(() => updateImages(), 50);
 
 let isDragging = false;
+
+function updateSliderPosition(clientX) {
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const offset = Math.max(0, Math.min(clientX - rect.left, rect.width));
+  const percent = (offset / rect.width) * 100;
+  afterWrapper.style.width = `${percent}%`;
+  slider.style.left = `${percent}%`;
+}
+
+// Mouse events
 slider.addEventListener("mousedown", () => isDragging = true);
 window.addEventListener("mouseup", () => isDragging = false);
 window.addEventListener("mousemove", e => {
   if (!isDragging) return;
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const offset = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-  const percent = (offset / rect.width) * 100;
-  afterWrapper.style.width = `${percent}%`;
-  slider.style.left = `${percent}%`;
+  updateSliderPosition(e.clientX);
 });
 
+// Touch events
+slider.addEventListener("touchstart", () => isDragging = true);
+window.addEventListener("touchend", () => isDragging = false);
+window.addEventListener("touchmove", e => {
+  if (!isDragging || e.touches.length !== 1) return;
+  updateSliderPosition(e.touches[0].clientX);
+});
 document.getElementById("toggleButton").addEventListener("click", () => {
   const left = leftSelect.value;
   const right = rightSelect.value;
