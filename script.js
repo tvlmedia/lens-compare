@@ -250,21 +250,21 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   // PAGINA 1 – vergelijking
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
-  await drawFullWidthImage(data, 60, 80);
+  await drawFullWidthImage(splitData, 60, 80); // op pagina 1
   drawBottomBarPage1(barHeight);
 
   // PAGINA 2 – linker lens
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
-  await drawFullWidthImage(data, 60, 80);
+await drawFullWidthImage(leftData, 60, 80);  // op pagina 2
   drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
 
   // PAGINA 3 – rechter lens
   pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
-  await drawFullWidthImage(data, 60, 80);
+  await drawFullWidthImage(rightData, 60, 80); // op pagina 3
   drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
 
   const safeLeft = left.replace(/\s+/g, "");
