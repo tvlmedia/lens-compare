@@ -255,11 +255,11 @@ const splitData = scaledCanvas.toDataURL("image/jpeg", 1.0);
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
 
-  fillBlack();
-  drawTopBar(`${leftText} vs ${rightText}`);
-  await drawFullWidthImage(splitData);
-  drawSiteURL();
-  drawBottomLogo();
+ fillBlack();
+drawTopBar(`${leftText} vs ${rightText}`);
+await drawFullWidthImage(splitData);
+drawBottomBar("", ""); // zelfde zwarte onderbalk, maar zonder tekst
+drawBottomLogo();
 
   pdf.addPage();
   fillBlack();
