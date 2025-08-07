@@ -387,3 +387,8 @@ select:hover,
     align-items: center;
   }
 }
+@media (max-width: 767px) {
+  #fullscreenButton {
+    display: none !important;
+  }
+}
