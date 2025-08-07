@@ -277,7 +277,7 @@ pdf.textWithLink(displayText, x, y, { url: link });
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
   await drawFullWidthImage(splitData);
-  drawBottomBar("", "https://tvlrental.nl/lenses/");
+  drawBottomBarPage1();
 
   // PAGINA 2 – linker lens
   pdf.addPage();
