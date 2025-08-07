@@ -84,32 +84,6 @@ window.addEventListener("mousemove", e => {
 updateImages();
 
 document.getElementById("toggleButton").addEventListener("click", () => {
-  const leftValue = leftSelect.value;
-  const rightValue = rightSelect.value;
-  leftSelect.value = rightValue;
-  rightSelect.value = leftValue;
-  updateImages();
-});
-
-document.getElementById("fullscreenButton").addEventListener("click", () => {
-  const wrapper = document.getElementById("comparisonWrapper");
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    if (wrapper.requestFullscreen) {
-      wrapper.requestFullscreen();
-    } else if (wrapper.webkitRequestFullscreen) {
-      wrapper.webkitRequestFullscreen();
-    }
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
-  }
-});
-
-
-document.getElementById("toggleButton").addEventListener("click", () => {
   const left = leftSelect.value;
   const right = rightSelect.value;
   leftSelect.value = right;
@@ -136,6 +110,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const right = rightSelect.value;
   const focal = focalLengthSelect.value;
   const t = tStopSelect.value;
+  const barHeight = 80;
 
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -202,26 +177,23 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   }
 
   function drawBottomBar(text = "", link = "") {
-    const barHeight = 70;
+    const barHeight = 80;
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-    // Beschrijvingstekst
     pdf.setFontSize(12);
     pdf.setTextColor(255, 255, 255);
     pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
 
-    // Link
     if (link) {
       const displayText = "Klik hier voor alle info over deze lens";
-      const x = 20; // exact zelfde als witte tekst
-const y = pageHeight - barHeight + 55; // visueel net onder de witte regel
-pdf.setFontSize(10);
-pdf.setTextColor(0, 102, 255); // blauw
-pdf.textWithLink(displayText, x, y, { url: link });
+      const x = 20;
+      const y = pageHeight - barHeight + 55;
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 102, 255);
+      pdf.textWithLink(displayText, x, y, { url: link });
     }
 
-    // Logo
     const targetHeight = 50;
     const ratio = logo.width / logo.height;
     const targetWidth = targetHeight * ratio;
@@ -230,47 +202,40 @@ pdf.textWithLink(displayText, x, y, { url: link });
     pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   }
 
-  function drawBottomBarPage1() {
-  const barHeight = 80;
-  pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  function drawBottomBarPage1(barHeight) {
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  const text = "Benieuwd naar alle lenzen? Klik hier";
-  const y = pageHeight - barHeight + 40;
+    const text = "Benieuwd naar alle lenzen? Klik hier";
+    const fontSize = 22;
+    const textY = pageHeight - barHeight / 2 + fontSize / 2 - 10;
 
-  const fontSize = 22;
-const textY = pageHeight - barHeight / 2 + fontSize / 2 - 10;
+    pdf.setFontSize(fontSize);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, pageWidth / 2, textY, { align: "center" });
 
-pdf.setFontSize(fontSize);
-pdf.setTextColor(255, 255, 255);
-pdf.text(text, pageWidth / 2, textY, { align: "center" });
+    const textWidth = pdf.getTextWidth(text);
+    const linkX = (pageWidth - textWidth) / 2;
+    const linkY = textY - fontSize + 5 - 10;
+    const linkHeight = fontSize + 6;
+    pdf.link(linkX, linkY, textWidth, linkHeight, {
+      url: "https://tvlrental.nl/lenses/"
+    });
 
-// Onzichtbare link over de tekst heen
-const textWidth = pdf.getTextWidth(text);
-const linkX = (pageWidth - textWidth) / 2;
-const linkY = textY - fontSize + 5 - 10;
-const linkHeight = fontSize + 6;
-pdf.link(linkX, linkY, textWidth, linkHeight, {
-  url: "https://tvlrental.nl/lenses/"
-});
-    
-  // Logo rechtsonder
-  const targetHeight = 50;
-  const ratio = logo.width / logo.height;
-  const targetWidth = targetHeight * ratio;
-  const xLogo = pageWidth - targetWidth - 12;
-  const yLogo = pageHeight - targetHeight - 12;
-  pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
-}
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
 
   function fillBlack() {
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
-  
-
-  // Screenshot maken
+  // Screenshot
   const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
   const scaledCanvas = document.createElement("canvas");
   scaledCanvas.width = 1920;
@@ -285,21 +250,21 @@ pdf.link(linkX, linkY, textWidth, linkHeight, {
   // PAGINA 1 – vergelijking
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
-  await drawFullWidthImage(splitData);
-  drawBottomBarPage1();
+  await drawFullWidthImage(splitData, 40, barHeight);
+  drawBottomBarPage1(barHeight);
 
   // PAGINA 2 – linker lens
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
-  await drawFullWidthImage(leftData);
+  await drawFullWidthImage(leftData, 40, barHeight);
   drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
 
   // PAGINA 3 – rechter lens
   pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
-  await drawFullWidthImage(rightData);
+  await drawFullWidthImage(rightData, 40, barHeight);
   drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
 
   const safeLeft = left.replace(/\s+/g, "");
