@@ -163,12 +163,18 @@ window.addEventListener("mousemove", e => {
 });
 
 // Touch events
-slider.addEventListener("touchstart", () => isDragging = true);
+slider.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  isDragging = true;
+}, { passive: false });
+
 window.addEventListener("touchend", () => isDragging = false);
-window.addEventListener("touchmove", e => {
+
+window.addEventListener("touchmove", (e) => {
   if (!isDragging || e.touches.length !== 1) return;
+  e.preventDefault();
   updateSliderPosition(e.touches[0].clientX);
-});
+}, { passive: false });
 document.getElementById("toggleButton").addEventListener("click", () => {
   const left = leftSelect.value;
   const right = rightSelect.value;
