@@ -8,14 +8,20 @@
 </head>
 <body>
 
-  <!-- === Controls === -->
   <div class="controls">
+  <div class="controls-row">
     <button id="toggleButton">↔ Flip</button>
-    <button id="fullscreenButton">⛶ Fullscreen</button>
     <button id="downloadPdfButton">⤓ Download PDF</button>
+  </div>
 
-    <select id="leftLens"></select>
-    <select id="rightLens"></select>
+  <select id="leftLens"></select>
+  <select id="rightLens"></select>
+
+  <div class="controls-row">
+    <select id="tStop">...</select>
+    <select id="focalLength">...</select>
+  </div>
+</div>
 
     <select id="tStop">
       <option value="1.4">T1.4</option>
