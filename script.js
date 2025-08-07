@@ -209,7 +209,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     // Beschrijvingstekst
     pdf.setFontSize(12);
     pdf.setTextColor(255, 255, 255);
-    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 100 });
+    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
 
     // Link
     if (link) {
