@@ -327,3 +327,27 @@ select:hover,
     font-size: 13px;
   }
 }
+.lens-frame-outer {
+  width: 100%;
+  margin: 60px auto 80px auto;
+  z-index: 10;
+}
+
+.lens-frame-wrapper {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.lens-frame-wrapper iframe {
+  width: 100%;
+  height: 100vh;
+  border: none;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .lens-frame-wrapper iframe {
+    height: calc(100vh - 60px);
+  }
+}
