@@ -198,7 +198,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.rect(0, 0, pageWidth, barHeight, "F");
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(16);
-    pdf.text(text, pageWidth / 2, 26, { align: "center" });
+    pdf.text(text, pageWidth / 2, 20, { align: "center" });
   }
 
   function drawBottomBar(text = "", link = "") {
