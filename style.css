@@ -308,3 +308,8 @@ select:hover,
   top: 0;
   left: 0;
 }
+@media (max-width: 767px) {
+  #fullscreenButton {
+    display: none !important;
+  }
+}
