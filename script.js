@@ -143,6 +143,10 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
   const logo = await loadImage(logoUrl);
 
+  const splitData = await renderImage(comparison);
+  const leftData = await renderImage(leftImg);
+  const rightData = await renderImage(rightImg);
+
   const lensDescriptions = {
     "IronGlass Red P": {
       text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series Sovjet-lenzen met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – puur vintage glasoptiek.",
@@ -152,47 +156,38 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
       text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
       url: "https://tvlrental.nl/ironglasszeissjena/"
     }
+    // voeg meer lenzen toe indien nodig
   };
 
-  async function renderImage(imgEl) {
-    const canvas = document.createElement("canvas");
-    canvas.width = imgEl.naturalWidth || 1920;
-    canvas.height = imgEl.naturalHeight || 1080;
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = imgEl.src;
-    await new Promise(resolve => img.onload = resolve);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 1.0);
+  function fillBlack() {
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
   async function drawFullWidthImage(imgData, top = 40, bottom = 70) {
-  const img = new Image();
-  img.src = imgData;
-  await new Promise(resolve => img.onload = resolve);
+    const img = new Image();
+    img.src = imgData;
+    await new Promise(resolve => img.onload = resolve);
 
-  const imgAspect = img.width / img.height;
-  const pageAspect = pageWidth / (pageHeight - top - bottom);
+    const imgAspect = img.width / img.height;
+    const pageAspect = pageWidth / (pageHeight - top - bottom);
 
-  let imgWidth, imgHeight, x, y;
+    let imgWidth, imgHeight, x, y;
 
-  if (imgAspect > pageAspect) {
-    // Beeld is breder dan pagina: schalen op hoogte
-    imgHeight = pageHeight - top - bottom;
-    imgWidth = imgHeight * imgAspect;
-    x = (pageWidth - imgWidth) / 2;
-    y = top;
-  } else {
-    // Beeld is smaller of exact passend: schalen op breedte
-    imgWidth = pageWidth;
-    imgHeight = imgWidth / imgAspect;
-    x = 0;
-    y = top - ((imgHeight - (pageHeight - top - bottom)) / 2); // centreren en croppen
+    if (imgAspect > pageAspect) {
+      imgHeight = pageHeight - top - bottom;
+      imgWidth = imgHeight * imgAspect;
+      x = (pageWidth - imgWidth) / 2;
+      y = top;
+    } else {
+      imgWidth = pageWidth;
+      imgHeight = imgWidth / imgAspect;
+      x = 0;
+      y = top - ((imgHeight - (pageHeight - top - bottom)) / 2);
+    }
+
+    pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
   }
-
-  pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
-}
 
   function drawTopBar(text) {
     const barHeight = 40;
@@ -231,11 +226,9 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   function drawBottomBarCenteredLink(link = "") {
     const barHeight = 70;
 
-    // Zwarte balk
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-    // Gecentreerde klikbare tekst
     if (link) {
       pdf.setFontSize(14);
       pdf.setTextColor(255, 255, 255);
@@ -246,7 +239,6 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
       pdf.textWithLink(displayText, x, y, { url: link });
     }
 
-    // Logo rechtsonder
     const targetHeight = 50;
     const ratio = logo.width / logo.height;
     const targetWidth = targetHeight * ratio;
@@ -264,13 +256,13 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.addImage(logo, "PNG", x, y, targetWidth, targetHeight);
   }
 
-  // ===== PAGINA 1 =====
+  // PAGINA 1
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
   await drawFullWidthImage(splitData);
   drawBottomBarCenteredLink("https://tvlrental.nl/lenses/");
 
-  // ===== PAGINA 2 =====
+  // PAGINA 2
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
@@ -278,7 +270,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
   drawBottomLogo();
 
-  // ===== PAGINA 3 =====
+  // PAGINA 3
   pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
@@ -292,6 +284,19 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   pdf.save(filename);
 });
 
+async function renderImage(imgEl) {
+  const canvas = document.createElement("canvas");
+  canvas.width = imgEl.naturalWidth || 1920;
+  canvas.height = imgEl.naturalHeight || 1080;
+  const ctx = canvas.getContext("2d");
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = imgEl.src;
+  await new Promise(resolve => img.onload = resolve);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/jpeg", 1.0);
+}
+
 async function loadImage(url) {
   return new Promise(resolve => {
     const img = new Image();
@@ -300,4 +305,3 @@ async function loadImage(url) {
     img.src = url;
   });
 }
-
