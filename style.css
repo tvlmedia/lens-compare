@@ -392,3 +392,6 @@ select:hover,
     display: none !important;
   }
 }
+#slider {
+  touch-action: none;
+}
