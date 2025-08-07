@@ -123,6 +123,11 @@ rightSelect.value = "IronGlass Zeiss Jena";
 tStopSelect.value = "2.8";
 focalLengthSelect.value = "35mm";
 
+updateImages(); // ← staat er al
+
+// Force update to fix initial load issue
+setTimeout(() => updateImages(), 50);
+
 let isDragging = false;
 slider.addEventListener("mousedown", () => isDragging = true);
 window.addEventListener("mouseup", () => isDragging = false);
