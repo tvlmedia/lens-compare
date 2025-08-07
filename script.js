@@ -79,6 +79,12 @@ function updateImages() {
   rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
 }
 
+updateLensInfo();
+
+[leftSelect, rightSelect].forEach(el =>
+  el.addEventListener("change", updateLensInfo)
+);
+
 [leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
   el.addEventListener("change", updateImages)
 );
