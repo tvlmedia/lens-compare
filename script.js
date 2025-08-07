@@ -206,15 +206,41 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.setFillColor(0, 0, 0);
     pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
+
     // Beschrijvingstekst
     pdf.setFontSize(12);
     pdf.setTextColor(255, 255, 255);
     pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
 
+    function drawBottomBarPage1() {
+  const barHeight = 80;
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+  // Witte grote gecentreerde linktekst
+  const displayText = "Benieuwd naar alle lenzen? Klik hier";
+  const y = pageHeight - barHeight + 50;
+
+  pdf.setFontSize(20);
+  pdf.setTextColor(255, 255, 255); // wit
+  pdf.textWithLink(displayText, pageWidth / 2, y, {
+    url: "https://tvlrental.nl/lenses/",
+    align: "center"
+  });
+
+  // Logo (optioneel)
+  const targetHeight = 50;
+  const ratio = logo.width / logo.height;
+  const targetWidth = targetHeight * ratio;
+  const xLogo = pageWidth - targetWidth - 12;
+  const yLogo = pageHeight - targetHeight - 12;
+  pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+}
+
     // Link
     if (link) {
       const displayText = "Klik hier voor alle info over deze lens";
-      const x = 20; // exact zelfde als witte tekst
+      const x = 19; // exact zelfde als witte tekst
 const y = pageHeight - barHeight + 55; // visueel net onder de witte regel
 pdf.setFontSize(10);
 pdf.setTextColor(0, 102, 255); // blauw
@@ -251,7 +277,7 @@ pdf.textWithLink(displayText, x, y, { url: link });
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
   await drawFullWidthImage(splitData);
-  drawBottomBar("", "https://tvlrental.nl/lenses/");
+  drawBottomBarPage1();
 
   // PAGINA 2 – linker lens
   pdf.addPage();
