@@ -1,4 +1,15 @@
 // ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF LOGO) ======
+if (window.innerWidth < 768) {
+  document.body.classList.add("mobile-mode");
+}
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth < 768) {
+    document.body.classList.add("mobile-mode");
+  } else {
+    document.body.classList.remove("mobile-mode");
+  }
+});
 
 const lenses = [
   "IronGlass Red P",
