@@ -168,25 +168,31 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   }
 
   async function drawFullWidthImage(imgData, top = 40, bottom = 70) {
-    const img = new Image();
-    img.src = imgData;
-    await new Promise(resolve => img.onload = resolve);
+  const img = new Image();
+  img.src = imgData;
+  await new Promise(resolve => img.onload = resolve);
 
-    const aspect = img.width / img.height;
-    let imgWidth = pageWidth;
-    let imgHeight = imgWidth / aspect;
-    let x = 0;
-    const y = top;
+  const imgAspect = img.width / img.height;
+  const pageAspect = pageWidth / (pageHeight - top - bottom);
 
-    const availableHeight = pageHeight - top - bottom;
-    if (imgHeight > availableHeight) {
-      imgHeight = availableHeight;
-      imgWidth = imgHeight * aspect;
-      x = (pageWidth - imgWidth) / 2;
-    }
+  let imgWidth, imgHeight, x, y;
 
-    pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
+  if (imgAspect > pageAspect) {
+    // Beeld is breder dan pagina: schalen op hoogte
+    imgHeight = pageHeight - top - bottom;
+    imgWidth = imgHeight * imgAspect;
+    x = (pageWidth - imgWidth) / 2;
+    y = top;
+  } else {
+    // Beeld is smaller of exact passend: schalen op breedte
+    imgWidth = pageWidth;
+    imgHeight = imgWidth / imgAspect;
+    x = 0;
+    y = top - ((imgHeight - (pageHeight - top - bottom)) / 2); // centreren en croppen
   }
+
+  pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
+}
 
   function drawTopBar(text) {
     const barHeight = 40;
