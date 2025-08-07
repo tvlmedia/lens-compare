@@ -240,8 +240,18 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
-  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const splitData = splitCanvas.toDataURL("image/jpeg", 1.0);
+  // Maak screenshot van comparisonWrapper
+const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+
+// Converteer naar exact 1920x1080 voor uniforme schaal (zoals losse lensbeelden)
+const scaledCanvas = document.createElement("canvas");
+scaledCanvas.width = 1920;
+scaledCanvas.height = 1080;
+const ctx = scaledCanvas.getContext("2d");
+ctx.drawImage(splitCanvas, 0, 0, 1920, 1080);
+
+// Gebruik deze versie als afbeelding voor de PDF
+const splitData = scaledCanvas.toDataURL("image/jpeg", 1.0);
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
 
