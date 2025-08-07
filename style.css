@@ -356,3 +356,12 @@ select:hover,
   margin: 60px auto 80px auto;
   z-index: 10;
 }
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-only {
+    display: block;
+  }
+}
