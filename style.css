@@ -365,3 +365,25 @@ select:hover,
     display: block;
   }
 }
+@media (max-width: 767px) {
+  .controls {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .controls-row,
+  .controls-column {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .controls-column {
+    flex-direction: column;
+    align-items: center;
+  }
+}
