@@ -229,8 +229,8 @@ select:hover,
 
 .mobile-mode #leftLabel,
 .mobile-mode #rightLabel {
-  width: 100%;
-  margin: 4px 0;
+  width: 50%;
+  margin: 0;
 }
 @media screen and (max-width: 767px) {
   body.mobile-mode:fullscreen #afterWrapper {
@@ -320,5 +320,10 @@ select:hover,
     font-size: 12px;
     line-height: 1.4;
     padding: 10px 12px;
+  }
+}
+@media (max-width: 767px) {
+  #infoContainer {
+    font-size: 13px;
   }
 }
