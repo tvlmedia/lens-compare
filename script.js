@@ -200,34 +200,49 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.setFontSize(16);
     pdf.text(text, pageWidth / 2, 20, { align: "center" });
   }
+function drawBottomBar(text = "", link = "") {
+  const barHeight = 70;
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  function drawBottomBar(text = "", link = "") {
-    const barHeight = 70;
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  // Beschrijvingstekst
+  pdf.setFontSize(12);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
 
+  // Link
+  if (link) {
+    const displayText = "Meer informatie over deze lens";
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 102, 255); // blauw
+    pdf.textWithLink(displayText, 20, pageHeight - barHeight + 55, { url: link });
+  }
+}
 
-    // Beschrijvingstekst
-    pdf.setFontSize(12);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
-
-    function drawBottomBarPage1() {
+// ⬇️ Deze hoort **los** te staan, erbuiten dus
+function drawBottomBarPage1() {
   const barHeight = 80;
   pdf.setFillColor(0, 0, 0);
   pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  // Witte grote gecentreerde linktekst
   const displayText = "Benieuwd naar alle lenzen? Klik hier";
   const y = pageHeight - barHeight + 50;
 
   pdf.setFontSize(20);
-  pdf.setTextColor(255, 255, 255); // wit
+  pdf.setTextColor(255, 255, 255);
   pdf.textWithLink(displayText, pageWidth / 2, y, {
     url: "https://tvlrental.nl/lenses/",
     align: "center"
   });
 
+  // Logo
+  const targetHeight = 50;
+  const ratio = logo.width / logo.height;
+  const targetWidth = targetHeight * ratio;
+  const xLogo = pageWidth - targetWidth - 12;
+  const yLogo = pageHeight - targetHeight - 12;
+  pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+}
   // Logo (optioneel)
   const targetHeight = 50;
   const ratio = logo.width / logo.height;
