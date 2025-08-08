@@ -395,3 +395,36 @@ select:hover,
 #slider {
   touch-action: none;
 }
+/* ========== Detail View Overlay ========== */
+#detailOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  z-index: 9999;
+  cursor: crosshair;
+}
+
+#detailOverlay.active {
+  display: block;
+}
+
+.detail-view-square {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 2px solid white;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.detail-view-square img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: top left;
+}
