@@ -464,3 +464,8 @@ body.dragging * {
   -webkit-user-select: none !important;
   -ms-user-select: none !important;
 }
+@media (max-width: 767px) {
+  #detailViewToggle {
+    display: none !important;
+  }
+}
