@@ -381,9 +381,9 @@ detailToggleButton.addEventListener("click", () => {
 comparisonWrapper.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+ const offsetX = detail === leftDetail ? -130 : 130;
+detail.style.left = `${e.clientX + offsetX}px`;
+detail.style.top = `${e.clientY}px`;
 
   const zoom = 4;
   const size = 200;
