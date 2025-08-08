@@ -1,4 +1,4 @@
-/* ========== Algemene reset ========== */
+  1§/* ========== Algemene reset ========== */
 * {
   -webkit-user-drag: none;
   user-select: none;
@@ -49,7 +49,7 @@ select:hover,
   aspect-ratio: 16 / 9;
   position: relative;
   background: black;
-  overflow: hidden;
+  overflow: visible;
 }
 
 #beforeImage, #afterImage {
