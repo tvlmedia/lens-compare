@@ -422,3 +422,449 @@ comparisonWrapper.addEventListener("mouseleave", () => {
   leftDetail.style.display = "none";
   rightDetail.style.display = "none";
 });
+
+  1§/* ========== Algemene reset ========== */
+* {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  background: #0f0f0f;
+  color: white;
+  font-family: "Inter", "Helvetica Neue", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ========== Controls bovenaan ========== */
+.controls {
+  margin: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+select, #toggleButton, #fullscreenButton, #downloadPdfButton {
+  padding: 6px 12px;
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+select:hover,
+#toggleButton:hover,
+#fullscreenButton:hover,
+#downloadPdfButton:hover {
+  background: #666;
+  border-color: #666;
+}
+
+/* ========== Wrapper en sliderstructuur ========== */
+#comparisonWrapper {
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  background: black;
+  overflow: visible;
+}
+
+#beforeImage, #afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#beforeImage img,
+#afterImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  position: absolute;
+  inset: 0;
+}
+
+/* ========== AFTER WRAPPER voor split ========== */
+#afterWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+}
+
+#afterWrapper #afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 960px;
+  height: 540px;
+}
+
+#afterWrapper #afterImage img {
+  width: 960px;
+  height: 540px;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* ========== Slider lijn ========== */
+#slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  background: white;
+  cursor: ew-resize;
+  z-index: 10;
+}
+
+/* ========== Labels onderin ========== */
+#infoContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 960px;
+  margin-top: 12px;
+  padding: 0 40px;
+  box-sizing: border-box;
+  font-size: 16px;
+  color: #eee;
+}
+
+#leftLabel, #rightLabel {
+  width: 50%;
+  text-align: center;
+}
+
+/* ========== Extra uitlegtekst ========== */
+#explanationBox {
+  margin-top: 12px;
+  max-width: 960px;
+  font-size: 13px;
+  color: #aaa;
+  padding: 12px 16px;
+  background: #1a1a1a;
+  border-left: 4px solid orange;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+/* ========== Fullscreen ========== */
+:fullscreen #comparisonWrapper,
+:-webkit-full-screen #comparisonWrapper {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+}
+
+:fullscreen #afterWrapper,
+:-webkit-full-screen #afterWrapper {
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+}
+
+:fullscreen #afterWrapper #afterImage,
+:-webkit-full-screen #afterWrapper #afterImage {
+  width: 100vw;
+  height: 100vh;
+}
+
+:fullscreen #afterWrapper #afterImage img,
+:-webkit-full-screen #afterWrapper #afterImage img {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* ========== Print ========== */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .controls, #explanationBox {
+    display: none !important;
+  }
+
+  #comparisonWrapper {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
+  }
+
+  #infoContainer {
+    color: black !important;
+  }
+
+  #comparisonWrapper img {
+    object-fit: contain !important;
+  }
+}
+
+/* ========== Mobile mode ========== */
+.mobile-mode #comparisonWrapper {
+  width: 100vw;
+  aspect-ratio: 16 / 9;
+}
+
+.mobile-mode #afterWrapper {
+  width: 50vw;
+}
+
+.mobile-mode #afterWrapper #afterImage {
+  width: 100vw;
+  height: auto;
+}
+
+.mobile-mode #afterWrapper #afterImage img {
+  width: 100vw;
+  height: auto;
+  object-fit: cover;
+}
+
+.mobile-mode #infoContainer {
+  width: 100%;
+  padding: 0 16px;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 13px;
+  text-align: center;
+  gap: 8px;
+}
+
+.mobile-mode #leftLabel,
+.mobile-mode #rightLabel {
+  width: 50%;
+  margin: 0;
+}
+@media screen and (max-width: 767px) {
+  body.mobile-mode:fullscreen #afterWrapper {
+    pointer-events: auto;
+  }
+
+  body.mobile-mode:fullscreen #slider {
+    z-index: 20;
+    pointer-events: auto;
+  }
+}
+#slider:hover {
+  background: #fff;
+  box-shadow: 0 0 8px #fff;
+}
+#comparisonWrapper {
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
+}
+@media (max-width: 767px) {
+  #slider {
+    width: 4px;
+  }
+}
+#beforeImage img,
+#afterImage img {
+  transition: opacity 0.3s ease-in-out;
+}
+.loading::after {
+  content: "Bezig met laden...";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: white;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.6);
+  padding: 12px 16px;
+  border-radius: 4px;
+  z-index: 20;
+}
+#lensInfo {
+  max-width: 960px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  background: #1a1a1a;
+  border-left: 4px solid #0066ff;
+  color: #ccc;
+  font-size: 14px;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+/* ========== Mobile Fix voor beforeImage (rechter beeld) ========== */
+.mobile-mode #comparisonWrapper {
+  width: 100vw;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  position: relative;
+}
+
+.mobile-mode #beforeImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.mobile-mode #beforeImage img {
+  width: 100vw;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+@media (max-width: 767px) {
+  #fullscreenButton {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 767px) {
+  #lensInfo {
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 10px 12px;
+  }
+}
+@media (max-width: 767px) {
+  #infoContainer {
+    font-size: 13px;
+  }
+}
+.lens-frame-outer {
+  width: 100%;
+  margin: 60px auto 80px auto;
+  z-index: 10;
+}
+
+.lens-frame-wrapper {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.lens-frame-wrapper iframe {
+  width: 100%;
+  height: 100vh;
+  border: none;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .lens-frame-wrapper iframe {
+    height: calc(100vh - 60px);
+  }
+}
+.lens-frame-outer {
+  width: 100%;
+  margin: 60px auto 80px auto;
+  z-index: 10;
+}
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-only {
+    display: block;
+  }
+}
+@media (max-width: 767px) {
+  .controls {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .controls-row,
+  .controls-column {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .controls-column {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+@media (max-width: 767px) {
+  #fullscreenButton {
+    display: none !important;
+  }
+}
+#slider {
+  touch-action: none;
+}
+#detailOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+  display: none;
+}
+
+#detailOverlay.active {
+  display: block;
+}
+
+.detail-view-square {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  overflow: hidden;
+  border: 2px solid white;
+  background: black;
+  pointer-events: none;
+}
+
+.detail-view-square img {
+  position: absolute;
+  width: 300%;
+  height: auto;
+  object-fit: cover;
+  transform-origin: top left;
+}
+#leftDetail {
+  margin-left: -130px;
+}
+
+#rightDetail {
+  margin-left: 130px;
+}
+// ⎋ Sluit detail viewer met ESC
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && detailActive) {
+    detailActive = false;
+    detailOverlay.classList.remove("active");
+    leftDetail.style.display = "none";
+    rightDetail.style.display = "none";
+  }
+});
