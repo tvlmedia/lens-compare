@@ -412,8 +412,8 @@ select:hover,
 
 .detail-view-square {
   position: absolute;
-  width: 200px;
-  height: 200px;
+  width: 260px;
+  height: 260px;
   overflow: hidden;
   border: 2px solid white;
   background: black;
