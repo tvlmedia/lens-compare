@@ -412,9 +412,8 @@ comparisonWrapper.addEventListener("mousemove", (e) => {
   };
 
   // Toon beide zoomvensters
-  updateZoomViewer(leftDetail, leftDetailImg, afterImgTag, -size - 10);
-  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag, 10);
-});
+  updateZoomViewer(leftDetail, leftDetailImg, afterImgTag, -size / 2);
+updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag, size / 2);
 
 comparisonWrapper.addEventListener("mouseleave", () => {
   leftDetail.style.display = "none";
