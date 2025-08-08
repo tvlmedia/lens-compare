@@ -371,13 +371,13 @@ let detailActive = false;
 detailToggleButton.addEventListener("click", () => {
   detailActive = !detailActive;
   detailOverlay.classList.toggle("active", detailActive);
+  detailToggleButton.classList.toggle("active", detailActive); // <== hier dus toevoegen
 
   if (!detailActive) {
     leftDetail.style.display = "none";
     rightDetail.style.display = "none";
   }
 });
-
 comparisonWrapper.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
