@@ -155,8 +155,17 @@ function updateSliderPosition(clientX) {
 }
 
 // Mouse events
-slider.addEventListener("mousedown", () => isDragging = true);
-window.addEventListener("mouseup", () => isDragging = false);
+// Mouse events
+slider.addEventListener("mousedown", () => {
+  isDragging = true;
+  document.body.classList.add("dragging");
+});
+
+window.addEventListener("mouseup", () => {
+  isDragging = false;
+  document.body.classList.remove("dragging");
+});
+
 window.addEventListener("mousemove", e => {
   if (!isDragging) return;
   updateSliderPosition(e.clientX);
@@ -166,7 +175,13 @@ window.addEventListener("mousemove", e => {
 slider.addEventListener("touchstart", (e) => {
   e.preventDefault();
   isDragging = true;
+  document.body.classList.add("dragging");
 }, { passive: false });
+
+window.addEventListener("touchend", () => {
+  isDragging = false;
+  document.body.classList.remove("dragging");
+});
 
 window.addEventListener("touchend", () => isDragging = false);
 
@@ -425,10 +440,11 @@ comparisonWrapper.addEventListener("mouseleave", () => {
 
 // ⎋ Sluit detail viewer met ESC
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && detailActive) {
-    detailActive = false;
-    detailOverlay.classList.remove("active");
-    leftDetail.style.display = "none";
-    rightDetail.style.display = "none";
-  }
+ if (e.key === "Escape" && detailActive) {
+  detailActive = false;
+  detailOverlay.classList.remove("active");
+  detailToggleButton.classList.remove("active"); // <== DIT OOK!
+  leftDetail.style.display = "none";
+  rightDetail.style.display = "none";
+}
 });
