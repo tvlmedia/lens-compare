@@ -1,142 +1,360 @@
-
-/* ========== Algemene reset ========== */
-* {
-  -webkit-user-drag: none;
-  user-select: none;
+// ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF LOGO) ======
+if (window.innerWidth < 768) {
+  document.body.classList.add("mobile-mode");
 }
 
-body {
-  margin: 0;
-  background: #0f0f0f;
-  color: white;
-  font-family: "Inter", "Helvetica Neue", sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 14px;
-  line-height: 1.6;
+window.addEventListener("resize", () => {
+  if (window.innerWidth < 768) {
+    document.body.classList.add("mobile-mode");
+  } else {
+    document.body.classList.remove("mobile-mode");
+  }
+});
+
+const lenses = [
+  "IronGlass Red P",
+  "IronGlass Zeiss Jena",
+  "DZO Vespid",
+  "DZO Arles",
+  "Cooke Panchro FF",
+  "Lomo Standard Speed"
+];
+
+const notes = {
+  "ironglass_red_p_35mm": "37mm",
+  "ironglass_zeiss_jena_35mm": "35mm",
+  "ironglass_red_p_50mm": "58mm",
+  "ironglass_zeiss_jena_50mm": "50mm",
+  "cooke_panchro_ff_25mm": "32mm",
+  "cooke_panchro_ff_50mm": "50mm"
+};
+
+const lensImageMap = {
+  "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
+  "ironglass_zeiss_jena_35mm_t2_8": "zeiss_jena_35mm_t2_8.jpg",
+  "ironglass_red_p_50mm_t2_8": "red_p_58mm_t2_8.jpg",
+  "ironglass_zeiss_jena_50mm_t2_8": "zeiss_jena_50mm_t2_8.jpg",
+  "cooke_panchro_ff_50mm_t2_8": "cooke_panchro_ff_50mm_t2_8.jpg"
+};
+
+const lensDescriptions = {
+  "IronGlass Red P": {
+    text: "De IronGlass RED P set is een zeldzame vondst: bestaande uit de alleroudste series Sovjet-lenzen met single coating en maximale karakterweergave. Geen tweaks, geen trucjes – puur vintage glasoptiek.",
+    url: "https://tvlrental.nl/ironglassredp/"
+  },
+  "IronGlass Zeiss Jena": {
+    text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
+    url: "https://tvlrental.nl/ironglasszeissjena/"
+  },
+  "Cooke Panchro FF": {
+    text: "Karakteristieke full frame lenzenset met een klassieke Cooke-look. Subtiele glow en zachte roll-off, perfect voor een romantische of authentieke sfeer.",
+    url: "https://tvlrental.nl/cookepanchro/"
+  },
+  "DZO Arles": {
+    text: "Scherpe en cleane full-frame cine primes met zachte bokeh en moderne flarecontrole. Ideaal voor commercials en high-end narratieve projecten.",
+    url: "https://tvlrental.nl/dzoarles/"
+  },
+  "DZO Vespid": {
+    text: "Betaalbare maar serieuze cine-lenzen met consistente look, lichte vintage feel en goede optische prestaties. Full frame coverage.",
+    url: "https://tvlrental.nl/dzovespid/"
+  },
+  "Lomo Standard Speed": {
+    text: "Zachte vintage lenzen met unieke glow en flare. Niet voor elk project, maar heerlijk voor rauwe of experimentele looks.",
+    url: "https://tvlrental.nl/lomostandardspeed/"
+  }
+};
+
+const leftSelect = document.getElementById("leftLens");
+const rightSelect = document.getElementById("rightLens");
+const tStopSelect = document.getElementById("tStop");
+const focalLengthSelect = document.getElementById("focalLength");
+const beforeImgTag = document.getElementById("beforeImgTag");
+const afterImgTag = document.getElementById("afterImgTag");
+const afterWrapper = document.getElementById("afterWrapper");
+const slider = document.getElementById("slider");
+const comparisonWrapper = document.getElementById("comparisonWrapper");
+const leftLabel = document.getElementById("leftLabel");
+const rightLabel = document.getElementById("rightLabel");
+
+function updateLensInfo() {
+  const left = leftSelect.value;
+  const right = rightSelect.value;
+  const leftDesc = lensDescriptions[left]?.text || "";
+  const rightDesc = lensDescriptions[right]?.text || "";
+
+  const lensInfoDiv = document.getElementById("lensInfo");
+  lensInfoDiv.innerHTML = `
+    <p><strong>${left}:</strong> ${leftDesc}</p>
+    <p><strong>${right}:</strong> ${rightDesc}</p>
+  `;
 }
 
-/* ========== Controls bovenaan ========== */
-.controls {
-  margin: 20px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+lenses.forEach(lens => {
+  leftSelect.add(new Option(lens, lens));
+  rightSelect.add(new Option(lens, lens));
+});
+
+function updateImages() {
+  const leftLens = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
+  const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
+  const tStop = tStopSelect.value.replace(".", "_");
+  const focalLength = focalLengthSelect.value;
+
+  const leftBaseKey = `${leftLens}_${focalLength}`;
+  const rightBaseKey = `${rightLens}_${focalLength}`;
+  const leftKey = `${leftLens}_${focalLength}_t${tStop}`;
+  const rightKey = `${rightLens}_${focalLength}_t${tStop}`;
+
+  const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
+  const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
+
+  beforeImgTag.src = imgRight;
+  afterImgTag.src = imgLeft;
+
+  const tStopRaw = tStopSelect.value;
+  const tStopFormatted = `T${tStopRaw}`;
+
+  leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
+  rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
 }
 
-select, #toggleButton, #fullscreenButton, #downloadPdfButton, #detailViewToggle {
-  padding: 6px 12px;
-  background: #1a1a1a;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
+updateLensInfo();
+updateImages();
+
+[leftSelect, rightSelect].forEach(el =>
+  el.addEventListener("change", updateLensInfo)
+);
+
+[leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
+  el.addEventListener("change", updateImages)
+);
+
+leftSelect.value = "IronGlass Red P";
+rightSelect.value = "IronGlass Zeiss Jena";
+tStopSelect.value = "2.8";
+focalLengthSelect.value = "35mm";
+
+updateImages();
+updateLensInfo();
+
+
+
+updateImages(); // ← staat er al
+
+// Force update to fix initial load issue
+setTimeout(() => updateImages(), 50);
+
+let isDragging = false;
+
+function updateSliderPosition(clientX) {
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const offset = Math.max(0, Math.min(clientX - rect.left, rect.width));
+  const percent = (offset / rect.width) * 100;
+  afterWrapper.style.width = `${percent}%`;
+  slider.style.left = `${percent}%`;
 }
 
-select:hover,
-#toggleButton:hover,
-#fullscreenButton:hover,
-#downloadPdfButton:hover,
-#detailViewToggle:hover {
-  background: #666;
-  border-color: #666;
-}
+// Mouse events
+slider.addEventListener("mousedown", () => isDragging = true);
+window.addEventListener("mouseup", () => isDragging = false);
+window.addEventListener("mousemove", e => {
+  if (!isDragging) return;
+  updateSliderPosition(e.clientX);
+});
 
-/* ========== Wrapper en sliderstructuur ========== */
-#comparisonWrapper {
-  width: 100%;
-  max-width: 960px;
-  aspect-ratio: 16 / 9;
-  position: relative;
-  background: black;
-  overflow: hidden;
-  margin: 0 auto;
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
-}
+// Touch events
+slider.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  isDragging = true;
+}, { passive: false });
 
-#beforeImage, #afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
+window.addEventListener("touchend", () => isDragging = false);
 
-#beforeImage img,
-#afterImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  position: absolute;
-  inset: 0;
-  transition: opacity 0.3s ease-in-out;
-}
+window.addEventListener("touchmove", (e) => {
+  if (!isDragging || e.touches.length !== 1) return;
+  e.preventDefault();
+  updateSliderPosition(e.touches[0].clientX);
+}, { passive: false });
+document.getElementById("toggleButton").addEventListener("click", () => {
+  const left = leftSelect.value;
+  const right = rightSelect.value;
+  leftSelect.value = right;
+  rightSelect.value = left;
+  updateImages();
+});
 
-#afterWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 2;
-  pointer-events: none;
-}
+document.getElementById("fullscreenButton")?.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    comparisonWrapper.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
 
-#slider {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  background: white;
-  cursor: ew-resize;
-  z-index: 10;
-  touch-action: none;
-}
+document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
+  const { jsPDF } = window.jspdf;
+  const comparison = document.getElementById("comparisonWrapper");
+  const leftImg = afterImgTag;
+  const rightImg = beforeImgTag;
+  const leftText = leftLabel.textContent;
+  const rightText = rightLabel.textContent;
+  const left = leftSelect.value;
+  const right = rightSelect.value;
+  const focal = focalLengthSelect.value;
+  const t = tStopSelect.value;
+  const barHeight = 80;
 
-#slider:hover {
-  background: #fff;
-  box-shadow: 0 0 8px #fff;
-}
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
+  const logo = await loadImage(logoUrl);
 
-/* ========== Detail View Overlay (Zoom) ========== */
-#detailOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 10;
-  display: none;
-}
+  async function renderImage(imgEl) {
+    const canvas = document.createElement("canvas");
+    canvas.width = imgEl.naturalWidth || 1920;
+    canvas.height = imgEl.naturalHeight || 1080;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imgEl.src;
+    await new Promise(resolve => img.onload = resolve);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 1.0);
+  }
 
-#detailOverlay.active {
-  display: block;
-}
+  async function drawFullWidthImage(imgData, top = 40, bottom = 70) {
+    const img = new Image();
+    img.src = imgData;
+    await new Promise(resolve => img.onload = resolve);
 
-.detail-view-square {
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  overflow: hidden;
-  border: 2px solid white;
-  background: black;
-  pointer-events: none;
-  z-index: 15;
-}
+    const imgAspect = img.width / img.height;
+    const pageAspect = pageWidth / (pageHeight - top - bottom);
 
-.detail-view-square img {
-  position: absolute;
-  width: 300%;
-  height: auto;
-  object-fit: cover;
-  transform-origin: top left;
-  will-change: transform;
-  pointer-events: none;
+    let imgWidth, imgHeight, x, y;
+
+    if (imgAspect > pageAspect) {
+      imgHeight = pageHeight - top - bottom;
+      imgWidth = imgHeight * imgAspect;
+      x = (pageWidth - imgWidth) / 2;
+      y = top;
+    } else {
+      imgWidth = pageWidth;
+      imgHeight = imgWidth / imgAspect;
+      x = 0;
+      y = top - ((imgHeight - (pageHeight - top - bottom)) / 2);
+    }
+
+    pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
+  }
+
+  function drawTopBar(text) {
+    const barHeight = 40;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, barHeight, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.text(text, pageWidth / 2, 20, { align: "center" });
+  }
+
+  function drawBottomBar(text = "", link = "") {
+    const barHeight = 80;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
+
+    if (link) {
+      const displayText = "Klik hier voor alle info over deze lens";
+      const x = 20;
+      const y = pageHeight - barHeight + 55;
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 102, 255);
+      pdf.textWithLink(displayText, x, y, { url: link });
+    }
+
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
+
+  function drawBottomBarPage1(barHeight) {
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+    const text = "Benieuwd naar alle lenzen? Klik hier";
+    const fontSize = 22;
+    const textY = pageHeight - barHeight / 2 + fontSize / 2 - 10;
+
+    pdf.setFontSize(fontSize);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, pageWidth / 2, textY, { align: "center" });
+
+    const textWidth = pdf.getTextWidth(text);
+    const linkX = (pageWidth - textWidth) / 2;
+    const linkY = textY - fontSize + 5 - 10;
+    const linkHeight = fontSize + 6;
+    pdf.link(linkX, linkY, textWidth, linkHeight, {
+      url: "https://tvlrental.nl/lenses/"
+    });
+
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
+
+  function fillBlack() {
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, pageHeight, "F");
+  }
+
+  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+  const scaledCanvas = document.createElement("canvas");
+  scaledCanvas.width = 1920;
+  scaledCanvas.height = 1080;
+  const ctx = scaledCanvas.getContext("2d");
+  ctx.drawImage(splitCanvas, 0, 0, 1920, 1080);
+  const splitData = scaledCanvas.toDataURL("image/jpeg", 1.0);
+
+  const leftData = await renderImage(leftImg);
+  const rightData = await renderImage(rightImg);
+
+  fillBlack();
+  drawTopBar(`${leftText} vs ${rightText}`);
+  await drawFullWidthImage(splitData, 60, 80);
+  drawBottomBarPage1(barHeight);
+
+  pdf.addPage();
+  fillBlack();
+  drawTopBar(leftText);
+  await drawFullWidthImage(leftData, 60, 80);
+  drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
+
+  pdf.addPage();
+  fillBlack();
+  drawTopBar(rightText);
+  await drawFullWidthImage(rightData, 60, 80);
+  drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
+
+  const safeLeft = left.replace(/\s+/g, "");
+  const safeRight = right.replace(/\s+/g, "");
+  const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
+  pdf.save(filename);
+});
+
+async function loadImage(url) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.src = url;
+  });
 }
