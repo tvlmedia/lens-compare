@@ -24,7 +24,11 @@ body {
   flex-wrap: wrap;
 }
 
-select, #toggleButton, #fullscreenButton, #downloadPdfButton {
+select,
+#toggleButton,
+#fullscreenButton,
+#downloadPdfButton,
+#detailViewToggle {
   padding: 6px 12px;
   background: #1a1a1a;
   color: white;
@@ -37,12 +41,13 @@ select, #toggleButton, #fullscreenButton, #downloadPdfButton {
 select:hover,
 #toggleButton:hover,
 #fullscreenButton:hover,
-#downloadPdfButton:hover {
+#downloadPdfButton:hover,
+#detailViewToggle:hover {
   background: #666;
   border-color: #666;
 }
 
-/* ========== Wrapper en sliderstructuur ========== */
+/* ========== Comparison wrapper en beelden ========== */
 #comparisonWrapper {
   width: 100%;
   max-width: 960px;
@@ -51,6 +56,7 @@ select:hover,
   background: black;
   overflow: hidden;
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
+  margin: 0 auto; /* centreert horizontaal */
 }
 
 #beforeImage, #afterImage {
@@ -72,7 +78,7 @@ select:hover,
   transition: opacity 0.3s ease-in-out;
 }
 
-/* ========== AFTER WRAPPER voor split ========== */
+/* ========== AFTER WRAPPER (split left) ========== */
 #afterWrapper {
   position: absolute;
   top: 0;
@@ -135,7 +141,7 @@ select:hover,
   text-align: center;
 }
 
-/* ========== Extra uitlegtekst ========== */
+/* ========== Uitlegbox ========== */
 #explanationBox {
   margin-top: 12px;
   max-width: 960px;
@@ -148,6 +154,7 @@ select:hover,
   line-height: 1.5;
 }
 
+/* ========== Lensinfo box ========== */
 #lensInfo {
   max-width: 960px;
   margin-bottom: 12px;
@@ -160,6 +167,7 @@ select:hover,
   line-height: 1.5;
 }
 
+/* ========== Laadindicator ========== */
 .loading::after {
   content: "Bezig met laden...";
   position: absolute;
@@ -173,7 +181,7 @@ select:hover,
   z-index: 20;
 }
 
-/* ========== Fullscreen ========== */
+/* ========== Fullscreen ondersteuning ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
   width: 100vw;
@@ -203,112 +211,7 @@ select:hover,
   object-position: center center;
 }
 
-/* ========== Mobile mode ========== */
-.mobile-mode #comparisonWrapper {
-  width: 100vw;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  position: relative;
-}
-
-.mobile-mode #beforeImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100%;
-  overflow: hidden;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.mobile-mode #beforeImage img {
-  width: 100vw;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.mobile-mode #afterWrapper {
-  width: 50vw;
-}
-
-.mobile-mode #afterWrapper #afterImage {
-  width: 100vw;
-  height: auto;
-}
-
-.mobile-mode #afterWrapper #afterImage img {
-  width: 100vw;
-  height: auto;
-  object-fit: cover;
-}
-
-.mobile-mode #infoContainer {
-  width: 100%;
-  padding: 0 16px;
-  flex-direction: row;
-  justify-content: space-between;
-  font-size: 13px;
-  text-align: center;
-  gap: 8px;
-}
-
-.mobile-mode #leftLabel,
-.mobile-mode #rightLabel {
-  width: 50%;
-  margin: 0;
-}
-
-@media (max-width: 767px) {
-  #fullscreenButton {
-    display: none !important;
-  }
-
-  .controls {
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    flex-direction: column;
-  }
-
-  .controls-row,
-  .controls-column {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-  }
-
-  .controls-column {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .mobile-only {
-    display: block;
-  }
-
-  #lensInfo {
-    font-size: 12px;
-    line-height: 1.4;
-    padding: 10px 12px;
-  }
-
-  #infoContainer {
-    font-size: 13px;
-  }
-
-  .lens-frame-wrapper iframe {
-    height: calc(100vh - 60px);
-  }
-}
-
-/* ========== Detail View Overlay (Zoom) ========== */
+/* ========== Detail View Overlay ========== */
 #detailOverlay {
   position: absolute;
   top: 0;
@@ -333,6 +236,7 @@ select:hover,
   background: black;
   pointer-events: none;
   z-index: 10;
+  transition: top 0.1s ease-out, left 0.1s ease-out;
 }
 
 .detail-view-square img {
@@ -347,7 +251,68 @@ select:hover,
   pointer-events: none;
 }
 
-/* ========== Mobile embed iframe wrapper ========== */
+/* ========== Mobile weergave ========== */
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-only {
+    display: block;
+  }
+
+  .controls {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .controls-row,
+  .controls-column {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .controls-column {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #fullscreenButton {
+    display: none !important;
+  }
+
+  #lensInfo {
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 10px 12px;
+  }
+
+  #infoContainer {
+    font-size: 13px;
+    padding: 0 16px;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  #leftLabel, #rightLabel {
+    width: 50%;
+    margin: 0;
+  }
+
+  .lens-frame-wrapper iframe {
+    height: calc(100vh - 60px);
+  }
+}
+
+/* ========== Mobiele iframe embed (bij fullscreen) ========== */
 .lens-frame-outer {
   width: 100%;
   margin: 60px auto 80px auto;
@@ -365,4 +330,30 @@ select:hover,
   height: 100vh;
   border: none;
   display: block;
+}
+
+/* ========== Print styles ========== */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .controls, #explanationBox {
+    display: none !important;
+  }
+
+  #comparisonWrapper {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
+  }
+
+  #infoContainer {
+    color: black !important;
+  }
+
+  #comparisonWrapper img {
+    object-fit: contain !important;
+  }
 }
