@@ -428,3 +428,29 @@ select:hover,
   object-fit: cover;
   transform-origin: top left;
 }
+#detailOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 960px; /* matcht met #comparisonWrapper */
+  height: 540px;
+  pointer-events: none;
+  display: none;
+  z-index: 30;
+}
+
+.detail-view-square {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  border: 2px solid white;
+  position: absolute;
+  background: black;
+}
+
+.detail-view-square img {
+  width: 300%;
+  height: auto;
+  object-fit: cover;
+  pointer-events: none;
+}
