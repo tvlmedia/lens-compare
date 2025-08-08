@@ -1,22 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Vergelijk cine-lenzen side-by-side op T-stop en brandpuntsafstand – van Cooke tot IronGlass.">
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <title>Lens Comparison – TVL Rental</title>
+  <meta charset="UTF-8">
+  <title>Lens Comparison</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- === CONTROLS (DESKTOP) === -->
+  <!-- === DESKTOP TOOL === -->
   <div class="controls desktop-only">
     <div class="controls-row">
       <button id="toggleButton">↔ Flip</button>
-      <button id="fullscreenButton">⛶ Fullscreen</button>
+      <button id="fullscreenButton">⛶ Fullscreen</button> <!-- ← voeg deze toe -->
       <button id="downloadPdfButton">⤓ Download PDF</button>
-      <button id="detailViewToggle">🔍 Detail View</button>
+  
     </div>
 
     <div class="controls-column">
@@ -45,20 +43,20 @@
     </div>
   </div>
 
-  <!-- === COMPARISON WRAPPER === -->
   <div id="comparisonWrapper" class="desktop-only">
     <div id="beforeImage">
       <img id="beforeImgTag" alt="Right lens preview">
     </div>
+
     <div id="afterWrapper">
       <div id="afterImage">
         <img id="afterImgTag" alt="Left lens preview">
       </div>
     </div>
+
     <div id="slider"></div>
   </div>
 
-  <!-- === LABELS EN INFO === -->
   <div id="infoContainer" class="desktop-only">
     <div id="leftLabel"></div>
     <div id="rightLabel"></div>
@@ -70,7 +68,7 @@
     <p>⚠️ Let op: sommige lenzen zijn visueel gematcht. Als je bijvoorbeeld 35mm kiest, zie je soms een lens van 32 of 37mm die op 35mm lijkt qua field of view. Dit is om een eerlijke vergelijking te bieden.</p>
   </div>
 
-  <!-- === MOBILE FULLSCREEN IFRAME === -->
+  <!-- === MOBILE VIEW ONLY: Embedded fullscreen iframe === -->
   <div class="lens-frame-outer mobile-only">
     <div class="lens-frame-wrapper">
       <iframe 
@@ -81,19 +79,13 @@
     </div>
   </div>
 
-  <!-- === DETAIL VIEW OVERLAY (ZOOM) === -->
-  <div id="detailOverlay">
-    <div id="leftDetail" class="detail-view-square"><img alt="Left detail zoom"></div>
-    <div id="rightDetail" class="detail-view-square"><img alt="Right detail zoom"></div>
-  </div>
-
-  <!-- === SCRIPT INCLUDES === -->
+  <!-- === Scripts === -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     window.jspdf = window.jspdf || window.jspdf;
   </script>
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
