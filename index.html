@@ -13,6 +13,7 @@
     <div class="controls-row">
       <button id="toggleButton">↔ Flip</button>
       <button id="fullscreenButton">⛶ Fullscreen</button> <!-- ← voeg deze toe -->
+      <button id="detailViewToggle">🔍 Detail View</button>
       <button id="downloadPdfButton">⤓ Download PDF</button>
   
     </div>
@@ -47,6 +48,12 @@
     <div id="beforeImage">
       <img id="beforeImgTag" alt="Right lens preview">
     </div>
+
+    <!-- === DETAIL VIEW OVERLAY (ZOOM) === -->
+<div id="detailOverlay">
+  <div id="leftDetail" class="detail-view-square"><img alt="Left zoom"></div>
+  <div id="rightDetail" class="detail-view-square"><img alt="Right zoom"></div>
+</div>
 
     <div id="afterWrapper">
       <div id="afterImage">
