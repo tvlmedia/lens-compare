@@ -403,10 +403,21 @@ comparisonWrapper.addEventListener("mousemove", (e) => {
 
   (isLeft ? rightDetail : leftDetail).style.display = "none";
 
-  const offsetX = -x * zoom + size / 2;
-  const offsetY = -y * zoom + size / 2;
-  detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
-});
+  const imgWidth = sourceImg.clientWidth;
+const imgHeight = sourceImg.clientHeight;
+
+const relX = x / imgWidth;
+const relY = y / imgHeight;
+
+const zoomedWidth = imgWidth * zoom;
+const zoomedHeight = imgHeight * zoom;
+
+const offsetX = -relX * zoomedWidth + size / 2;
+const offsetY = -relY * zoomedHeight + size / 2;
+
+detailImg.style.width = `${zoomedWidth}px`;
+detailImg.style.height = `${zoomedHeight}px`;
+detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
 comparisonWrapper.addEventListener("mouseleave", () => {
   leftDetail.style.display = "none";
