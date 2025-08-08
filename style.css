@@ -428,9 +428,9 @@ select:hover,
   transform-origin: top left;
 }
 #leftDetail {
-  transform: translateX(-90px);  /* 120px naar links */
+  transform: translateX(-100px);  /* 120px naar links */
 }
 
 #rightDetail {
-  transform: translateX(90px);   /* 120px naar rechts */
+  transform: translateX(100px);   /* 120px naar rechts */
 }
