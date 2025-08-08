@@ -469,3 +469,6 @@ body.dragging * {
     display: none !important;
   }
 }
+#infoContainer {
+  margin-bottom: 12px; /* of meer indien gewenst */
+}
