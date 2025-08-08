@@ -428,9 +428,19 @@ select:hover,
   transform-origin: top left;
 }
 #leftDetail {
-  transform: translate(-110%, -50%);
+  transform: translate(-110%, -110%);
 }
 
 #rightDetail {
-  transform: translate(10%, -50%);
+  transform: translate(10%, -110%);
+}
+.detail-view-square {
+  position: fixed;
+  width: 240px;
+  height: 240px;
+  overflow: visible;
+  border: 2px solid white;
+  background: black;
+  pointer-events: none;
+  z-index: 9999;
 }
