@@ -385,11 +385,10 @@ comparisonWrapper.addEventListener("mousemove", (e) => {
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
-  const zoom = 3;
-  const size = 200;
+  const zoom = 3.2;
+  const size = 260;
 
-  const updateZoomViewer = (detail, detailImg, sourceImg) => {
-    // Alleen .src updaten als nodig
+  const updateZoomViewer = (detail, detailImg, sourceImg, offsetX) => {
     if (detailImg.src !== sourceImg.src) {
       detailImg.src = sourceImg.src;
     }
@@ -400,23 +399,22 @@ comparisonWrapper.addEventListener("mousemove", (e) => {
 
     const zoomedWidth = imageRect.width * zoom;
     const zoomedHeight = imageRect.height * zoom;
-    const offsetX = -relX * zoomedWidth + size / 2;
-    const offsetY = -relY * zoomedHeight + size / 2;
+    const translateX = -relX * zoomedWidth + size / 2;
+    const translateY = -relY * zoomedHeight + size / 2;
 
-    detail.style.left = `${x - size / 2}px`;
-    detail.style.top = `${y - size / 2}px`;
+    detail.style.left = `${e.clientX + offsetX}px`;
+    detail.style.top = `${e.clientY - size / 2}px`;
     detail.style.display = "block";
 
     detailImg.style.width = `${zoomedWidth}px`;
     detailImg.style.height = `${zoomedHeight}px`;
-    detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    detailImg.style.transform = `translate(${translateX}px, ${translateY}px)`;
   };
 
-  // Altijd beide tonen:
-  updateZoomViewer(leftDetail, leftDetailImg, afterImgTag);   // Left = after
-  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag); // Right = before
+  // Toon beide zoomvensters
+  updateZoomViewer(leftDetail, leftDetailImg, afterImgTag, -size - 10);
+  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag, 10);
 });
-
 
 comparisonWrapper.addEventListener("mouseleave", () => {
   leftDetail.style.display = "none";
