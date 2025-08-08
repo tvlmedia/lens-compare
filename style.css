@@ -50,6 +50,7 @@ select:hover,
   position: relative;
   background: black;
   overflow: hidden;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
 }
 
 #beforeImage, #afterImage {
@@ -68,6 +69,7 @@ select:hover,
   object-position: center center;
   position: absolute;
   inset: 0;
+  transition: opacity 0.3s ease-in-out;
 }
 
 /* ========== AFTER WRAPPER voor split ========== */
@@ -108,6 +110,12 @@ select:hover,
   background: white;
   cursor: ew-resize;
   z-index: 10;
+  touch-action: none;
+}
+
+#slider:hover {
+  background: #fff;
+  box-shadow: 0 0 8px #fff;
 }
 
 /* ========== Labels onderin ========== */
@@ -140,6 +148,31 @@ select:hover,
   line-height: 1.5;
 }
 
+#lensInfo {
+  max-width: 960px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  background: #1a1a1a;
+  border-left: 4px solid #0066ff;
+  color: #ccc;
+  font-size: 14px;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.loading::after {
+  content: "Bezig met laden...";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: white;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.6);
+  padding: 12px 16px;
+  border-radius: 4px;
+  z-index: 20;
+}
+
 /* ========== Fullscreen ========== */
 :fullscreen #comparisonWrapper,
 :-webkit-full-screen #comparisonWrapper {
@@ -170,36 +203,33 @@ select:hover,
   object-position: center center;
 }
 
-/* ========== Print ========== */
-@media print {
-  body {
-    background: white !important;
-    color: black !important;
-  }
-
-  .controls, #explanationBox {
-    display: none !important;
-  }
-
-  #comparisonWrapper {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: auto !important;
-  }
-
-  #infoContainer {
-    color: black !important;
-  }
-
-  #comparisonWrapper img {
-    object-fit: contain !important;
-  }
-}
-
 /* ========== Mobile mode ========== */
 .mobile-mode #comparisonWrapper {
   width: 100vw;
   aspect-ratio: 16 / 9;
+  overflow: hidden;
+  position: relative;
+}
+
+.mobile-mode #beforeImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.mobile-mode #beforeImage img {
+  width: 100vw;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .mobile-mode #afterWrapper {
@@ -232,140 +262,12 @@ select:hover,
   width: 50%;
   margin: 0;
 }
-@media screen and (max-width: 767px) {
-  body.mobile-mode:fullscreen #afterWrapper {
-    pointer-events: auto;
-  }
 
-  body.mobile-mode:fullscreen #slider {
-    z-index: 20;
-    pointer-events: auto;
-  }
-}
-#slider:hover {
-  background: #fff;
-  box-shadow: 0 0 8px #fff;
-}
-#comparisonWrapper {
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
-}
-@media (max-width: 767px) {
-  #slider {
-    width: 4px;
-  }
-}
-#beforeImage img,
-#afterImage img {
-  transition: opacity 0.3s ease-in-out;
-}
-.loading::after {
-  content: "Bezig met laden...";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  color: white;
-  transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.6);
-  padding: 12px 16px;
-  border-radius: 4px;
-  z-index: 20;
-}
-#lensInfo {
-  max-width: 960px;
-  margin-bottom: 12px;
-  padding: 12px 16px;
-  background: #1a1a1a;
-  border-left: 4px solid #0066ff;
-  color: #ccc;
-  font-size: 14px;
-  border-radius: 6px;
-  line-height: 1.5;
-}
-
-/* ========== Mobile Fix voor beforeImage (rechter beeld) ========== */
-.mobile-mode #comparisonWrapper {
-  width: 100vw;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  position: relative;
-}
-
-.mobile-mode #beforeImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100%;
-  overflow: hidden;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.mobile-mode #beforeImage img {
-  width: 100vw;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
 @media (max-width: 767px) {
   #fullscreenButton {
     display: none !important;
   }
-}
-@media screen and (max-width: 767px) {
-  #lensInfo {
-    font-size: 12px;
-    line-height: 1.4;
-    padding: 10px 12px;
-  }
-}
-@media (max-width: 767px) {
-  #infoContainer {
-    font-size: 13px;
-  }
-}
-.lens-frame-outer {
-  width: 100%;
-  margin: 60px auto 80px auto;
-  z-index: 10;
-}
 
-.lens-frame-wrapper {
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.lens-frame-wrapper iframe {
-  width: 100%;
-  height: 100vh;
-  border: none;
-  display: block;
-}
-
-@media (max-width: 767px) {
-  .lens-frame-wrapper iframe {
-    height: calc(100vh - 60px);
-  }
-}
-.lens-frame-outer {
-  width: 100%;
-  margin: 60px auto 80px auto;
-  z-index: 10;
-}
-.mobile-only {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .mobile-only {
-    display: block;
-  }
-}
-@media (max-width: 767px) {
   .controls {
     justify-content: center;
     align-items: center;
@@ -386,26 +288,36 @@ select:hover,
     flex-direction: column;
     align-items: center;
   }
-}
-@media (max-width: 767px) {
-  #fullscreenButton {
-    display: none !important;
+
+  .mobile-only {
+    display: block;
+  }
+
+  #lensInfo {
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 10px 12px;
+  }
+
+  #infoContainer {
+    font-size: 13px;
+  }
+
+  .lens-frame-wrapper iframe {
+    height: calc(100vh - 60px);
   }
 }
-#slider {
-  touch-action: none;
-}
-/* ========== Detail View Overlay ========== */
+
+/* ========== Detail View Overlay (Zoom) ========== */
 #detailOverlay {
-  display: none;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.85);
-  z-index: 9999;
-  cursor: crosshair;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  display: none;
 }
 
 #detailOverlay.active {
@@ -416,66 +328,10 @@ select:hover,
   position: absolute;
   width: 200px;
   height: 200px;
-  border: 2px solid white;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.detail-view-square img {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform-origin: top left;
-}
-#detailOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 960px; /* matcht met #comparisonWrapper */
-  height: 540px;
-  pointer-events: none;
-  display: none;
-  z-index: 30;
-}
-
-.detail-view-square {
-  width: 150px;
-  height: 150px;
   overflow: hidden;
   border: 2px solid white;
-  position: absolute;
   background: black;
-}
-
-.detail-view-square img {
-  width: 300%;
-  height: auto;
-  object-fit: cover;
   pointer-events: none;
-}
-#comparisonWrapper {
-  position: relative;
-}
-
-#detailOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 5;
-}
-
-.detail-view-square {
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  overflow: hidden;
-  border: 2px solid white;
-  pointer-events: none;
-  background-color: #000;
   z-index: 10;
 }
 
@@ -483,6 +339,30 @@ select:hover,
   position: absolute;
   top: 0;
   left: 0;
-  transition: none;
+  width: 300%;
+  height: auto;
+  object-fit: cover;
+  transform-origin: top left;
   will-change: transform;
+  pointer-events: none;
+}
+
+/* ========== Mobile embed iframe wrapper ========== */
+.lens-frame-outer {
+  width: 100%;
+  margin: 60px auto 80px auto;
+  z-index: 10;
+}
+
+.lens-frame-wrapper {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.lens-frame-wrapper iframe {
+  width: 100%;
+  height: 100vh;
+  border: none;
+  display: block;
 }
