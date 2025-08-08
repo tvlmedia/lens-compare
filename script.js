@@ -378,12 +378,28 @@ detailToggleButton.addEventListener("click", () => {
   }
 });
 
+// ==== DETAIL VIEWER ====
+const detailOverlay = document.getElementById("detailOverlay");
+const leftDetail = document.getElementById("leftDetail");
+const rightDetail = document.getElementById("rightDetail");
+const leftDetailImg = leftDetail.querySelector("img");
+const rightDetailImg = rightDetail.querySelector("img");
+const detailToggleButton = document.getElementById("detailViewToggle");
+
+let detailActive = false;
+
+detailToggleButton.addEventListener("click", () => {
+  detailActive = !detailActive;
+  detailOverlay.classList.toggle("active", detailActive);
+
+  if (!detailActive) {
+    leftDetail.style.display = "none";
+    rightDetail.style.display = "none";
+  }
+});
+
 comparisonWrapper.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
-
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
 
   const zoom = 3.2;
   const size = 260;
@@ -411,10 +427,11 @@ comparisonWrapper.addEventListener("mousemove", (e) => {
     detailImg.style.transform = `translate(${translateX}px, ${translateY}px)`;
   };
 
-  // Toon beide zoomvensters
-  updateZoomViewer(leftDetail, leftDetailImg, afterImgTag, -size / 2);
-updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag, size / 2);
+  updateZoomViewer(leftDetail, leftDetailImg, afterImgTag, -size - 20);
+  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag, +20);
+});
 
+// ✅ DIT MOET BUITEN de mousemove blijven!
 comparisonWrapper.addEventListener("mouseleave", () => {
   leftDetail.style.display = "none";
   rightDetail.style.display = "none";
