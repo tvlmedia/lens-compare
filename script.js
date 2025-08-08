@@ -381,6 +381,8 @@ detailToggleButton.addEventListener("click", () => {
 comparisonWrapper.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
+
+
   const rect = comparisonWrapper.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
@@ -417,6 +419,8 @@ detailImg.style.width = `${zoomedWidth}px`;
 detailImg.style.height = `${zoomedHeight}px`;
 detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
+
+});
 comparisonWrapper.addEventListener("mouseleave", () => {
   leftDetail.style.display = "none";
   rightDetail.style.display = "none";
