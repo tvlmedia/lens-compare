@@ -381,11 +381,11 @@ detailToggleButton.addEventListener("click", () => {
 comparisonWrapper.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
- const offsetX = detail === leftDetail ? -130 : 130;
-detail.style.left = `${e.clientX + offsetX}px`;
-detail.style.top = `${e.clientY}px`;
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-  const zoom = 4;
+  const zoom = 3;
   const size = 200;
 
   const updateZoomViewer = (detail, detailImg, sourceImg) => {
