@@ -412,8 +412,8 @@ select:hover,
 
 .detail-view-square {
   position: absolute;
-  width: 260px;
-  height: 260px;
+  width: 200px;
+  height: 200px;
   overflow: hidden;
   border: 2px solid white;
   background: black;
@@ -428,9 +428,9 @@ select:hover,
   transform-origin: top left;
 }
 #leftDetail {
-  transform: translateX(-280px);
+  margin-left: -110px;
 }
 
 #rightDetail {
-  transform: translateX(20px);
+  margin-left: 110px;
 }

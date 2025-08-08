@@ -378,4 +378,47 @@ detailToggleButton.addEventListener("click", () => {
   }
 });
 
+comparisonWrapper.addEventListener("mousemove", (e) => {
+  if (!detailActive) return;
 
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  const zoom = 3;
+  const size = 200;
+
+  const updateZoomViewer = (detail, detailImg, sourceImg) => {
+    // Alleen .src updaten als nodig
+    if (detailImg.src !== sourceImg.src) {
+      detailImg.src = sourceImg.src;
+    }
+
+    const imageRect = sourceImg.getBoundingClientRect();
+    const relX = (e.clientX - imageRect.left) / imageRect.width;
+    const relY = (e.clientY - imageRect.top) / imageRect.height;
+
+    const zoomedWidth = imageRect.width * zoom;
+    const zoomedHeight = imageRect.height * zoom;
+    const offsetX = -relX * zoomedWidth + size / 2;
+    const offsetY = -relY * zoomedHeight + size / 2;
+
+    detail.style.left = `${x - size / 2}px`;
+    detail.style.top = `${y - size / 2}px`;
+    detail.style.display = "block";
+
+    detailImg.style.width = `${zoomedWidth}px`;
+    detailImg.style.height = `${zoomedHeight}px`;
+    detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+  };
+
+  // Altijd beide tonen:
+  updateZoomViewer(leftDetail, leftDetailImg, afterImgTag);   // Left = after
+  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag); // Right = before
+});
+
+
+comparisonWrapper.addEventListener("mouseleave", () => {
+  leftDetail.style.display = "none";
+  rightDetail.style.display = "none";
+});
