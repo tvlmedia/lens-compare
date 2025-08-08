@@ -472,19 +472,10 @@ body.dragging * {
 #infoContainer {
   margin-bottom: 12px; /* of meer indien gewenst */
 }
-/* Clickable lens labels */
 #infoContainer a {
-  color: #fff;
-  text-decoration: none;
+  color: inherit;          /* zelfde kleur als de tekst */
+  text-decoration: none;   /* geen lijn standaard */
 }
 #infoContainer a:hover {
-  text-decoration: underline;
-}
-#infoContainer a {
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px dashed #888;
-}
-#infoContainer a:hover {
-  text-decoration: underline;
+  text-decoration: underline; /* normale onderstreep bij hover */
 }
