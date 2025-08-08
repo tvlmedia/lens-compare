@@ -428,9 +428,9 @@ select:hover,
   transform-origin: top left;
 }
 #leftDetail {
-  margin-left: -80px;
+  margin-left: -180px;
 }
 
 #rightDetail {
-  margin-left: 80px;
+  margin-left: 180px;
 }
