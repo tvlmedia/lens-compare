@@ -114,12 +114,17 @@ function updateImages() {
   const tStopRaw = tStopSelect.value;
   const tStopFormatted = `T${tStopRaw}`;
 
-  leftLabel.textContent = `Lens: ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}`;
-  rightLabel.textContent = `Lens: ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}`;
-}
+  // Pak de URLs uit lensDescriptions (fallback "#")
+  const leftUrl  = lensDescriptions[leftSelect.value]?.url  || "#";
+  const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
 
-updateLensInfo();
-updateImages();
+  // Zet HTML met <a> links
+  leftLabel.innerHTML  =
+    `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}</a>`;
+  rightLabel.innerHTML =
+    `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}</a>`;
+} // ← BELANGRIJK: functie hier echt sluiten
+
 
 [leftSelect, rightSelect].forEach(el =>
   el.addEventListener("change", updateLensInfo)
@@ -133,13 +138,9 @@ leftSelect.value = "IronGlass Red P";
 rightSelect.value = "IronGlass Zeiss Jena";
 tStopSelect.value = "2.8";
 focalLengthSelect.value = "35mm";
-
-updateImages();
 updateLensInfo();
+updateImages();
 
-
-
-updateImages(); // ← staat er al
 
 // Force update to fix initial load issue
 setTimeout(() => updateImages(), 50);
@@ -183,7 +184,7 @@ window.addEventListener("touchend", () => {
   document.body.classList.remove("dragging");
 });
 
-window.addEventListener("touchend", () => isDragging = false);
+
 
 window.addEventListener("touchmove", (e) => {
   if (!isDragging || e.touches.length !== 1) return;
