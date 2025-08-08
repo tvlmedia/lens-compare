@@ -358,3 +358,53 @@ async function loadImage(url) {
     img.src = url;
   });
 }
+const detailToggle = document.getElementById("detailViewToggle");
+const detailOverlay = document.getElementById("detailOverlay");
+const leftDetail = document.getElementById("leftDetail");
+const rightDetail = document.getElementById("rightDetail");
+const leftDetailImg = leftDetail.querySelector("img");
+const rightDetailImg = rightDetail.querySelector("img");
+
+let detailViewEnabled = false;
+
+detailToggle.addEventListener("click", () => {
+  detailViewEnabled = !detailViewEnabled;
+  detailOverlay.classList.toggle("active", detailViewEnabled);
+});
+
+comparisonWrapper.addEventListener("mousemove", e => {
+  if (!detailViewEnabled) return;
+
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  const half = rect.width / 2;
+  const isLeft = x < half;
+
+  const zoomFactor = 3;
+  const squareSize = 200;
+
+  const detail = isLeft ? leftDetail : rightDetail;
+  const detailImg = isLeft ? leftDetailImg : rightDetailImg;
+  const sourceImg = isLeft ? afterImgTag : beforeImgTag;
+
+  // Update detail square position
+  detail.style.left = `${x - squareSize / 2}px`;
+  detail.style.top = `${y - squareSize / 2}px`;
+
+  // Update zoomed image source and transform
+  detailImg.src = sourceImg.src;
+  const offsetX = -x * zoomFactor + squareSize / 2;
+  const offsetY = -y * zoomFactor + squareSize / 2;
+  detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoomFactor})`;
+
+  // Hide the other detail viewer
+  (isLeft ? rightDetail : leftDetail).style.display = "none";
+  detail.style.display = "block";
+});
+
+comparisonWrapper.addEventListener("mouseleave", () => {
+  leftDetail.style.display = "none";
+  rightDetail.style.display = "none";
+});
