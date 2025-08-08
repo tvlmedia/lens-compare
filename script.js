@@ -358,3 +358,53 @@ async function loadImage(url) {
     img.src = url;
   });
 }
+// ===== DETAIL VIEW LOGIC =====
+const detailToggleBtn = document.getElementById("detailViewToggle");
+const detailOverlay = document.getElementById("detailOverlay");
+const leftDetail = document.getElementById("leftDetail");
+const rightDetail = document.getElementById("rightDetail");
+const leftDetailImg = leftDetail.querySelector("img");
+const rightDetailImg = rightDetail.querySelector("img");
+
+let detailModeActive = false;
+
+detailToggleBtn.addEventListener("click", () => {
+  detailModeActive = !detailModeActive;
+  detailOverlay.classList.toggle("active", detailModeActive);
+  if (detailModeActive) {
+    leftDetailImg.src = afterImgTag.src;
+    rightDetailImg.src = beforeImgTag.src;
+  }
+});
+
+detailOverlay.addEventListener("mousemove", (e) => {
+  const rect = detailOverlay.getBoundingClientRect();
+  const x = e.clientX;
+  const y = e.clientY;
+
+  const boxSize = 200;
+  const offset = 10;
+
+  // Position both squares
+  leftDetail.style.left = `${x - boxSize - offset}px`;
+  leftDetail.style.top = `${y - boxSize / 2}px`;
+
+  rightDetail.style.left = `${x + offset}px`;
+  rightDetail.style.top = `${y - boxSize / 2}px`;
+
+  // Update image position (zoom effect)
+  const scale = 2; // Vergroting
+  const imgX = -((x - rect.left) * scale - boxSize / 2);
+  const imgY = -((y - rect.top) * scale - boxSize / 2);
+
+  leftDetailImg.style.transform = `scale(${scale}) translate(${imgX / scale}px, ${imgY / scale}px)`;
+  rightDetailImg.style.transform = `scale(${scale}) translate(${imgX / scale}px, ${imgY / scale}px)`;
+});
+
+// Sluit detail view met ESC
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && detailModeActive) {
+    detailOverlay.classList.remove("active");
+    detailModeActive = false;
+  }
+});
