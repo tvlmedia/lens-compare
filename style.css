@@ -395,3 +395,35 @@ select:hover,
 #slider {
   touch-action: none;
 }
+#detailOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+  display: none;
+}
+
+#detailOverlay.active {
+  display: block;
+}
+
+.detail-view-square {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  border: 2px solid white;
+  background: black;
+  pointer-events: none;
+}
+
+.detail-view-square img {
+  position: absolute;
+  width: 300%;
+  height: auto;
+  object-fit: cover;
+  transform-origin: top left;
+}
