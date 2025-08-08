@@ -358,3 +358,57 @@ async function loadImage(url) {
     img.src = url;
   });
 }
+// ==== DETAIL VIEWER ====
+const detailOverlay = document.getElementById("detailOverlay");
+const leftDetail = document.getElementById("leftDetail");
+const rightDetail = document.getElementById("rightDetail");
+const leftDetailImg = leftDetail.querySelector("img");
+const rightDetailImg = rightDetail.querySelector("img");
+const detailToggleButton = document.getElementById("detailViewToggle");
+
+let detailActive = false;
+
+detailToggleButton.addEventListener("click", () => {
+  detailActive = !detailActive;
+  detailOverlay.classList.toggle("active", detailActive);
+
+  if (!detailActive) {
+    leftDetail.style.display = "none";
+    rightDetail.style.display = "none";
+  }
+});
+
+comparisonWrapper.addEventListener("mousemove", (e) => {
+  if (!detailActive) return;
+
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const centerX = rect.width / 2;
+
+  const zoom = 3;
+  const size = 200;
+
+  const isLeft = x < centerX;
+
+  const detail = isLeft ? leftDetail : rightDetail;
+  const detailImg = isLeft ? leftDetailImg : rightDetailImg;
+  const sourceImg = isLeft ? afterImgTag : beforeImgTag;
+
+  detailImg.src = sourceImg.src;
+
+  detail.style.left = `${x - size / 2}px`;
+  detail.style.top = `${y - size / 2}px`;
+  detail.style.display = "block";
+
+  (isLeft ? rightDetail : leftDetail).style.display = "none";
+
+  const offsetX = -x * zoom + size / 2;
+  const offsetY = -y * zoom + size / 2;
+  detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
+});
+
+comparisonWrapper.addEventListener("mouseleave", () => {
+  leftDetail.style.display = "none";
+  rightDetail.style.display = "none";
+});
