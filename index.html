@@ -11,11 +11,11 @@
   <!-- === DESKTOP TOOL === -->
   <div class="controls desktop-only">
     <div class="controls-row">
-  <button id="toggleButton">↔ Flip</button>
-  <button id="fullscreenButton">⛶ Fullscreen</button>
-  <button id="downloadPdfButton">⤓ Download PDF</button>
-  <button id="detailViewToggle">🔍 Detail View</button> <!-- 👈 NIEUW -->
-</div>
+      <button id="toggleButton">↔ Flip</button>
+      <button id="fullscreenButton">⛶ Fullscreen</button>
+      <button id="downloadPdfButton">⤓ Download PDF</button>
+      <button id="detailViewToggle">🔍 Detail View</button> <!-- 👈 Nieuw -->
+    </div>
     
     <div class="controls-column">
       <select id="leftLens"></select>
@@ -43,6 +43,7 @@
     </div>
   </div>
 
+  <!-- === Vergelijkingsgebied === -->
   <div id="comparisonWrapper" class="desktop-only">
     <div id="beforeImage">
       <img id="beforeImgTag" alt="Right lens preview">
@@ -57,6 +58,7 @@
     <div id="slider"></div>
   </div>
 
+  <!-- === Lens labels en info === -->
   <div id="infoContainer" class="desktop-only">
     <div id="leftLabel"></div>
     <div id="rightLabel"></div>
@@ -77,6 +79,12 @@
         loading="lazy">
       </iframe>
     </div>
+  </div>
+
+  <!-- === DETAIL VIEW OVERLAY (vierkant) === -->
+  <div id="detailOverlay">
+    <div id="leftDetail" class="detail-view-square"><img></div>
+    <div id="rightDetail" class="detail-view-square"><img></div>
   </div>
 
   <!-- === Scripts === -->
