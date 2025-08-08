@@ -385,8 +385,8 @@ comparisonWrapper.addEventListener("mousemove", (e) => {
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
-  const zoom = 3;
-  const size = 200;
+ const zoom = 3.2;
+const size = 260;
 
   const updateZoomViewer = (detail, detailImg, sourceImg) => {
     // Alleen .src updaten als nodig
