@@ -472,3 +472,11 @@ body.dragging * {
 #infoContainer {
   margin-bottom: 12px; /* of meer indien gewenst */
 }
+/* Clickable lens labels */
+#infoContainer a {
+  color: #fff;
+  text-decoration: none;
+}
+#infoContainer a:hover {
+  text-decoration: underline;
+}
