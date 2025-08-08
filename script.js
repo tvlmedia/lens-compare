@@ -403,14 +403,12 @@ comparisonWrapper.addEventListener("mousemove", (e) => {
 
   (isLeft ? rightDetail : leftDetail).style.display = "none";
 
-  const imgWidth = sourceImg.clientWidth;
-const imgHeight = sourceImg.clientHeight;
+ const imageRect = sourceImg.getBoundingClientRect();
+const relX = (e.clientX - imageRect.left) / imageRect.width;
+const relY = (e.clientY - imageRect.top) / imageRect.height;
 
-const relX = x / imgWidth;
-const relY = y / imgHeight;
-
-const zoomedWidth = imgWidth * zoom;
-const zoomedHeight = imgHeight * zoom;
+const zoomedWidth = imageRect.width * zoom;
+const zoomedHeight = imageRect.height * zoom;
 
 const offsetX = -relX * zoomedWidth + size / 2;
 const offsetY = -relY * zoomedHeight + size / 2;
