@@ -418,7 +418,6 @@ comparisonWrapper.addEventListener("mousemove", (e) => {
 });
 
 
-});
 comparisonWrapper.addEventListener("mouseleave", () => {
   leftDetail.style.display = "none";
   rightDetail.style.display = "none";
