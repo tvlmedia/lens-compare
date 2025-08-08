@@ -427,3 +427,10 @@ select:hover,
   object-fit: cover;
   transform-origin: top left;
 }
+#leftDetail {
+  transform: translateX(-110px); /* links uit beeld */
+}
+
+#rightDetail {
+  transform: translateX(110px);  /* rechts uit beeld */
+}
