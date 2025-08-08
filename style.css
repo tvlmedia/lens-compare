@@ -458,3 +458,9 @@ select:hover,
   border-color: #007bff;
   color: white;
 }
+body.dragging,
+body.dragging * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -ms-user-select: none !important;
+}
