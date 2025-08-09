@@ -508,7 +508,12 @@ body.dragging * {
   object-position:center;
 }
 
-
+/* Als sensor-mode actief is → beide kanten contain + black bars */
+.sensor-mode #beforeImage img,
+.sensor-mode #afterImage img {
+  object-fit: contain;
+  background: black; /* voor transparante PNG's */
+}
 
 
 
