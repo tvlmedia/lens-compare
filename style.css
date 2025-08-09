@@ -545,3 +545,11 @@ body.dragging * {
 #afterImage img {
   display: block;
 }
+
+
+/* --- SENSOR-MODE OVERRIDE (moet helemaal onderaan) --- */
+.sensor-mode #comparisonWrapper #beforeImage img,
+.sensor-mode #comparisonWrapper #afterWrapper #afterImage img {
+  object-fit: contain !important;
+  background: black;
+}
