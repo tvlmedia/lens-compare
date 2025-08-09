@@ -75,6 +75,8 @@ const slider = document.getElementById("slider");
 const comparisonWrapper = document.getElementById("comparisonWrapper");
 const leftLabel = document.getElementById("leftLabel");
 const rightLabel = document.getElementById("rightLabel");
+const downloadLeftRawButton  = document.getElementById("downloadLeftRawButton");
+const downloadRightRawButton = document.getElementById("downloadRightRawButton");
 
 function updateLensInfo() {
   const left = leftSelect.value;
@@ -94,6 +96,47 @@ lenses.forEach(lens => {
   rightSelect.add(new Option(lens, lens));
 });
 
+// Welke RAW-file hoort bij welke combi (key = <lens>_<focal>_t<stop>)
+// Tip: laat de key aansluiten op je bestaande keys (dus "ironglass_red_p_35mm_t2_8" die evt. mapt naar 37mm)
+const rawFileMap = {
+  // voorbeelden – pas de paden/filenames aan naar wat jij uploadt
+  "ironglass_red_p_35mm_t2_8":   "raw/REDP_37mm_T2.8_frame01.tif",
+  "ironglass_zeiss_jena_35mm_t2_8": "raw/Jena_35mm_T2.8_frame01.tif",
+  "ironglass_red_p_50mm_t2_8":   "raw/REDP_58mm_T2.8_frame01.tif",
+  "ironglass_zeiss_jena_50mm_t2_8": "raw/Jena_50mm_T2.8_frame01.tif",
+  "cooke_panchro_ff_50mm_t2_8":  "raw/CookeFF_50mm_T2.8_frame01.tif"
+  // ...meer keys toevoegen zodra je meer files online zet
+};
+function setDownloadButton(buttonEl, key) {
+  const file = rawFileMap[key];
+  if (file) {
+    buttonEl.disabled = false;
+    buttonEl.title = "Download RAW";
+
+    buttonEl.onclick = () => {
+      const url = new URL(file, location.href);
+      const sameOrigin = url.origin === location.origin;
+
+      if (sameOrigin) {
+        // Forceer download
+        const a = document.createElement("a");
+        a.href = url.href;
+        a.download = url.pathname.split("/").pop(); // bestandsnaam
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // Cross-origin: sommige hosts negeren download-attribute
+        // dan is nieuw tabblad de veiligste fallback
+        window.open(url.href, "_blank", "noopener,noreferrer");
+      }
+    };
+  } else {
+    buttonEl.disabled = true;
+    buttonEl.title = "RAW download (coming soon)";
+    buttonEl.onclick = null;
+  }
+}
 function updateImages() {
   const leftLens = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
   const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
@@ -117,6 +160,11 @@ function updateImages() {
   // Pak de URLs uit lensDescriptions (fallback "#")
   const leftUrl  = lensDescriptions[leftSelect.value]?.url  || "#";
   const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
+
+
+  // RAW-download knoppen updaten
+setDownloadButton(downloadLeftRawButton,  leftKey);
+setDownloadButton(downloadRightRawButton, rightKey);
 
   // Zet HTML met <a> links
   leftLabel.innerHTML  =
