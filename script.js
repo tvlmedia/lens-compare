@@ -33,7 +33,7 @@ const cameras = {
 // Pak de elementen
 const cameraSelect = document.getElementById("cameraSelect");
 const sensorFormatSelect = document.getElementById("sensorFormatSelect");
-const comparisonWrapper = document.getElementById("comparisonWrapper");
+
 
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
