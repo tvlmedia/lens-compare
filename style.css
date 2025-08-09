@@ -71,15 +71,29 @@ select:hover,
 }
 
 /* ========== AFTER WRAPPER voor split ========== */
+/* NIEUW — overlay altijd full size, we knippen met clip-path */
 #afterWrapper {
   position: absolute;
   top: 0;
   left: 0;
-  width: 50%;
+  width: 100%;
   height: 100%;
   overflow: hidden;
   z-index: 2;
   pointer-events: none;
+  /* begin op 50/50 */
+  clip-path: inset(0 50% 0 0);
+  -webkit-clip-path: inset(0 50% 0 0); /* voor oudere Safari's */
+  will-change: clip-path;
+}
+
+/* Dit mag blijven; zorg dat binnenkant 100% van de wrapper is */
+#afterWrapper #afterImage,
+#afterWrapper #afterImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* of 'contain' als je sensor-mode gebruikt */
+  object-position: center;
 }
 
 #afterWrapper #afterImage{
@@ -139,9 +153,11 @@ select:hover,
 /* overlay blijft 50% van de wrapper */
 :fullscreen #afterWrapper,
 :-webkit-full-screen #afterWrapper {
-  width: 50%;
+  width: 100%;
   height: 100%;
   overflow: hidden;
+  clip-path: inset(0 50% 0 0);
+  -webkit-clip-path: inset(0 50% 0 0);
 }
 
 /* binnenkant gewoon 100% van de wrapper houden */
