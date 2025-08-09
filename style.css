@@ -52,23 +52,7 @@ select:hover,
   overflow: hidden;
 }
 
-#beforeImage, #afterImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
 
-#beforeImage img,
-#afterImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  position: absolute;
-  inset: 0;
-}
 
 /* ========== AFTER WRAPPER voor split ========== */
 /* NIEUW — overlay altijd full size, we knippen met clip-path */
@@ -96,17 +80,6 @@ select:hover,
   object-position: center;
 }
 
-#afterWrapper #afterImage{
-  position:absolute; top:0; left:0;
-  width:100%;
-  height:100%;
-}
-#afterWrapper #afterImage img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center;
-}
 
 /* ========== Slider lijn ========== */
 #slider {
@@ -150,6 +123,14 @@ select:hover,
   background: black;  /* nette letterbox */
 }
 
+/* Beide beeld-lagen altijd exact over de hele wrapper leggen */
+#beforeImage,
+#afterImage {
+  position: absolute;
+  inset: 0;          /* top:0; right:0; bottom:0; left:0; */
+  width: 100%;
+  height: 100%;
+}
 /* overlay blijft 50% van de wrapper */
 :fullscreen #afterWrapper,
 :-webkit-full-screen #afterWrapper {
@@ -531,7 +512,17 @@ body.dragging * {
   background: black; /* voor transparante PNG's */
 }
 
-
+/* Hard fix tegen theme-regels zoals img{height:auto} */
+#comparisonWrapper #beforeImage img,
+#comparisonWrapper #afterWrapper #afterImage img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
 
 /* Mobiel: iets compacter */
 @media (max-width: 767px) {
