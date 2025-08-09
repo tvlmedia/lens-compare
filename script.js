@@ -80,15 +80,16 @@ sensorFormatSelect.addEventListener("change", () => {
   // 2) Sensor-mode = contain + letterbox in CSS
   document.body.classList.add("sensor-mode");
 
-  // 3) Schaal t.o.v. basis (Venice 6K 3:2) op *diagonaal* (meest natuurgetrouw)
-  const diagBase   = Math.hypot(BASE_SENSOR.w, BASE_SENSOR.h);
-  const diagTarget = Math.hypot(w, h);
+ // 3) Schaal tov basis op *diagonaal* (FOV-crop: kleiner = meer zoom)
+const diagBase   = Math.hypot(BASE_SENSOR.w, BASE_SENSOR.h);
+const diagTarget = Math.hypot(w, h);
 
-  // Nooit upscalen (we hebben basisbeelden op Venice 6K)
-  const scale = Math.min(1, diagTarget / diagBase);
+// Zoom IN bij kleinere sensor (en clamp minimaal 1 zodat hij niet uitzoomt)
+let scale = diagBase / diagTarget; // >1 bij crop, 1 bij basis
+scale = Math.max(1, scale);
 
-  // 4) Doorzetten naar CSS var → gebruikt door 'transform: scale(var(--sensor-scale))'
-  comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
+// 4) Doorzetten naar CSS var
+comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
 });
 
 // Init (optioneel: standaard op Venice 6K 3:2)
