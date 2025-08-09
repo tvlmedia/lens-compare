@@ -52,13 +52,7 @@ cameraSelect.addEventListener("change", () => {
     comparisonWrapper.style.aspectRatio = "3 / 2"; // fallback
     return;
   }
-  // Scale berekenen tov basis (diagonaal-cropfactor is het meest natuurgetrouw)
-const diagBase   = Math.hypot(BASE_SENSOR.w, BASE_SENSOR.h);
-const diagTarget = Math.hypot(w, h);
-const scale = diagTarget / diagBase;   // < 1 bij crop, > 1 bij groter dan basis
-
-// Doorzetten naar CSS (gebruikt door transform: scale(var(--sensor-scale)))
-comparisonWrapper.style.setProperty("--sensor-scale", scale);
+ 
   
   const formats = cameras[cam];
   Object.keys(formats).forEach(fmt => {
@@ -71,28 +65,29 @@ comparisonWrapper.style.setProperty("--sensor-scale", scale);
 
 comparisonWrapper.style.removeProperty("--sensor-scale");
 
-// Toepassen van gekozen formaat (aspect + letterbox + schaal)
 sensorFormatSelect.addEventListener("change", () => {
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
   if (!cam || !fmt) return;
 
-  const { w, h } = cameras[cam][fmt];
+  // 0) Reset eventuele oude waarde
+  comparisonWrapper.style.removeProperty("--sensor-scale");
 
-  // 1) Aspect van de viewer instellen
+  // 1) Aspect van de viewer instellen (mm → verhouding)
+  const { w, h } = cameras[cam][fmt];
   comparisonWrapper.style.aspectRatio = `${w} / ${h}`;
 
-  // 2) Sensor-mode aan (contain + letterbox in CSS)
+  // 2) Sensor-mode = contain + letterbox in CSS
   document.body.classList.add("sensor-mode");
 
-  // 3) Schaal t.o.v. basis-sensor (diagonaal is het eerlijkst)
+  // 3) Schaal t.o.v. basis (Venice 6K 3:2) op *diagonaal* (meest natuurgetrouw)
   const diagBase   = Math.hypot(BASE_SENSOR.w, BASE_SENSOR.h);
   const diagTarget = Math.hypot(w, h);
 
-  // Nooit upscalen (we hebben basisbeelden op Venice 6K): clamp naar max 1
+  // Nooit upscalen (we hebben basisbeelden op Venice 6K)
   const scale = Math.min(1, diagTarget / diagBase);
 
-  // 4) Doorzetten naar CSS var
+  // 4) Doorzetten naar CSS var → gebruikt door 'transform: scale(var(--sensor-scale))'
   comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
 });
 
