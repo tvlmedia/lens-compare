@@ -15,8 +15,7 @@
 <button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
 <button id="detailViewToggle" class="control-button">🔍 Detail View</button>
 <button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
-     <button id="downloadLeftRawButton"  class="control-button" disabled>⬇ Download Left RAW</button>
-<button id="downloadRightRawButton" class="control-button" disabled>⬇ Download Right RAW</button>
+   
   
     </div>
 
@@ -66,11 +65,18 @@
     <div id="slider"></div>
   </div>
 
-  <div id="infoContainer" class="desktop-only">
+ <div id="infoContainer" class="desktop-only">
+  <div class="infoCol">
     <div id="leftLabel"></div>
-    <div id="rightLabel"></div>
+    <button id="downloadLeftRawButton" class="control-button" disabled>⬇ Download Left RAW</button>
   </div>
 
+  <div class="infoCol">
+    <div id="rightLabel"></div>
+    <button id="downloadRightRawButton" class="control-button" disabled>⬇ Download Right RAW</button>
+  </div>
+</div>
+  
   <div id="lensInfo" class="desktop-only"></div>
 
   <div id="explanationBox" class="desktop-only">
