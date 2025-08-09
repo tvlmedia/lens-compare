@@ -33,7 +33,7 @@ const cameras = {
 // Pak de elementen
 const cameraSelect = document.getElementById("cameraSelect");
 const sensorFormatSelect = document.getElementById("sensorFormatSelect");
-
+const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← verplaatst naar boven
 
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
@@ -144,7 +144,6 @@ const beforeImgTag = document.getElementById("beforeImgTag");
 const afterImgTag = document.getElementById("afterImgTag");
 const afterWrapper = document.getElementById("afterWrapper");
 const slider = document.getElementById("slider");
-const comparisonWrapper = document.getElementById("comparisonWrapper");
 const leftLabel = document.getElementById("leftLabel");
 const rightLabel = document.getElementById("rightLabel");
 const downloadLeftRawButton  = document.getElementById("downloadLeftRawButton");
