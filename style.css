@@ -511,16 +511,7 @@ body.dragging * {
   object-fit: contain;
   background: black; /* voor het geval de img transparant is */
 }
-
-/* Mobiel: iets compacter */
-@media (max-width: 767px) {
-  #infoContainer {
-    max-width: 100%;
-    padding: 0 16px;
-    gap: 16px;
-  }
-
-  /* 1) Overlay moet altijd meeschalen met de wrapper */
+ /* 1) Overlay moet altijd meeschalen met de wrapper */
 #afterWrapper #afterImage {
   position: absolute;
   top: 0;
@@ -551,3 +542,12 @@ body.dragging * {
 }
   .infoCol { gap: 8px; }
 }
+/* Mobiel: iets compacter */
+@media (max-width: 767px) {
+  #infoContainer {
+    max-width: 100%;
+    padding: 0 16px;
+    gap: 16px;
+  }
+
+ 
