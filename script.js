@@ -231,6 +231,11 @@ function updateImages() {
   const leftUrl  = lensDescriptions[leftSelect.value]?.url  || "#";
   const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
 
+  
+// Beginstand: 50/50 reveal
+afterWrapper.style.clipPath = 'inset(0 50% 0 0)';
+afterWrapper.style.webkitClipPath = 'inset(0 50% 0 0)';
+slider.style.left = '50%';
 
   // RAW-download knoppen updaten
 setDownloadButton(downloadLeftRawButton,  leftKey);
@@ -269,7 +274,13 @@ function updateSliderPosition(clientX) {
   const rect = comparisonWrapper.getBoundingClientRect();
   const offset = Math.max(0, Math.min(clientX - rect.left, rect.width));
   const percent = (offset / rect.width) * 100;
-  afterWrapper.style.width = `${percent}%`;
+
+  // Reveal de rechter (AFTER) kant met clip‑path
+  const rightInset = 100 - percent; // % dat van rechts dicht blijft
+  afterWrapper.style.clipPath = `inset(0 ${rightInset}% 0 0)`;
+  afterWrapper.style.webkitClipPath = `inset(0 ${rightInset}% 0 0)`; // Safari
+
+  // Verplaats de balk
   slider.style.left = `${percent}%`;
 }
 
