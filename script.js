@@ -2,7 +2,79 @@
 if (window.innerWidth < 768) {
   document.body.classList.add("mobile-mode");
 }
+// === SENSOR DATA (mm) – Venice is je basis (6K 3:2) ===
+const cameras = {
+  "Sony Venice": {
+    "6K 3:2":     { w: 36.167, h: 24.111, label: "6K 3:2" },
+    "6K 1.85:1":  { w: 36.203, h: 19.567, label: "6K 1.85:1" },
+    "6K 17:9":    { w: 36.203, h: 19.088, label: "6K 17:9" },
+    "6K 2.39:1":  { w: 36.167, h: 15.153, label: "6K 2.39:1" },
+    "5.7K 16:9":  { w: 33.907, h: 19.076, label: "5.7K 16:9" },
+    "4K 6:5":     { w: 24.494, h: 20.523, label: "4K 6:5" },
+    "4K 4:3":     { w: 24.494, h: 18.084, label: "4K 4:3" },
+    "4K 17:9":    { w: 24.494, h: 12.917, label: "4K 17:9" },
+    "4K 2.39:1":  { w: 24.494, h: 10.262, label: "4K 2.39:1" },
+    "3.8K 16:9":  { w: 22.963, h: 12.917, label: "3.8K 16:9" },
+  },
+  "Arri Alexa Mini": {
+    "Open Gate":       { w: 28.248, h: 18.166, label: "Open Gate" },
+    "3.2K":            { w: 26.400, h: 14.850, label: "3.2K (16:9)" },
+    "4K UHD":          { w: 26.400, h: 14.850, label: "4K UHD (16:9)" },
+    "4:3 2.8K":        { w: 23.760, h: 17.820, label: "4:3 2.8K" },
+    "HD":              { w: 23.760, h: 13.365, label: "HD (16:9)" },
+    "2K":              { w: 23.661, h: 13.299, label: "2K (16:9)" },
+    "2.39:1 2K Ana":   { w: 42.240, h: 17.696, label: "2.39:1 2K Ana" }, // anamorf tabje
+    "HD Ana":          { w: 31.680, h: 17.820, label: "HD Ana (16:9)" },
+    "S16 HD":          { w: 13.200, h: 7.425, label: "S16 HD (16:9)" },
+  },
+  // …later meer camera’s toevoegen
+};
 
+// Pak de elementen
+const cameraSelect = document.getElementById("cameraSelect");
+const sensorFormatSelect = document.getElementById("sensorFormatSelect");
+const comparisonWrapper = document.getElementById("comparisonWrapper");
+
+// Vul camera dropdown
+Object.keys(cameras).forEach(cam => {
+  cameraSelect.add(new Option(cam, cam));
+});
+
+// Vul formats wanneer camera verandert
+cameraSelect.addEventListener("change", () => {
+  sensorFormatSelect.innerHTML = "";
+  const cam = cameraSelect.value;
+  if (!cam) {
+    sensorFormatSelect.disabled = true;
+    document.body.classList.remove("sensor-mode");
+    comparisonWrapper.style.aspectRatio = "3 / 2"; // fallback
+    return;
+  }
+  const formats = cameras[cam];
+  Object.keys(formats).forEach(fmt => {
+    sensorFormatSelect.add(new Option(formats[fmt].label, fmt));
+  });
+  sensorFormatSelect.disabled = false;
+  // default: eerste optie meteen toepassen
+  sensorFormatSelect.dispatchEvent(new Event("change"));
+});
+
+// Toepassen van gekozen formaat (aspect + letterbox)
+sensorFormatSelect.addEventListener("change", () => {
+  const cam = cameraSelect.value;
+  const fmt = sensorFormatSelect.value;
+  if (!cam || !fmt) return;
+
+  const { w, h } = cameras[cam][fmt];
+  // Stel de aspect ratio van de viewer in op target sensor
+  comparisonWrapper.style.aspectRatio = `${w} / ${h}`;
+  // activeer contain-modus (geen crop, wel black bars)
+  document.body.classList.add("sensor-mode");
+});
+
+// Init (optioneel: standaard op Venice 6K 3:2)
+cameraSelect.value = "Sony Venice";
+cameraSelect.dispatchEvent(new Event("change"));
 window.addEventListener("resize", () => {
   if (window.innerWidth < 768) {
     document.body.classList.add("mobile-mode");
