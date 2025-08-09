@@ -519,5 +519,35 @@ body.dragging * {
     padding: 0 16px;
     gap: 16px;
   }
+
+  /* 1) Overlay moet altijd meeschalen met de wrapper */
+#afterWrapper #afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;     /* was 960px */
+  height: 100%;    /* was 640px */
+}
+#afterWrapper #afterImage img {
+  width: 100%;     /* was 960px */
+  height: 100%;    /* was 640px */
+  object-fit: cover;
+  object-position: center;
+}
+
+/* 2) Sensor-mode: nooit croppen (desktop + mobiel + fullscreen) */
+.sensor-mode #beforeImage img,
+.sensor-mode #afterImage img {
+  object-fit: contain !important;
+  background: black;
+}
+
+/* 3) Fullscreen overrides: laat contain winnen i.p.v. cover */
+:fullscreen .sensor-mode #afterWrapper #afterImage img,
+:-webkit-full-screen .sensor-mode #afterWrapper #afterImage img,
+:fullscreen .sensor-mode #beforeImage img,
+:-webkit-full-screen .sensor-mode #beforeImage img {
+  object-fit: contain !important;
+}
   .infoCol { gap: 8px; }
 }
