@@ -1,4 +1,4 @@
-  1§/* ========== Algemene reset ========== */
+* ========== Algemene reset ========== */
 * {
   -webkit-user-drag: none;
   user-select: none;
@@ -113,10 +113,6 @@ select:hover,
 /* ========== Labels onderin ========== */
 
 
-#leftLabel, #rightLabel {
-  width: 50%;
-  text-align: center;
-}
 
 /* ========== Extra uitlegtekst ========== */
 #explanationBox {
@@ -460,9 +456,7 @@ body.dragging * {
     display: none !important;
   }
 }
-#infoContainer {
-  margin-bottom: 12px; /* of meer indien gewenst */
-}
+
 #infoContainer a {
   color: inherit;          /* zelfde kleur als de tekst */
   text-decoration: none;   /* geen lijn standaard */
@@ -480,15 +474,7 @@ body.dragging * {
   cursor: not-allowed;
 }
 
-/* kleine tweak voor mobiel */
-@media (max-width: 767px) {
-  #infoContainer {
-    width: 100%;
-    padding: 0 16px;
-    gap: 12px;
-  }
-  .infoCol { gap: 6px; }
-}
+
 
 /* ===== Labels + RAW-knoppen onder het beeld ===== */
 #infoContainer {
