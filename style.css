@@ -521,9 +521,13 @@ body.dragging * {
 #infoContainer {
   display: flex;
   justify-content: center;
-  gap: 50px; /* ruimte tussen links en rechts */
+  gap: 80px; /* ruimte tussen links en rechts */
+  align-items: center; /* verticaal centreren */
 }
 
 .infoCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* horizontaal centreren */
   text-align: center;
 }
