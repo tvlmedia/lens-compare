@@ -512,5 +512,11 @@ body.dragging * {
     padding: 0 16px;
     gap: 16px;
   }
+  /* Sensor-mode: nooit croppen, altijd letter-/pillarbox */
+.sensor-mode #beforeImage img,
+.sensor-mode #afterImage img {
+  object-fit: contain;
+  background: black; /* voor het geval de img transparant is */
+}
   .infoCol { gap: 8px; }
 }
