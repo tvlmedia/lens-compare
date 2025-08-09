@@ -523,11 +523,13 @@ body.dragging * {
   object-position: center;
   display: block;
 }
-/* Sensor-mode: scale beide beelden o.b.v. --sensor-scale */
-#comparisonWrapper #beforeImage img,
-#comparisonWrapper #afterWrapper #afterImage img {
+/* Sensor crop: schaal de beelden fysiek omlaag t.o.v. Venice 6K 3:2 */
+.sensor-mode #beforeImage img,
+.sensor-mode #afterImage img {
   transform: scale(var(--sensor-scale, 1));
   transform-origin: center center;
+  /* optioneel smooth */
+  transition: transform 0.2s ease;
 }
 
 /* Mobiel: iets compacter */
