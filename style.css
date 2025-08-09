@@ -523,6 +523,12 @@ body.dragging * {
   object-position: center;
   display: block;
 }
+/* Sensor-mode: scale beide beelden o.b.v. --sensor-scale */
+#comparisonWrapper #beforeImage img,
+#comparisonWrapper #afterWrapper #afterImage img {
+  transform: scale(var(--sensor-scale, 1));
+  transform-origin: center center;
+}
 
 /* Mobiel: iets compacter */
 @media (max-width: 767px) {
