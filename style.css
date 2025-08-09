@@ -46,7 +46,7 @@ select:hover,
 #comparisonWrapper {
   width: 100%;
   max-width: 960px;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 3 / 2;
   position: relative;
   background: black;
   overflow: visible;
@@ -87,12 +87,12 @@ select:hover,
   top: 0;
   left: 0;
   width: 960px;
-  height: 540px;
+  height: 640px;
 }
 
 #afterWrapper #afterImage img {
   width: 960px;
-  height: 540px;
+  height: 640px;
   object-fit: cover;
   object-position: center center;
 }
@@ -186,7 +186,7 @@ select:hover,
 /* ========== Mobile mode ========== */
 .mobile-mode #comparisonWrapper {
   width: 100vw;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 3 / 2;
 }
 
 .mobile-mode #afterWrapper {
@@ -272,7 +272,7 @@ select:hover,
 /* ========== Mobile Fix voor beforeImage (rechter beeld) ========== */
 .mobile-mode #comparisonWrapper {
   width: 100vw;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
   position: relative;
 }
