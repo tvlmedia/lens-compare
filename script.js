@@ -32,8 +32,10 @@ const cameras = {
 
 // Pak de elementen
 const cameraSelect = document.getElementById("cameraSelect");
+const BASE_SENSOR = cameras["Sony Venice"]["6K 3:2"]; // jouw referentie
 const sensorFormatSelect = document.getElementById("sensorFormatSelect");
 const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← verplaatst naar boven
+
 
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
@@ -50,6 +52,14 @@ cameraSelect.addEventListener("change", () => {
     comparisonWrapper.style.aspectRatio = "3 / 2"; // fallback
     return;
   }
+  // Scale berekenen tov basis (diagonaal-cropfactor is het meest natuurgetrouw)
+const diagBase   = Math.hypot(BASE_SENSOR.w, BASE_SENSOR.h);
+const diagTarget = Math.hypot(w, h);
+const scale = diagTarget / diagBase;   // < 1 bij crop, > 1 bij groter dan basis
+
+// Doorzetten naar CSS (gebruikt door transform: scale(var(--sensor-scale)))
+comparisonWrapper.style.setProperty("--sensor-scale", scale);
+  
   const formats = cameras[cam];
   Object.keys(formats).forEach(fmt => {
     sensorFormatSelect.add(new Option(formats[fmt].label, fmt));
@@ -59,17 +69,31 @@ cameraSelect.addEventListener("change", () => {
   sensorFormatSelect.dispatchEvent(new Event("change"));
 });
 
-// Toepassen van gekozen formaat (aspect + letterbox)
+comparisonWrapper.style.removeProperty("--sensor-scale");
+
+// Toepassen van gekozen formaat (aspect + letterbox + schaal)
 sensorFormatSelect.addEventListener("change", () => {
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
   if (!cam || !fmt) return;
 
   const { w, h } = cameras[cam][fmt];
-  // Stel de aspect ratio van de viewer in op target sensor
+
+  // 1) Aspect van de viewer instellen
   comparisonWrapper.style.aspectRatio = `${w} / ${h}`;
-  // activeer contain-modus (geen crop, wel black bars)
+
+  // 2) Sensor-mode aan (contain + letterbox in CSS)
   document.body.classList.add("sensor-mode");
+
+  // 3) Schaal t.o.v. basis-sensor (diagonaal is het eerlijkst)
+  const diagBase   = Math.hypot(BASE_SENSOR.w, BASE_SENSOR.h);
+  const diagTarget = Math.hypot(w, h);
+
+  // Nooit upscalen (we hebben basisbeelden op Venice 6K): clamp naar max 1
+  const scale = Math.min(1, diagTarget / diagBase);
+
+  // 4) Doorzetten naar CSS var
+  comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
 });
 
 // Init (optioneel: standaard op Venice 6K 3:2)
