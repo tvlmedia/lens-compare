@@ -100,9 +100,8 @@ lenses.forEach(lens => {
 // Tip: laat de key aansluiten op je bestaande keys (dus "ironglass_red_p_35mm_t2_8" die evt. mapt naar 37mm)
 // Welke RAW-file hoort bij welke combi (key = <lens>_<focal>_t<stop>)
 const rawFileMap = {
-  "ironglass_red_p_35mm_t2_8":        "raw/RedP_37mm_T2.8_RAW.tif",
-  "ironglass_zeiss_jena_35mm_t2_8":   "raw/ZeissJena_35mm_T2.8_RAW.tif"
-  // voeg hier later meer keys/files aan toe
+  "ironglass_red_p_35mm_t2_8":      "raw/RedP_37mm_T2.8_RAW.tif",
+  "ironglass_zeiss_jena_35mm_t2_8": "raw/ZeissJena_35mm_T2.8_RAW.tif",
 };
 function setDownloadButton(buttonEl, key) {
   const file = rawFileMap[key];
