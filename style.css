@@ -508,25 +508,10 @@ body.dragging * {
   object-position:center;
 }
 
-/* 2) Sensor‑mode: GEEN crop (letter/pillarbox) – GLOBALLY (haal dit UIT je @media!) */
-.sensor-mode #beforeImage img,
-.sensor-mode #afterImage img{
-  object-fit:contain !important;
-  background:black;
-}
 
-/* optioneel: basis is ‘cover’ als sensor-mode uit staat */
-#beforeImage img,
-#afterImage img{
-  object-fit:cover;
-  object-position:center;
-}
 
-/* (fullscreen mag dit niet overrulen) */
-:fullscreen .sensor-mode #beforeImage img,
-:fullscreen .sensor-mode #afterImage img{
-  object-fit:contain !important;
-}
+
+
 /* Mobiel: iets compacter */
 @media (max-width: 767px) {
   #infoContainer {
@@ -536,3 +521,7 @@ body.dragging * {
   }
 }
  
+#beforeImage img,
+#afterImage img {
+  display: block;
+}
