@@ -518,3 +518,12 @@ body.dragging * {
   white-space: nowrap;
   text-align: center;
 }
+#infoContainer {
+  display: flex;
+  justify-content: center;
+  gap: 50px; /* ruimte tussen links en rechts */
+}
+
+.infoCol {
+  text-align: center;
+}
