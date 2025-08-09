@@ -505,6 +505,13 @@ body.dragging * {
   white-space: nowrap;     /* T2.8 blijft op dezelfde regel */
 }
 
+/* Sensor-mode: nooit croppen, altijd letter-/pillarbox */
+.sensor-mode #beforeImage img,
+.sensor-mode #afterImage img {
+  object-fit: contain;
+  background: black; /* voor het geval de img transparant is */
+}
+
 /* Mobiel: iets compacter */
 @media (max-width: 767px) {
   #infoContainer {
@@ -512,11 +519,5 @@ body.dragging * {
     padding: 0 16px;
     gap: 16px;
   }
-  /* Sensor-mode: nooit croppen, altijd letter-/pillarbox */
-.sensor-mode #beforeImage img,
-.sensor-mode #afterImage img {
-  object-fit: contain;
-  background: black; /* voor het geval de img transparant is */
-}
   .infoCol { gap: 8px; }
 }
