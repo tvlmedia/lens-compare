@@ -787,17 +787,24 @@ function resetSplitToMiddle() {
 
 // VERVANGT updateSliderPosition()
 function updateSliderPosition(clientX) {
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const lbLeft = comparisonWrapper._lbLeft || 0;
+  const rect    = comparisonWrapper.getBoundingClientRect();
+  const lbLeft  = comparisonWrapper._lbLeft  || 0;
   const lbRight = comparisonWrapper._lbRight || 0;
-  const usable = Math.max(1, Math.round(rect.width - lbLeft - lbRight));
+  const usable  = Math.max(1, Math.round(rect.width - lbLeft - lbRight));
 
+  // cursorpositie binnen het bruikbare beeld (tussen de pillarboxen)
   const xInUsable = clientX - rect.left - lbLeft;
-  const clamped = Math.max(0, Math.min(Math.round(xInUsable), usable));
-  const rightInsetPx = usable - clamped;
+  const clamped   = Math.max(0, Math.min(Math.round(xInUsable), usable));
 
-  afterWrapper.style.clipPath = `inset(0 ${rightInsetPx}px 0 0)`;
-  afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
+  // clip aan beide kanten: links vast = lbLeft, rechts = lbRight + rest
+  const leftInsetPx  = lbLeft;
+  const rightInsetPx = lbRight + (usable - clamped);
+
+  const inset = `inset(0 ${rightInsetPx}px 0 ${leftInsetPx}px)`;
+  afterWrapper.style.clipPath = inset;
+  afterWrapper.style.webkitClipPath = inset;
+
+  // lijn op exact dezelfde X als de overgang
   slider.style.left = (lbLeft + clamped) + 'px';
 }
 function pulseFsBars({ duration = 1400 } = {}) {
