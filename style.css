@@ -46,7 +46,6 @@ select:hover,
 #comparisonWrapper {
   width: 100%;
   max-width: 960px;
-  aspect-ratio: 3 / 2;
   position: relative;
   background: black;
   overflow: hidden;
