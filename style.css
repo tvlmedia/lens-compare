@@ -461,15 +461,7 @@ body.dragging * {
 
 
 
-/* De <img> zelf blijft gewoon het 'bruikbare' vak vullen */
-#comparisonWrapper:fullscreen #beforeImage img,
-#comparisonWrapper:-webkit-full-screen #beforeImage img,
-#comparisonWrapper:fullscreen #afterWrapper #afterImage img,
-#comparisonWrapper:-webkit-full-screen #afterWrapper #afterImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+
 #comparisonWrapper:fullscreen #beforeImage img,
 #comparisonWrapper:-webkit-full-screen #beforeImage img,
 #comparisonWrapper:fullscreen #afterWrapper #afterImage img,
