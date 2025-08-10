@@ -573,19 +573,33 @@ async function drawImageCover(pdf, imgData) {
 
   const img = new Image();
   img.src = imgData;
-  await new Promise(r => img.onload = r);
+  await new Promise(r => (img.onload = r));
 
-  // Teken eerst op een offscreen canvas met cover (dus gecropt)
-  const cvs = document.createElement("canvas");
-  cvs.width = Math.round(box.w);
-  cvs.height = Math.round(box.h);
-  const ctx = cvs.getContext("2d");
-
+  // 1) Bepaal ‘cover’ fit binnen het content-vlak
   const fit = fitCover(img.width, img.height, box.w, box.h);
-  ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(img, fit.x, fit.y, fit.w, fit.h);
 
-  const covered = cvs.toDataURL("image/jpeg", 1.0);
+  // 2) Render op hogere resolutie om blur te voorkomen
+  const dpr = Math.min(2, window.devicePixelRatio || 1);   // 2x is meestal genoeg; 3x kan, maar maakt PDF zwaarder
+  const cvs = document.createElement("canvas");
+  cvs.width  = Math.round(box.w * dpr);
+  cvs.height = Math.round(box.h * dpr);
+  const ctx = cvs.getContext("2d", { alpha: false });
+
+  // Belangrijk: smoothing aan + high quality
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  // 3) Teken de afbeelding met dezelfde cover-offsets, opgeschaald naar dpr
+  ctx.drawImage(
+    img,
+    Math.round(fit.x * dpr),
+    Math.round(fit.y * dpr),
+    Math.round(fit.w * dpr),
+    Math.round(fit.h * dpr)
+  );
+
+  // 4) Zet om naar JPEG en plaats exact passend in het content-vlak
+  const covered = cvs.toDataURL("image/jpeg", 0.95); // 0.95 is praktisch identiek aan 1.0 maar kleinere file
   pdf.addImage(covered, "JPEG", box.x, box.y, box.w, box.h);
 }
  function drawTopBar(text) {
@@ -674,7 +688,7 @@ function drawBottomBarPage1() {
   const yLogo        = pageHeight - targetHeight - 12;
   pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
 }
- const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+ const splitCanvas = await html2canvas(comparison, { scale: 3, useCORS: true });
 // Gebruik gewoon de natuurlijke canvas-afmeting (geen vervorming)
 const splitData = splitCanvas.toDataURL("image/jpeg", 0.95);
 
