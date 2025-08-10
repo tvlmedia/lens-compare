@@ -696,50 +696,61 @@ function drawBottomBarPage1() {
   const yLogo        = pageHeight - targetHeight - 12;
   pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
 }
-// 1) Screenshot maken
-const splitCanvas = await html2canvas(comparison, {
-  scale: Math.min(3, (window.devicePixelRatio || 1) * 1.5),
-  useCORS: true,
-  backgroundColor: null
-});
+// === BUILD SPLIT IMAGE OFF-DOM (zelfde scaling als p2/p3) ===
+const leftImgEl  = leftImg;   // afterImgTag
+const rightImgEl = rightImg;  // beforeImgTag
 
-// 2) Crop de canvas naar het echte beeldvlak obv huidig sensor-AR
+// Target AR = huidig sensorformaat
 const { w: sensW, h: sensH } = getCurrentWH();
 const targetAR = sensW / sensH;
 
-const cw = splitCanvas.width;
-const ch = splitCanvas.height;
-const canvasAR = cw / ch;
+// Kies een nette renderresolutie voor pagina 1
+// (2000px breed is ruim genoeg voor A4-landscape)
+const outW = 2000;
+const outH = Math.round(outW / targetAR);
 
-let sx = 0, sy = 0, sw = cw, sh = ch; // source crop rect
+const splitCvs = document.createElement("canvas");
+splitCvs.width = outW;
+splitCvs.height = outH;
+const sctx = splitCvs.getContext("2d", { alpha: false });
+sctx.imageSmoothingEnabled = true;
+sctx.imageSmoothingQuality = "high";
 
-if (canvasAR > targetAR) {
-  // breder → crop links/rechts
-  sh = ch;
-  sw = Math.round(sh * targetAR);
-  sx = Math.round((cw - sw) / 2);
-  sy = 0;
-} else {
-  // hoger → crop boven/onder
-  sw = cw;
-  sh = Math.round(sw / targetAR);
-  sx = 0;
-  sy = Math.round((ch - sh) / 2);
+// Helper om cover‑fit rect te krijgen binnen outW/outH
+function coverFit(srcW, srcH, boxW, boxH) {
+  const srcAR = srcW / srcH, boxAR = boxW / boxH;
+  if (srcAR < boxAR) {
+    const w = boxW, h = w / srcAR;
+    return { x: 0, y: (boxH - h) / 2, w, h };
+  } else {
+    const h = boxH, w = h * srcAR;
+    return { x: (boxW - w) / 2, y: 0, w, h };
+  }
 }
 
-// 3) Nieuwe canvas met alleen bruikbare beeld
-const splitCropped = document.createElement("canvas");
-splitCropped.width  = sw;
-splitCropped.height = sh;
-splitCropped.getContext("2d", { alpha: false }).drawImage(
-  splitCanvas, sx, sy, sw, sh, 0, 0, sw, sh
-);
+// Render LEFT full, COVER
+const li = new Image(); li.crossOrigin = "anonymous"; li.src = leftImgEl.src;
+await new Promise(r => li.onload = r);
+let fit = coverFit(li.naturalWidth || li.width, li.naturalHeight || li.height, outW, outH);
+sctx.drawImage(li, fit.x, fit.y, fit.w, fit.h);
 
-// 4) DataURL voor PDF
-const splitData = splitCropped.toDataURL("image/jpeg", 0.95);
+// Render RIGHT, maar alleen de rechter helft zichtbaar
+const ri = new Image(); ri.crossOrigin = "anonymous"; ri.src = rightImgEl.src;
+await new Promise(r => ri.onload = r);
+fit = coverFit(ri.naturalWidth || ri.width, ri.naturalHeight || ri.height, outW, outH);
+sctx.save();
+sctx.beginPath();
+sctx.rect(outW / 2, 0, outW / 2, outH); // clip rechter helft
+sctx.clip();
+sctx.drawImage(ri, fit.x, fit.y, fit.w, fit.h);
+sctx.restore();
 
-  const leftData = await renderImage(leftImg);
-  const rightData = await renderImage(rightImg);
+// Middenlijn tekenen (optioneel iets dikker)
+sctx.fillStyle = "#FFFFFF";
+sctx.fillRect(Math.round(outW / 2) - 1, 0, 2, outH);
+
+// DataURL voor de PDF
+const splitData = splitCvs.toDataURL("image/jpeg", 0.95);
 
   
 
