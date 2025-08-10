@@ -356,14 +356,23 @@ select:hover,
   touch-action: none;
 }
 #detailOverlay {
-  position: fixed;          /* ipv absolute */
+  position: fixed;     /* full-screen overlay */
+  inset: 0;            /* top/right/bottom/left = 0 */
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   z-index: 9999;
   overflow: visible;
   display: none;
 }
-
 #detailOverlay.active { display: block; }
+
+/* (optioneel, maar prettig tegen Safari artefacts) */
+.detail-view-square {
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
 
 .detail-view-square {
   position: absolute;
