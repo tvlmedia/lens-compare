@@ -157,6 +157,11 @@ pulseFsBars({ duration: 1400 });
     comparisonWrapper.style.setProperty('--lb-left', '0px');
     comparisonWrapper.style.setProperty('--lb-right', '0px');
   }
+    // Slider meteen terug op volle hoogte buiten fullscreen
+  slider.style.top = '0px';
+  slider.style.height = '100%';
+  slider.style.bottom = '0';
+}
 
   // Balken + slider opnieuw
   updateFullscreenBars();
