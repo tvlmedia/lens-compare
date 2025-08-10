@@ -639,13 +639,9 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.rect(0, 0, pageWidth, pageHeight, "F");
   }
 
-  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
-  const scaledCanvas = document.createElement("canvas");
-  scaledCanvas.width = 1920;
-  scaledCanvas.height = 1080;
-  const ctx = scaledCanvas.getContext("2d");
-  ctx.drawImage(splitCanvas, 0, 0, 1920, 1080);
-  const splitData = scaledCanvas.toDataURL("image/jpeg", 1.0);
+ const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
+// Gebruik gewoon de natuurlijke canvas-afmeting (geen vervorming)
+const splitData = splitCanvas.toDataURL("image/jpeg", 0.95);
 
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
