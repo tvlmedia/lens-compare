@@ -467,6 +467,12 @@ document.getElementById("fullscreenButton")?.addEventListener("click", toggleFul
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
+
+    // PDF layout constants
+  const TOP_BAR = 40;      // bovenbalk (titel)
+  const BOTTOM_BAR = 80;   // onderbalk (omschrijving/CTA/logo)
+  const PAGE_MARGIN = 24;  // veilige marge rond het beeld
+  
   const comparison = document.getElementById("comparisonWrapper");
   const leftImg = afterImgTag;
   const rightImg = beforeImgTag;
@@ -521,7 +527,50 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
 
     pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
   }
+  function getContentBox(pageW, pageH) {
+    const x = PAGE_MARGIN;
+    const y = TOP_BAR + PAGE_MARGIN;
+    const w = pageW - PAGE_MARGIN * 2;
+    const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
+    return { x, y, w, h };
+  }
 
+  function fitRectIntoBox(srcW, srcH, boxW, boxH) {
+    const srcAR = srcW / srcH;
+    const boxAR = boxW / boxH;
+    let w, h;
+    if (srcAR > boxAR) {
+      w = boxW;
+      h = Math.round(w / srcAR);
+    } else {
+      h = boxH;
+      w = Math.round(h * srcAR);
+    }
+    const x = Math.round((boxW - w) / 2);
+    const y = Math.round((boxH - h) / 2);
+    return { w, h, x, y };
+  }
+
+  async function drawImagePreserveAR(pdf, imgData) {
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+
+    const img = new Image();
+    img.src = imgData;
+    await new Promise(res => { img.onload = res; });
+
+    const box = getContentBox(pageW, pageH);
+    const fit = fitRectIntoBox(img.width, img.height, box.w, box.h);
+
+    pdf.addImage(
+      imgData,
+      "JPEG",
+      box.x + fit.x,
+      box.y + fit.y,
+      fit.w,
+      fit.h
+    );
+  }
   function drawTopBar(text) {
     const barHeight = 40;
     pdf.setFillColor(0, 0, 0);
@@ -603,19 +652,19 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
 
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
-  await drawFullWidthImage(splitData, 60, 80);
+  await drawImagePreserveAR(pdf, splitData); // pagina 1
   drawBottomBarPage1(barHeight);
 
   pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
-  await drawFullWidthImage(leftData, 60, 80);
+  await drawImagePreserveAR(pdf, leftData);  // pagina 2
   drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
 
   pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
-  await drawFullWidthImage(rightData, 60, 80);
+  await drawImagePreserveAR(pdf, rightData); // pagina 3
   drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
 
   const safeLeft = left.replace(/\s+/g, "");
