@@ -466,7 +466,13 @@ document.getElementById("fullscreenButton")?.addEventListener("click", toggleFul
 
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
-  const { jsPDF } = window.jspdf;
+ const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+
+// meet het content-vlak van de pagina (excl. top/bottom bar & marges)
+const pageW = pdf.internal.pageSize.getWidth();
+const pageH = pdf.internal.pageSize.getHeight();
+const box   = getContentBox(pageW, pageH);
+const boxAR = box.w / box.h;   // ← deze AR gaan we gebruiken voor de split
 
   // --- Oriëntatie op basis van aspect ratio ---
 
@@ -703,22 +709,9 @@ function drawBottomBarPage1() {
 const leftImgEl  = leftImg;   // afterImgTag
 const rightImgEl = rightImg;  // beforeImgTag
 
-// Target AR = huidig sensorformaat
-const { w: sensW, h: sensH } = getCurrentWH();
-const targetAR = sensW / sensH;
-
-// Bronafbeeldingen op natuurlijke grootte inladen
-const li = new Image(); li.crossOrigin = "anonymous"; li.src = leftImgEl.src;
-await new Promise(r => (li.onload = r));
-
-const ri = new Image(); ri.crossOrigin = "anonymous"; ri.src = rightImgEl.src;
-await new Promise(r => (ri.onload = r));
-
-// Outputbreedte kiezen zonder upscaling (neem de kleinste bronbreedte)
-const leftNatW  = li.naturalWidth  || li.width;
-const rightNatW = ri.naturalWidth || ri.width;
+// We gebruiken de AR van het PDF content-vlak i.p.v. sensor-AR
 const outW = Math.min(leftNatW, rightNatW);
-const outH = Math.round(outW / targetAR);
+const outH = Math.round(outW / boxAR);  // ← belangrijk
 
 const splitCvs = document.createElement("canvas");
 splitCvs.width  = outW;
@@ -771,9 +764,9 @@ const rightData = await renderImage(rightImg);
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
 
   fillBlack();
-  drawTopBar(`${leftText} vs ${rightText}`);
- await drawImageContain(pdf, splitData);
-  drawBottomBarPage1();
+drawTopBar(`${leftText} vs ${rightText}`);
+await drawImageContain(pdf, splitData);   // ← nu 1:1 passend in het content-vlak
+drawBottomBarPage1();
 
  pdf.addPage("a4", "landscape");
 fillBlack();
