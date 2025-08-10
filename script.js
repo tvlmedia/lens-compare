@@ -117,18 +117,8 @@ window.addEventListener("resize", () => {
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
   if (!cam || !fmt) return;
-
-  const { w, h } = cameras[cam][fmt];
-  const keepBaseAR =
-    (cam === "Sony Venice") &&
-    fmt.startsWith("6K") &&
-    (fmt.includes("17:9") || fmt.includes("1.85:1"));
-
-  if (keepBaseAR) {
-    setWrapperSizeByAR(BASE_SENSOR.w, BASE_SENSOR.h);
-  } else {
-    setWrapperSizeByAR(w, h);
-  }
+const { w, h } = cameras[cam][fmt];
+setWrapperSizeByAR(w, h);
 });
 
 const lenses = [
