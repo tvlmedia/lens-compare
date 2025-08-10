@@ -449,25 +449,37 @@ function updateSliderPosition(clientX) {
   const rect = comparisonWrapper.getBoundingClientRect();
   const { left: lbLeft, right: lbRight } = getLbOffsets();
 
-  // Bruikbare breedte = wrapperbreedte minus pillarbox (links/rechts)
-  const usableWidth = Math.max(1, rect.width - lbLeft - lbRight);
+  // bruikbare breedte (zonder pillarbox)
+  const usableWidth = Math.max(1, Math.round(rect.width - lbLeft - lbRight));
 
-  // Muispositie t.o.v. START van bruikbaar vlak
+  // muispositie t.o.v. bruikbaar vlak
   const xInUsable = clientX - rect.left - lbLeft;
 
-  // Clamp binnen [0, usableWidth]
-  const clamped = Math.max(0, Math.min(xInUsable, usableWidth));
+  // clamp + afronden naar hele px
+  const clampedPx = Math.max(0, Math.min(Math.round(xInUsable), usableWidth));
 
-  // Percentage over bruikbaar vlak → bepaalt clip‑path
-  const percent = (clamped / usableWidth) * 100;
+  // rechter inset in PX (niet in %)
+  const rightInsetPx = usableWidth - clampedPx;
 
-  // Clip de rechter (AFTER) kant op basis van bruikbaar percentage
-  const rightInset = 100 - percent;
-  afterWrapper.style.clipPath = `inset(0 ${rightInset}% 0 0)`;
-  afterWrapper.style.webkitClipPath = `inset(0 ${rightInset}% 0 0)`;
+  afterWrapper.style.clipPath       = `inset(0 ${rightInsetPx}px 0 0)`;
+  afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
 
-  // Slider exact boven het bruikbare vlak (in pixels)
-  slider.style.left = (lbLeft + clamped) + 'px';
+  // slider exact boven bruikbare vlak
+  slider.style.left = (lbLeft + clampedPx) + 'px';
+}
+
+function resetSplitToMiddle() {
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const { left: lbLeft, right: lbRight } = getLbOffsets();
+  const usableWidth = Math.max(1, Math.round(rect.width - lbLeft - lbRight));
+
+  const midPx = Math.round(usableWidth / 2);
+  const rightInsetPx = usableWidth - midPx;
+
+  afterWrapper.style.clipPath       = `inset(0 ${rightInsetPx}px 0 0)`;
+  afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
+
+  slider.style.left = (lbLeft + midPx) + 'px';
 }
 
 // Mouse events
