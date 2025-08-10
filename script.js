@@ -37,10 +37,9 @@ const sensorFormatSelect = document.getElementById("sensorFormatSelect");
 const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← verplaatst naar boven
 
 
- function setWrapperSizeByAR(w, h) {
-  const scale = BASE_SENSOR.w / w; // horizontale schaal t.o.v. Venice 6K 3:2
+function setWrapperSizeByAR(w, h) {
   const width  = comparisonWrapper.getBoundingClientRect().width;
-  const height = Math.round((width / scale) * (h / w));
+  const height = Math.round(width * (h / w)); // puur AR
 
   comparisonWrapper.style.removeProperty('aspect-ratio');
   comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
