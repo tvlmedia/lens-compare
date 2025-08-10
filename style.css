@@ -478,7 +478,7 @@ body.dragging * {
   width: 100%;
   height: 100%;
   object-fit: cover;
-
+}
  /* Fullscreen specifieke crop voor 6K 2.39:1 */
 body.fullscreen-239 #comparisonWrapper:fullscreen,
 body.fullscreen-239 #comparisonWrapper:-webkit-full-screen {
