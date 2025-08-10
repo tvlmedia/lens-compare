@@ -117,11 +117,14 @@ document.body.classList.add("sensor-mode");
 // - bredere sensor  => scale < 1 (uitzoomen, bv. Alexa 2K Ana)
 let scale = BASE_SENSOR.w / w;
 
-// mini-verschillen rond Venice afronden naar 1 om micro-zoom te voorkomen
-if (Math.abs(BASE_SENSOR.w - w) < 0.1) scale = 1;
+  // mini-verschillen rond Venice afronden naar 1 om micro-zoom te voorkomen
+  if (Math.abs(BASE_SENSOR.w - w) < 0.1) scale = 1;
 
-comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
-}
+  comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
+
+  // >>> voeg deze als allerlaatste regel toe <<<
+  updateFullscreenBars();
+} // einde applyCurrentFormat
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
   cameraSelect.add(new Option(cam, cam));
@@ -154,11 +157,15 @@ cameraSelect.addEventListener("change", () => {
 
 
 sensorFormatSelect.addEventListener("change", applyCurrentFormat);
- 
+// → Reageer op fullscreen wisselen en op venstergrootte
+document.addEventListener('fullscreenchange', updateFullscreenBars);
+window.addEventListener('resize', updateFullscreenBars); 
 
 // Init (optioneel: standaard op Venice 6K 3:2)
 cameraSelect.value = "Sony Venice";
 cameraSelect.dispatchEvent(new Event("change"));
+// zorg dat de fullscreen‑balken direct kloppen (ook als je al fullscreen zit)
+updateFullscreenBars();
 
 window.addEventListener("resize", () => {
   if (window.innerWidth < 768) {
@@ -166,7 +173,8 @@ window.addEventListener("resize", () => {
   } else {
     document.body.classList.remove("mobile-mode");
   }
-
+document.addEventListener('fullscreenchange', updateFullscreenBars);
+window.addEventListener('resize', updateFullscreenBars);
   // opnieuw toepassen voor huidige keuze
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
@@ -174,6 +182,10 @@ window.addEventListener("resize", () => {
 const { w, h } = cameras[cam][fmt];
 setWrapperSizeByAR(w, h);
 requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+    // update de letterbox/pillarbox waardes na resize
+  updateFullscreenBars();
+  requestAnimationFrame(updateFullscreenBars);
+});
 });
 
 const lenses = [
