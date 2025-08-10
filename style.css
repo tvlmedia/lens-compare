@@ -417,17 +417,7 @@ body.dragging * {
 
 
 
-/* Hard fix tegen theme-regels zoals img{height:auto} */
-#comparisonWrapper #beforeImage img,
-#comparisonWrapper #afterWrapper #afterImage img {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
+
 /* Sensor crop: schaal de beelden fysiek omlaag t.o.v. Venice 6K 3:2 */
 .sensor-mode #beforeImage img,
 .sensor-mode #afterImage img {
