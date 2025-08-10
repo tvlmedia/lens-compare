@@ -472,21 +472,35 @@ body.dragging * {
   object-position:center;
   display:block;
 }
-/* ===== Fullscreen black bars fix voor 2.39:1 ===== */
+/* Fullscreen: centreer content en letterbox via aspect-ratio */
 #comparisonWrapper:fullscreen,
 #comparisonWrapper:-webkit-full-screen {
-  background: black;
+  background: #000;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
+/* In fullscreen laten we de lagen zich als 1 box met AR gedragen */
 #comparisonWrapper:fullscreen #beforeImage,
 #comparisonWrapper:-webkit-full-screen #beforeImage,
 #comparisonWrapper:fullscreen #afterWrapper,
 #comparisonWrapper:-webkit-full-screen #afterWrapper {
-  aspect-ratio: 2.39 / 1; /* Cinemascope verhouding */
-  max-height: 100%;
-  max-width: 100%;
-  background: black;
+  position: relative;           /* override absolute */
+  inset: auto;                  /* reset */
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--fullscreen-aspect, 16/9);
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+/* De img’s blijven netjes vullen */
+#comparisonWrapper:fullscreen #beforeImage img,
+#comparisonWrapper:-webkit-full-screen #beforeImage img,
+#comparisonWrapper:fullscreen #afterWrapper #afterImage img,
+#comparisonWrapper:-webkit-full-screen #afterWrapper #afterImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
