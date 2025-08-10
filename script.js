@@ -516,6 +516,9 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     const pageH = pdf.internal.pageSize.getHeight();
     const box = getContentBox(pageW, pageH);
 
+    // Full‑bleed box voor pagina 1 (geen linker/rechter marge)
+const fullBox = { x: 0, y: TOP_BAR, w: pageW, h: pageH - TOP_BAR - BOTTOM_BAR };
+
     const img = new Image();
     img.src = imgData;
     await new Promise(r => (img.onload = r));
@@ -692,9 +695,9 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   // === PDF render ===
   fillBlack();
 drawTopBar(`${leftText} vs ${rightText}`);
-await drawImageCover(pdf, splitData);   // ← gebruik cover in plaats van contain
+await drawImageCoverInBox(pdf, splitData, fullBox); // full‑bleed breedte
 drawBottomBarPage1(logo);
-
+  
   pdf.addPage("a4", "landscape");
   fillBlack();
   drawTopBar(leftText);
