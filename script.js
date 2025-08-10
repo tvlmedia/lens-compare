@@ -725,10 +725,12 @@ function updateFullscreenBars() {
     comparisonWrapper.style.setProperty('--lb-left', '0px');
     comparisonWrapper.style.setProperty('--lb-right', '0px');
     // Zorg dat interne helpers niet met oude waarden werken:
-    comparisonWrapper._lbLeft  = 0;
-    comparisonWrapper._lbRight = 0;
-    comparisonWrapper._usableW = comparisonWrapper.getBoundingClientRect().width;
-    return;
+   comparisonWrapper._lbLeft  = 0;
+comparisonWrapper._lbRight = 0;
+comparisonWrapper._lbTop    = 0; // ✅ toevoegen
+comparisonWrapper._lbBottom = 0; // ✅ toevoegen
+comparisonWrapper._usableW = comparisonWrapper.getBoundingClientRect().width;
+return;
   }
 
   const rect  = comparisonWrapper.getBoundingClientRect();
@@ -759,9 +761,11 @@ function updateFullscreenBars() {
   comparisonWrapper.style.setProperty('--lb-left',   lbLeft + 'px');
   comparisonWrapper.style.setProperty('--lb-right',  lbRight + 'px');
 
-  comparisonWrapper._lbLeft  = lbLeft;
-  comparisonWrapper._lbRight = lbRight;
-  comparisonWrapper._usableW = usedW;
+ comparisonWrapper._lbLeft  = lbLeft;
+comparisonWrapper._lbRight = lbRight;
+comparisonWrapper._lbTop    = lbTop;    // ✅ toevoegen
+comparisonWrapper._lbBottom = lbBottom; // ✅ toevoegen
+comparisonWrapper._usableW = usedW;
 }
 
 // VERVANGT resetSplitToMiddle()
@@ -783,6 +787,15 @@ function resetSplitToMiddle() {
 
   // lijn precies midden in bruikbare beeldvlak
   slider.style.left = (lbLeft + mid) + 'px';
+
+// ✅ lijn alleen over bruikbare hoogte
+const lbTop    = comparisonWrapper._lbTop    || 0;
+const lbBottom = comparisonWrapper._lbBottom || 0;
+const usableHeight = Math.max(1, Math.round(rect.height - lbTop - lbBottom));
+
+slider.style.top    = lbTop + 'px';
+slider.style.height = usableHeight + 'px';
+slider.style.bottom = 'auto';
 }
 
 // VERVANGT updateSliderPosition()
@@ -806,6 +819,15 @@ function updateSliderPosition(clientX) {
 
   // lijn op exact dezelfde X als de overgang
   slider.style.left = (lbLeft + clamped) + 'px';
+
+// ✅ lijn alleen over bruikbare hoogte
+const lbTop    = comparisonWrapper._lbTop    || 0;
+const lbBottom = comparisonWrapper._lbBottom || 0;
+const usableHeight = Math.max(1, Math.round(rect.height - lbTop - lbBottom));
+
+slider.style.top    = lbTop + 'px';
+slider.style.height = usableHeight + 'px';
+slider.style.bottom = 'auto';
 }
 function pulseFsBars({ duration = 1400 } = {}) {
   const start = performance.now();
