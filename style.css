@@ -552,3 +552,4 @@ body.dragging * {
   object-fit: contain !important;
   background: black;
 }
+.mobile-mode #comparisonWrapper { aspect-ratio: auto !important; }
