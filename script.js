@@ -108,7 +108,31 @@ function updateFullscreenBars() {
   comparisonWrapper.style.setProperty('--lb-left',   `${left}px`);
   comparisonWrapper.style.setProperty('--lb-right',  `${right}px`);
 }
+// --- helpers voor fullscreen-balken + reset midden ---
+function getLbOffsets() {
+  const cs = getComputedStyle(comparisonWrapper);
+  const n = v => parseInt(v || '0', 10) || 0;
+  return {
+    left:   n(cs.getPropertyValue('--lb-left')),
+    right:  n(cs.getPropertyValue('--lb-right')),
+    top:    n(cs.getPropertyValue('--lb-top')),
+    bottom: n(cs.getPropertyValue('--lb-bottom')),
+  };
+}
 
+function resetSplitToMiddle() {
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const { left: lbLeft, right: lbRight } = getLbOffsets();
+  const usableWidth = Math.max(1, rect.width - lbLeft - lbRight);
+
+  // 50/50 split in het bruikbare vlak
+  afterWrapper.style.clipPath = 'inset(0 50% 0 0)';
+  afterWrapper.style.webkitClipPath = 'inset(0 50% 0 0)';
+  slider.style.left = (lbLeft + usableWidth / 2) + 'px';
+}
+
+function applyCurrentFormat() {
+  // ...
 function applyCurrentFormat() {
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
@@ -371,10 +395,7 @@ function updateImages() {
   const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
 
   
-// Beginstand: 50/50 reveal
-afterWrapper.style.clipPath = 'inset(0 50% 0 0)';
-afterWrapper.style.webkitClipPath = 'inset(0 50% 0 0)';
-slider.style.left = '50%';
+resetSplitToMiddle();
 
   // RAW-download knoppen updaten
 setDownloadButton(downloadLeftRawButton,  leftKey);
@@ -411,16 +432,27 @@ let isDragging = false;
 
 function updateSliderPosition(clientX) {
   const rect = comparisonWrapper.getBoundingClientRect();
-  const offset = Math.max(0, Math.min(clientX - rect.left, rect.width));
-  const percent = (offset / rect.width) * 100;
+  const { left: lbLeft, right: lbRight } = getLbOffsets();
 
-  // Reveal de rechter (AFTER) kant met clip‑path
-  const rightInset = 100 - percent; // % dat van rechts dicht blijft
+  // Bruikbare breedte = wrapperbreedte minus pillarbox (links/rechts)
+  const usableWidth = Math.max(1, rect.width - lbLeft - lbRight);
+
+  // Muispositie t.o.v. START van bruikbaar vlak
+  const xInUsable = clientX - rect.left - lbLeft;
+
+  // Clamp binnen [0, usableWidth]
+  const clamped = Math.max(0, Math.min(xInUsable, usableWidth));
+
+  // Percentage over bruikbaar vlak → bepaalt clip‑path
+  const percent = (clamped / usableWidth) * 100;
+
+  // Clip de rechter (AFTER) kant op basis van bruikbaar percentage
+  const rightInset = 100 - percent;
   afterWrapper.style.clipPath = `inset(0 ${rightInset}% 0 0)`;
-  afterWrapper.style.webkitClipPath = `inset(0 ${rightInset}% 0 0)`; // Safari
+  afterWrapper.style.webkitClipPath = `inset(0 ${rightInset}% 0 0)`;
 
-  // Verplaats de balk
-  slider.style.left = `${percent}%`;
+  // Slider exact boven het bruikbare vlak (in pixels)
+  slider.style.left = (lbLeft + clamped) + 'px';
 }
 
 // Mouse events
