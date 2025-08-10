@@ -172,9 +172,9 @@ select:hover,
 }
 
 /* ========== Mobile mode ========== */
-
+.mobile-mode #comparisonWrapper {
   width: 100vw;
-  aspect-ratio: 3 / 2;
+  /* laat JS de hoogte bepalen → geen aspect-ratio hier */
 }
 
 .mobile-mode #afterWrapper #afterImage,
