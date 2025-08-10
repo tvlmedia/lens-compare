@@ -692,17 +692,17 @@ const ori3 = decideOrientationByAR(rw, rh); // right
   await drawImagePreserveAR(pdf, splitData); // pagina 1
   drawBottomBarPage1(barHeight);
 
-  pdf.addPage();
-  fillBlack();
-  drawTopBar(leftText);
-  await drawImagePreserveAR(pdf, leftData);  // pagina 2
-  drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
+ pdf.addPage("a4", ori2);
+fillBlack();
+drawTopBar(leftText);
+await drawImagePreserveAR(pdf, leftData);
+drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
 
-  pdf.addPage();
-  fillBlack();
-  drawTopBar(rightText);
-  await drawImagePreserveAR(pdf, rightData); // pagina 3
-  drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
+pdf.addPage("a4", ori3);
+fillBlack();
+drawTopBar(rightText);
+await drawImagePreserveAR(pdf, rightData);
+drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
 
   const safeLeft = left.replace(/\s+/g, "");
   const safeRight = right.replace(/\s+/g, "");
