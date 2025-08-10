@@ -704,19 +704,19 @@ const rightImgEl = rightImg;  // beforeImgTag
 const { w: sensW, h: sensH } = getCurrentWH();
 const targetAR = sensW / sensH;
 
-// Kies een nette renderresolutie voor pagina 1
-// (2000px breed is ruim genoeg voor A4-landscape)
+// Renderresolutie voor pagina 1 (ruim voldoende voor A4)
 const outW = 2000;
 const outH = Math.round(outW / targetAR);
 
 const splitCvs = document.createElement("canvas");
 splitCvs.width = outW;
 splitCvs.height = outH;
+
 const sctx = splitCvs.getContext("2d", { alpha: false });
 sctx.imageSmoothingEnabled = true;
 sctx.imageSmoothingQuality = "high";
 
-// Helper om cover‑fit rect te krijgen binnen outW/outH
+// Helper: cover‑fit binnen box (zoals p2/p3)
 function coverFit(srcW, srcH, boxW, boxH) {
   const srcAR = srcW / srcH, boxAR = boxW / boxH;
   if (srcAR < boxAR) {
@@ -728,29 +728,37 @@ function coverFit(srcW, srcH, boxW, boxH) {
   }
 }
 
-// Render LEFT full, COVER
-const li = new Image(); li.crossOrigin = "anonymous"; li.src = leftImgEl.src;
-await new Promise(r => li.onload = r);
+// LEFT (volledig) tekenen met cover‑fit
+const li = new Image();
+li.crossOrigin = "anonymous";
+li.src = leftImgEl.src;
+await new Promise(r => (li.onload = r));
 let fit = coverFit(li.naturalWidth || li.width, li.naturalHeight || li.height, outW, outH);
 sctx.drawImage(li, fit.x, fit.y, fit.w, fit.h);
 
-// Render RIGHT, maar alleen de rechter helft zichtbaar
-const ri = new Image(); ri.crossOrigin = "anonymous"; ri.src = rightImgEl.src;
-await new Promise(r => ri.onload = r);
+// RIGHT tekenen met clip op rechter helft (split)
+const ri = new Image();
+ri.crossOrigin = "anonymous";
+ri.src = rightImgEl.src;
+await new Promise(r => (ri.onload = r));
 fit = coverFit(ri.naturalWidth || ri.width, ri.naturalHeight || ri.height, outW, outH);
 sctx.save();
 sctx.beginPath();
-sctx.rect(outW / 2, 0, outW / 2, outH); // clip rechter helft
+sctx.rect(outW / 2, 0, outW / 2, outH); // alleen rechter helft zichtbaar
 sctx.clip();
 sctx.drawImage(ri, fit.x, fit.y, fit.w, fit.h);
 sctx.restore();
 
-// Middenlijn tekenen (optioneel iets dikker)
+// Middenlijn
 sctx.fillStyle = "#FFFFFF";
 sctx.fillRect(Math.round(outW / 2) - 1, 0, 2, outH);
 
-// DataURL voor de PDF
+// DataURL voor de PDF (pagina 1)
 const splitData = splitCvs.toDataURL("image/jpeg", 0.95);
+
+// DataURL’s voor pagina 2/3 (zoals je al deed)
+const leftData  = await renderImage(leftImg);
+const rightData = await renderImage(rightImg);
 
   
 
