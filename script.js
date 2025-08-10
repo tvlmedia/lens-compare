@@ -844,17 +844,21 @@ function pulseFsBars({ duration = 1400 } = {}) {
   })(start);
 }
 // === Keyboard shortcuts ===
-document.addEventListener("keydown", (e) => {
-  if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
-// SELECT laten we door, zodat f/d ook werken als een dropdown focus heeft
-  const k = e.key.toLowerCase();
+function onGlobalKeydown(e) {
+  // voorkom conflict met browser/OS sneltoetsen
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
 
+  const tag = (document.activeElement?.tagName || "").toUpperCase();
+  if (["INPUT", "TEXTAREA"].includes(tag)) return; // SELECT laten we door
+
+  const k = (e.key || "").toLowerCase();
   if (k === "f") {
     e.preventDefault();
-    toggleFullscreen(); // direct de functie i.p.v. synthetic click
+    toggleFullscreen();
   }
   if (k === "d") {
     e.preventDefault();
-    document.getElementById("detailViewToggle")?.click(); // of maak een toggleDetail() als je wilt
+    document.getElementById("detailViewToggle")?.click();
   }
-});
+}
+window.addEventListener("keydown", onGlobalKeydown, { capture: true });
