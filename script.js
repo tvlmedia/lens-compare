@@ -540,15 +540,25 @@ async function getImageDimsFromDataURL(dataUrl) {
 }
 
 function fitCover(srcW, srcH, boxW, boxH) {
-  const srcAR = srcW / srcH, boxAR = boxW / boxH;
-  let w, h;
-  if (srcAR < boxAR) { // breder nodig → hoogte vullen, breedte over
-    h = boxH; w = Math.round(h * srcAR);
-  } else {            // hoger nodig → breedte vullen, hoogte over
-    w = boxW; h = Math.round(w / srcAR);
+  const srcAR = srcW / srcH;
+  const boxAR = boxW / boxH;
+
+  let w, h, x, y;
+
+  if (srcAR < boxAR) {
+    // bron is "smaller/botter" (verticaler) → breedte moet box vullen
+    w = boxW;
+    h = w / srcAR;          // wordt hoger dan box
+    x = 0;
+    y = (boxH - h) / 2;     // negatief → boven/onder afsnijden
+  } else {
+    // bron is breder → hoogte moet box vullen
+    h = boxH;
+    w = h * srcAR;          // wordt breder dan box
+    y = 0;
+    x = (boxW - w) / 2;     // negatief → links/rechts afsnijden
   }
-  const x = Math.round((boxW - w) / 2);
-  const y = Math.round((boxH - h) / 2);
+
   return { w, h, x, y };
 }
 
