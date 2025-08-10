@@ -696,13 +696,47 @@ function drawBottomBarPage1() {
   const yLogo        = pageHeight - targetHeight - 12;
   pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
 }
+// 1) Screenshot maken
 const splitCanvas = await html2canvas(comparison, {
   scale: Math.min(3, (window.devicePixelRatio || 1) * 1.5),
   useCORS: true,
   backgroundColor: null
 });
-// Gebruik gewoon de natuurlijke canvas-afmeting (geen vervorming)
-const splitData = splitCanvas.toDataURL("image/jpeg", 0.95);
+
+// 2) Crop de canvas naar het echte beeldvlak obv huidig sensor-AR
+const { w: sensW, h: sensH } = getCurrentWH();
+const targetAR = sensW / sensH;
+
+const cw = splitCanvas.width;
+const ch = splitCanvas.height;
+const canvasAR = cw / ch;
+
+let sx = 0, sy = 0, sw = cw, sh = ch; // source crop rect
+
+if (canvasAR > targetAR) {
+  // breder → crop links/rechts
+  sh = ch;
+  sw = Math.round(sh * targetAR);
+  sx = Math.round((cw - sw) / 2);
+  sy = 0;
+} else {
+  // hoger → crop boven/onder
+  sw = cw;
+  sh = Math.round(sw / targetAR);
+  sx = 0;
+  sy = Math.round((ch - sh) / 2);
+}
+
+// 3) Nieuwe canvas met alleen bruikbare beeld
+const splitCropped = document.createElement("canvas");
+splitCropped.width  = sw;
+splitCropped.height = sh;
+splitCropped.getContext("2d", { alpha: false }).drawImage(
+  splitCanvas, sx, sy, sw, sh, 0, 0, sw, sh
+);
+
+// 4) DataURL voor PDF
+const splitData = splitCropped.toDataURL("image/jpeg", 0.95);
 
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
