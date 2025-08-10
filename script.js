@@ -801,30 +801,39 @@ document.addEventListener("keydown", (e) => {
 });
 // VERVANGT updateFullscreenBars()
 function updateFullscreenBars() {
-  // Bereken bruikbare viewport (px) binnen de wrapper obv gekozen sensor AR
-  const rect = comparisonWrapper.getBoundingClientRect();
+  const rect  = comparisonWrapper.getBoundingClientRect();
   const hostW = Math.max(1, Math.round(rect.width));
   const hostH = Math.max(1, Math.round(rect.height));
 
   const { w, h } = getCurrentWH();
   const targetAR = w / h;
-  const hostAR = hostW / hostH;
+  const hostAR   = hostW / hostH;
 
-  let usedW, usedH, lbLeft = 0, lbRight = 0;
+  let usedW, usedH;
+  let lbLeft = 0, lbRight = 0, lbTop = 0, lbBottom = 0;
+
   if (hostAR > targetAR) {
-    // pillarbox links/rechts
+    // Pillarbox links/rechts
     usedH = hostH;
     usedW = Math.round(usedH * targetAR);
     const side = Math.floor((hostW - usedW) / 2);
-    lbLeft = side; lbRight = side;
+    lbLeft = lbRight = side;
   } else {
-    // letterbox boven/onder (voor de slider niet relevant)
+    // Letterbox boven/onder
     usedW = hostW;
     usedH = Math.round(usedW / targetAR);
+    const bar = Math.floor((hostH - usedH) / 2);
+    lbTop = lbBottom = bar;
   }
 
-  // Sla offsets op als data, we gebruiken ze in de slider/cropping
-  comparisonWrapper._lbLeft = lbLeft;
+  // Zet CSS variabelen voor fullscreen black bars
+  comparisonWrapper.style.setProperty('--lb-top',    lbTop + 'px');
+  comparisonWrapper.style.setProperty('--lb-bottom', lbBottom + 'px');
+  comparisonWrapper.style.setProperty('--lb-left',   lbLeft + 'px');
+  comparisonWrapper.style.setProperty('--lb-right',  lbRight + 'px');
+
+  // Bewaar waarden voor slider/clip-path
+  comparisonWrapper._lbLeft  = lbLeft;
   comparisonWrapper._lbRight = lbRight;
   comparisonWrapper._usableW = usedW;
 }
