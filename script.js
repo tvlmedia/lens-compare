@@ -36,6 +36,45 @@ const BASE_SENSOR = cameras["Sony Venice"]["6K 3:2"]; // jouw referentie
 const sensorFormatSelect = document.getElementById("sensorFormatSelect");
 const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← verplaatst naar boven
 
+function setWrapperSizeByAR(w, h) {
+  const width  = comparisonWrapper.clientWidth || comparisonWrapper.offsetWidth;
+  const height = width * (h / w);
+  comparisonWrapper.style.setProperty('aspect-ratio', 'auto'); // AR niet forceren
+  comparisonWrapper.style.height = `${height}px`;              // expliciet in px
+}
+
+function applyCurrentFormat() {
+  const cam = cameraSelect.value;
+  const fmt = sensorFormatSelect.value;
+  if (!cam || !fmt) return;
+
+  const { w, h } = cameras[cam][fmt];
+
+  // reset schaal var
+  comparisonWrapper.style.removeProperty("--sensor-scale");
+
+  // Venice 6K 17:9 en 1.85:1 → container 3:2 houden
+  const keepBaseAR =
+    cam === "Sony Venice" &&
+    fmt.startsWith("6K") &&
+    (fmt.includes("17:9") || fmt.includes("1.85:1"));
+
+  if (keepBaseAR) {
+    setWrapperSizeByAR(BASE_SENSOR.w, BASE_SENSOR.h);
+  } else {
+    setWrapperSizeByAR(w, h);
+  }
+
+  // sensor-mode aan
+  document.body.classList.add("sensor-mode");
+
+  // schaal tov diagonaal (kleiner target => inzoomen)
+  const diagBase   = Math.hypot(BASE_SENSOR.w, BASE_SENSOR.h);
+  const diagTarget = Math.hypot(w, h);
+  const scale = Math.max(1, diagBase / diagTarget);
+
+  comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
+}
 
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
@@ -46,12 +85,13 @@ Object.keys(cameras).forEach(cam => {
 cameraSelect.addEventListener("change", () => {
   sensorFormatSelect.innerHTML = "";
   const cam = cameraSelect.value;
-  if (!cam) {
-    sensorFormatSelect.disabled = true;
-    document.body.classList.remove("sensor-mode");
-    comparisonWrapper.style.aspectRatio = "3 / 2"; // fallback
-    return;
-  }
+ if (!cam) {
+  sensorFormatSelect.disabled = true;
+  document.body.classList.remove("sensor-mode");
+  comparisonWrapper.style.removeProperty('height');      // geen geforceerde hoogte
+  comparisonWrapper.style.setProperty('aspect-ratio', 'auto');
+  return;
+}
  
   
   const formats = cameras[cam];
@@ -63,57 +103,12 @@ cameraSelect.addEventListener("change", () => {
   sensorFormatSelect.dispatchEvent(new Event("change"));
 });
 
-comparisonWrapper.style.removeProperty("--sensor-scale");
 
-function setWrapperSizeByAR(w, h) {
-  // breedte van de wrapper zoals hij nu op de pagina staat
-  const width = comparisonWrapper.clientWidth || comparisonWrapper.offsetWidth;
-  // reken hoogte uit: H = W * (h/w)
-  const height = width * (h / w);
-  // zet expliciet de hoogte in px, en wis evt. oude inline aspectRatio
-  comparisonWrapper.style.height = `${height}px`;
-  comparisonWrapper.style.removeProperty('aspectRatio');
-}
 
-sensorFormatSelect.addEventListener("change", () => {
-  const cam = cameraSelect.value;
-  const fmt = sensorFormatSelect.value;
-  if (!cam || !fmt) return;
 
-  // 0) Reset eventuele oude waarde
-  comparisonWrapper.style.removeProperty("--sensor-scale");
 
- // 1) Aspect — SPECIAL CASE voor Venice 6K-modi (breedte ≈ gelijk aan basis)
-// Hierdoor blijft de wrapper 3:2 zodat de zoom zichtbaar wordt.
-const { w, h } = cameras[cam][fmt];
-
-// 1) Wil je bij Venice 6K 17:9 en 6K 1.85:1 de viewer op 3:2 laten
-//    om puur de *zoom* te zien? Laat de container dan 3:2,
-//    maar laat we de *beelden* zélf zoomen (dat doe je al met transform: scale).
-const isVenice6K = (cam === "Sony Venice") && fmt.startsWith("6K");
-const keepBaseAR = isVenice6K && (fmt.includes("17:9") || fmt.includes("1.85:1"));
-
-if (keepBaseAR) {
-  // Container: 3:2 hoogte
-  setWrapperSizeByAR(BASE_SENSOR.w, BASE_SENSOR.h);
-} else {
-  // Container: echte verhouding van het gekozen formaat (bv. 2.39:1 wordt echt platter)
-  setWrapperSizeByAR(w, h);
-}
-  // 2) Sensor-mode = contain + letterbox in CSS
-  document.body.classList.add("sensor-mode");
-
- // 3) Schaal tov basis op *diagonaal* (FOV-crop: kleiner = meer zoom)
-const diagBase   = Math.hypot(BASE_SENSOR.w, BASE_SENSOR.h);
-const diagTarget = Math.hypot(w, h);
-
-// Zoom IN bij kleinere sensor (en clamp minimaal 1 zodat hij niet uitzoomt)
-let scale = diagBase / diagTarget; // >1 bij crop, 1 bij basis
-scale = Math.max(1, scale);
-
-// 4) Doorzetten naar CSS var
-comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
-});
+sensorFormatSelect.addEventListener("change", applyCurrentFormat);
+ 
 
 // Init (optioneel: standaard op Venice 6K 3:2)
 cameraSelect.value = "Sony Venice";
