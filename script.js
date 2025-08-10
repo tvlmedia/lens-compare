@@ -847,16 +847,13 @@ function pulseFsBars({ duration = 1400 } = {}) {
 }
 // === Keyboard shortcuts ===
 document.addEventListener("keydown", (e) => {
-  // Niet triggeren als je in een input/select/textarea zit
-  if (["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) return;
+  // alleen als je niet in een invoerveld zit
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
 
   if (e.key.toLowerCase() === "f") {
-    // Fullscreen toggle
-    document.getElementById("fullscreenButton")?.click();
+    document.getElementById("fullscreenButton")?.dispatchEvent(new Event("click"));
   }
-
   if (e.key.toLowerCase() === "d") {
-    // Detail view toggle
-    document.getElementById("detailViewToggle")?.click();
+    document.getElementById("detailViewToggle")?.dispatchEvent(new Event("click"));
   }
 });
