@@ -151,20 +151,24 @@ cameraSelect.addEventListener("change", () => {
 
 sensorFormatSelect.addEventListener("change", applyCurrentFormat);
 function onFsChange() {
-  const fs = isWrapperFullscreen();
-  const { w, h } = getCurrentWH();
-
-  if (fs) {
+  if (isWrapperFullscreen()) {
     // In fullscreen: nooit inline heights
     clearInlineHeights();
   } else {
-    // Uit fullscreen: direct weer een vaste hoogte op basis van sensor AR
+    // UIT fullscreen: direct de juiste hoogte terugzetten
+    const { w, h } = getCurrentWH();
+    comparisonWrapper.style.setProperty('aspect-ratio', 'auto'); // vangnet
     setWrapperSizeByAR(w, h);
-    // vangnet in de volgende frame (na layout)
     requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+
+    // FS-balk variabelen naar 0 zodat er niets klemt
+    comparisonWrapper.style.setProperty('--lb-top', '0px');
+    comparisonWrapper.style.setProperty('--lb-bottom', '0px');
+    comparisonWrapper.style.setProperty('--lb-left', '0px');
+    comparisonWrapper.style.setProperty('--lb-right', '0px');
   }
 
-  // Bars/slider altijd even opnieuw laten rekenen
+  // Bars opnieuw berekenen + slider centreren
   updateFullscreenBars();
   requestAnimationFrame(() => {
     updateFullscreenBars();
@@ -447,13 +451,23 @@ document.getElementById("toggleButton").addEventListener("click", () => {
 document.getElementById("fullscreenButton")?.addEventListener("click", async () => {
   if (isWrapperFullscreen()) {
     await exitAnyFullscreen();
+
+    // ← direct herstellen zodra we UIT FS zijn
+    const { w, h } = getCurrentWH();
+    comparisonWrapper.style.setProperty('aspect-ratio', 'auto');
+    setWrapperSizeByAR(w, h);
+    requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+
+    comparisonWrapper.style.setProperty('--lb-top', '0px');
+    comparisonWrapper.style.setProperty('--lb-bottom', '0px');
+    comparisonWrapper.style.setProperty('--lb-left', '0px');
+    comparisonWrapper.style.setProperty('--lb-right', '0px');
   } else {
     clearInlineHeights();
     await enterWrapperFullscreen();
   }
-  // 1e pass direct
+
   updateFullscreenBars();
-  // 2e pass nà layout + slider centreren
   requestAnimationFrame(() => {
     updateFullscreenBars();
     resetSplitToMiddle();
