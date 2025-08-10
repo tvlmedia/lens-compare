@@ -516,27 +516,7 @@ async function getImageDimsFromDataURL(dataUrl) {
     return canvas.toDataURL("image/jpeg", 1.0);
   }
 
-  async function drawFullWidthImage(imgData, top = 40, bottom = 70) {
-    const img = new Image();
-    img.src = imgData;
-    await new Promise(resolve => img.onload = resolve);
-
-    const imgAspect = img.width / img.height;
-    const pageAspect = pageWidth / (pageHeight - top - bottom);
-
-    let imgWidth, imgHeight, x, y;
-
-    if (imgAspect > pageAspect) {
-      imgHeight = pageHeight - top - bottom;
-      imgWidth = imgHeight * imgAspect;
-      x = (pageWidth - imgWidth) / 2;
-      y = top;
-    } else {
-      imgWidth = pageWidth;
-      imgHeight = imgWidth / imgAspect;
-      x = 0;
-      y = top - ((imgHeight - (pageHeight - top - bottom)) / 2);
-    }
+  
 
     pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
   }
@@ -584,13 +564,18 @@ async function getImageDimsFromDataURL(dataUrl) {
       fit.h
     );
   }
+ function drawTopBar(text) {
   const pageWidth = pdf.internal.pageSize.getWidth();
-const barHeight = TOP_BAR;
-pdf.setFillColor(0, 0, 0);
-pdf.rect(0, 0, pageWidth, barHeight, "F");
-pdf.setTextColor(255, 255, 255);
-pdf.setFontSize(16);
-pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, { align: "center", baseline: "middle" });
+  const barHeight = TOP_BAR;
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, 0, pageWidth, barHeight, "F");
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(16);
+  pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, {
+    align: "center",
+    baseline: "middle"
+  });
+}
 
   const pageWidth = pdf.internal.pageSize.getWidth();
 const pageHeight = pdf.internal.pageSize.getHeight();
@@ -627,7 +612,7 @@ pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
     pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   }
 
-  function drawBottomBarPage1() {
+  function drawBottomBar(text = "", link = "") {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const barHeight = BOTTOM_BAR;
@@ -635,19 +620,20 @@ pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   pdf.setFillColor(0, 0, 0);
   pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  const text = "Benieuwd naar alle lenzen? Klik hier";
-  const fontSize = 22;
-  const textY = pageHeight - Math.round(barHeight / 2);
-
-  pdf.setFontSize(fontSize);
+  pdf.setFontSize(12);
   pdf.setTextColor(255, 255, 255);
-  pdf.text(text, pageWidth / 2, textY, { align: "center", baseline: "middle" });
+  pdf.text(text, 20, pageHeight - barHeight + 25, {
+    maxWidth: pageWidth - 120
+  });
 
-  const textWidth = pdf.getTextWidth(text);
-  const linkX = (pageWidth - textWidth) / 2;
-  const linkY = textY - Math.round(fontSize / 2) - 4;
-  const linkHeight = fontSize + 8;
-  pdf.link(linkX, linkY, textWidth, linkHeight, { url: "https://tvlrental.nl/lenses/" });
+  if (link) {
+    const displayText = "Klik hier voor alle info over deze lens";
+    const x = 20;
+    const y = pageHeight - barHeight + 55;
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 102, 255);
+    pdf.textWithLink(displayText, x, y, { url: link });
+  }
 
   const targetHeight = 50;
   const ratio = logo.width / logo.height;
@@ -657,18 +643,13 @@ pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
 }
 
-    const targetHeight = 50;
-    const ratio = logo.width / logo.height;
-    const targetWidth = targetHeight * ratio;
-    const xLogo = pageWidth - targetWidth - 12;
-    const yLogo = pageHeight - targetHeight - 12;
-    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
-  }
-
+   
   function fillBlack() {
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, pageHeight, "F");
-  }
+  const pw = pdf.internal.pageSize.getWidth();
+  const ph = pdf.internal.pageSize.getHeight();
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, 0, pw, ph, "F");
+}
 
  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
 // Gebruik gewoon de natuurlijke canvas-afmeting (geen vervorming)
@@ -690,7 +671,7 @@ const ori3 = decideOrientationByAR(rw, rh); // right
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
   await drawImagePreserveAR(pdf, splitData); // pagina 1
-  drawBottomBarPage1(barHeight);
+  drawBottomBarPage1();
 
  pdf.addPage("a4", ori2);
 fillBlack();
