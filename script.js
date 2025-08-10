@@ -504,17 +504,19 @@ async function getImageDimsFromDataURL(dataUrl) {
   const logo = await loadImage(logoUrl);
 
   async function renderImage(imgEl) {
-    const canvas = document.createElement("canvas");
-    canvas.width = imgEl.naturalWidth || 1920;
-    canvas.height = imgEl.naturalHeight || 1080;
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = imgEl.src;
-    await new Promise(resolve => img.onload = resolve);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 1.0);
-  }
+  const canvas = document.createElement("canvas");
+  canvas.width  = imgEl.naturalWidth || 1920;
+  canvas.height = imgEl.naturalHeight || 1080;
+  const ctx = canvas.getContext("2d", { alpha: false });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = imgEl.src;
+  await new Promise(resolve => img.onload = resolve);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/jpeg", 0.95); // 0.95 is prima balans
+}
 
   
 
@@ -688,7 +690,7 @@ function drawBottomBarPage1() {
   const yLogo        = pageHeight - targetHeight - 12;
   pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
 }
- const splitCanvas = await html2canvas(comparison, { scale: 3, useCORS: true });
+ const splitCanvas = await html2canvas(comparison, { scale: 4, useCORS: true });
 // Gebruik gewoon de natuurlijke canvas-afmeting (geen vervorming)
 const splitData = splitCanvas.toDataURL("image/jpeg", 0.95);
 
