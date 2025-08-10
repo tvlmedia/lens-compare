@@ -190,8 +190,7 @@ window.addEventListener('resize', () => {
   }
 });
 
-// Direct bij pageload 1x runnen
-onFsChange();
+
 
 const lenses = [
   "IronGlass Red P",
@@ -258,6 +257,9 @@ const leftLabel = document.getElementById("leftLabel");
 const rightLabel = document.getElementById("rightLabel");
 const downloadLeftRawButton  = document.getElementById("downloadLeftRawButton");
 const downloadRightRawButton = document.getElementById("downloadRightRawButton");
+
+// Direct bij pageload 1x runnen
+onFsChange();
 
 function updateLensInfo() {
   const left = leftSelect.value;
