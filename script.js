@@ -38,6 +38,9 @@ const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← v
 
 
 function setWrapperSizeByAR(w, h) {
+  // In fullscreen nooit inline heights forceren; CSS + letterbox regelen dat
+  if (document.fullscreenElement === comparisonWrapper) return;
+
   const width  = comparisonWrapper.getBoundingClientRect().width;
   const height = Math.round(width * (h / w)); // puur AR
 
@@ -45,6 +48,11 @@ function setWrapperSizeByAR(w, h) {
   comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
   comparisonWrapper.style.setProperty('min-height', `${height}px`, 'important');
   comparisonWrapper.style.setProperty('max-height', `${height}px`, 'important');
+}
+function clearInlineHeights() {
+  comparisonWrapper.style.removeProperty('height');
+  comparisonWrapper.style.removeProperty('min-height');
+  comparisonWrapper.style.removeProperty('max-height');
 }
 
  // Geeft de width/height van het huidige sensor-formaat terug
@@ -180,23 +188,33 @@ cameraSelect.addEventListener("change", () => {
 
 
 sensorFormatSelect.addEventListener("change", applyCurrentFormat);
-// → Reageer op fullscreen wisselen en op venstergrootte (1x, buiten andere handlers)
-document.addEventListener('fullscreenchange', updateFullscreenBars);
-window.addEventListener('resize', updateFullscreenBars);
+document.addEventListener('fullscreenchange', () => {
+  if (document.fullscreenElement === comparisonWrapper) {
+    clearInlineHeights();   // kill inline heights zodra we fullscreen zijn
+  }
+  updateFullscreenBars();    // herbereken letter/pillarbox altijd
+});
 
 // Init (optioneel: standaard op Venice 6K 3:2)
 cameraSelect.value = "Sony Venice";
 cameraSelect.dispatchEvent(new Event("change"));
 // fullscreen-balken direct goedzetten (ook als je al fullscreen zit)
 updateFullscreenBars();
+clearInlineHeights();
 
 // Eigen resize-handler (GEEN extra listeners hier binnen toevoegen)
-window.addEventListener("resize", () => {
-  if (window.innerWidth < 768) {
-    document.body.classList.add("mobile-mode");
-  } else {
-    document.body.classList.remove("mobile-mode");
-  }
+const { w, h } = cameras[cam][fmt];
+
+if (document.fullscreenElement === comparisonWrapper) {
+  // In fullscreen geen heights forceren; alleen balken herberekenen
+  clearInlineHeights();
+  updateFullscreenBars();
+  requestAnimationFrame(updateFullscreenBars);
+} else {
+  // Niet fullscreen → wrapperhoogte volgens gekozen AR
+  setWrapperSizeByAR(w, h);
+  requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+}
 
   // opnieuw toepassen voor huidige keuze
   const cam = cameraSelect.value;
@@ -461,9 +479,15 @@ document.getElementById("fullscreenButton")?.addEventListener("click", async () 
   if (document.fullscreenElement === comparisonWrapper) {
     await document.exitFullscreen();
   } else {
+    // vóór fullscreen: inline heights weg zodat CSS/letterbox werkt
+    clearInlineHeights();
     await comparisonWrapper.requestFullscreen();
   }
-  requestAnimationFrame(updateFullscreenBars);
+  // na toggle: opruimen + balken rekenen
+  requestAnimationFrame(() => {
+    clearInlineHeights();
+    updateFullscreenBars();
+  });
 });
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
