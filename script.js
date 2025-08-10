@@ -799,3 +799,60 @@ document.addEventListener("keydown", (e) => {
   rightDetail.style.display = "none";
 }
 });
+// VERVANGT updateFullscreenBars()
+function updateFullscreenBars() {
+  // Bereken bruikbare viewport (px) binnen de wrapper obv gekozen sensor AR
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const hostW = Math.max(1, Math.round(rect.width));
+  const hostH = Math.max(1, Math.round(rect.height));
+
+  const { w, h } = getCurrentWH();
+  const targetAR = w / h;
+  const hostAR = hostW / hostH;
+
+  let usedW, usedH, lbLeft = 0, lbRight = 0;
+  if (hostAR > targetAR) {
+    // pillarbox links/rechts
+    usedH = hostH;
+    usedW = Math.round(usedH * targetAR);
+    const side = Math.floor((hostW - usedW) / 2);
+    lbLeft = side; lbRight = side;
+  } else {
+    // letterbox boven/onder (voor de slider niet relevant)
+    usedW = hostW;
+    usedH = Math.round(usedW / targetAR);
+  }
+
+  // Sla offsets op als data, we gebruiken ze in de slider/cropping
+  comparisonWrapper._lbLeft = lbLeft;
+  comparisonWrapper._lbRight = lbRight;
+  comparisonWrapper._usableW = usedW;
+}
+
+// VERVANGT resetSplitToMiddle()
+function resetSplitToMiddle() {
+  const usable = Math.max(1, comparisonWrapper._usableW || comparisonWrapper.getBoundingClientRect().width);
+  const lbLeft = comparisonWrapper._lbLeft || 0;
+  const mid = Math.round(usable / 2);
+  const rightInsetPx = usable - mid;
+
+  afterWrapper.style.clipPath = `inset(0 ${rightInsetPx}px 0 0)`;
+  afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
+  slider.style.left = (lbLeft + mid) + 'px';
+}
+
+// VERVANGT updateSliderPosition()
+function updateSliderPosition(clientX) {
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const lbLeft = comparisonWrapper._lbLeft || 0;
+  const lbRight = comparisonWrapper._lbRight || 0;
+  const usable = Math.max(1, Math.round(rect.width - lbLeft - lbRight));
+
+  const xInUsable = clientX - rect.left - lbLeft;
+  const clamped = Math.max(0, Math.min(Math.round(xInUsable), usable));
+  const rightInsetPx = usable - clamped;
+
+  afterWrapper.style.clipPath = `inset(0 ${rightInsetPx}px 0 0)`;
+  afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
+  slider.style.left = (lbLeft + clamped) + 'px';
+}
