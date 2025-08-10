@@ -36,12 +36,16 @@ const BASE_SENSOR = cameras["Sony Venice"]["6K 3:2"]; // jouw referentie
 const sensorFormatSelect = document.getElementById("sensorFormatSelect");
 const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← verplaatst naar boven
 
-function setWrapperSizeByAR(w, h) {
-  const width  = comparisonWrapper.clientWidth || comparisonWrapper.offsetWidth;
-  const height = width * (h / w);
-  // haal AR volledig weg en zet alleen een px-hoogte
+
+  function setWrapperSizeByAR(w, h) {
+  const width  = comparisonWrapper.getBoundingClientRect().width;
+  const height = Math.round(width * (h / w));
+
+  // aspect-ratio uit, harde hoogte erin
   comparisonWrapper.style.removeProperty('aspect-ratio');
-  comparisonWrapper.style.height = `${height}px`;
+  comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
+  comparisonWrapper.style.setProperty('min-height', `${height}px`, 'important');
+  comparisonWrapper.style.setProperty('max-height', `${height}px`, 'important');
 }
 
 function applyCurrentFormat() {
@@ -56,6 +60,8 @@ comparisonWrapper.style.removeProperty("--sensor-scale");
 
 // Altijd exact naar gekozen formaat schalen
 setWrapperSizeByAR(w, h);
+// vangnet: nog een keer in de volgende frame
+requestAnimationFrame(() => setWrapperSizeByAR(w, h));
 
   // sensor-mode aan
   document.body.classList.add("sensor-mode");
@@ -119,6 +125,7 @@ window.addEventListener("resize", () => {
   if (!cam || !fmt) return;
 const { w, h } = cameras[cam][fmt];
 setWrapperSizeByAR(w, h);
+requestAnimationFrame(() => setWrapperSizeByAR(w, h));
 });
 
 const lenses = [
