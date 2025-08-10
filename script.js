@@ -485,8 +485,8 @@ function fitContain(srcW, srcH, boxW, boxH) {
   return { w, h, x, y };
 }
 
-// Render een image naar exact de SENSOR aspect ratio (cover) op gewenste uit-hoogte
-async function renderToSensorAR(imgOrURL, targetAR, outH) {
+// Render naar exacte SENSOR-AR op gewenste hoogte, met extra crop/zoom via `scale`
+async function renderToSensorAR(imgOrURL, targetAR, outH, scale = 1) {
   const img = typeof imgOrURL === "string" ? await loadHTMLImage(imgOrURL) : imgOrURL;
   const H = outH;
   const W = Math.round(H * targetAR);
@@ -497,11 +497,29 @@ async function renderToSensorAR(imgOrURL, targetAR, outH) {
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  // coverFit naar (W,H)
+  // cover-fit naar (W,H)
   const srcAR = (img.naturalWidth || img.width) / (img.naturalHeight || img.height);
   let drawW, drawH, offX, offY;
-  if (srcAR < targetAR) { drawW = W; drawH = W / srcAR; offX = 0; offY = (H - drawH) / 2; }
-  else { drawH = H; drawW = H * srcAR; offY = 0; offX = (W - drawW) / 2; }
+  if (srcAR < targetAR) {        // te “smal” → vul breedte
+    drawW = W; 
+    drawH = W / srcAR; 
+    offX = 0; 
+    offY = (H - drawH) / 2;
+  } else {                       // te “breed” → vul hoogte
+    drawH = H; 
+    drawW = H * srcAR; 
+    offY = 0; 
+    offX = (W - drawW) / 2;
+  }
+
+  // Extra crop/zoom (alleen PDF): vergroot de getekende bron, centreer
+  if (scale !== 1) {
+    const oldW = drawW, oldH = drawH;
+    drawW = oldW * scale;
+    drawH = oldH * scale;
+    offX -= (drawW - oldW) / 2;
+    offY -= (drawH - oldH) / 2;
+  }
 
   ctx.drawImage(img, Math.round(offX), Math.round(offY), Math.round(drawW), Math.round(drawH));
   return { dataURL: cvs.toDataURL("image/jpeg", 0.98), W, H };
@@ -641,6 +659,10 @@ const targetAR = sW / sH;
 // Export-resolutie (scherpte).  ~300 DPI benadering op A4 landscape content-box
 const exportScale = 3; // 2.5–3 is meestal top; 3 geeft veel detail
 const exportH = Math.round(box.h * exportScale);
+
+  // Zoom/crop factor tov Venice breedte: nooit “uitzoomen”, alleen extra crop als kleiner is
+const zoom = Math.max(1, BASE_SENSOR.w / sW);
+// Wil je minder agressief? Neem bv: const zoom = 1 + 0.6 * (Math.max(1, BASE_SENSOR.w / sW) - 1);
   
   
 
