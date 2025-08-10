@@ -436,35 +436,33 @@ document.getElementById("toggleButton").addEventListener("click", () => {
   updateImages();
 });
 
-document.getElementById("fullscreenButton")?.addEventListener("click", async () => {
-  if (isWrapperFullscreen()) {
-    await exitAnyFullscreen();
+ function toggleFullscreen() {
+  (async () => {
+    if (isWrapperFullscreen()) {
+      await exitAnyFullscreen();
+      const { w, h } = getCurrentWH();
+      comparisonWrapper.style.setProperty('aspect-ratio', 'auto');
+      setWrapperSizeByAR(w, h);
+      requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+      comparisonWrapper.style.setProperty('--lb-top', '0px');
+      comparisonWrapper.style.setProperty('--lb-bottom', '0px');
+      comparisonWrapper.style.setProperty('--lb-left', '0px');
+      comparisonWrapper.style.setProperty('--lb-right', '0px');
+    } else {
+      clearInlineHeights();
+      await enterWrapperFullscreen();
+      pulseFsBars({ duration: 1400 });
+    }
 
-    // ← direct herstellen zodra we UIT FS zijn
-    const { w, h } = getCurrentWH();
-    comparisonWrapper.style.setProperty('aspect-ratio', 'auto');
-    setWrapperSizeByAR(w, h);
-    requestAnimationFrame(() => setWrapperSizeByAR(w, h));
-
-    comparisonWrapper.style.setProperty('--lb-top', '0px');
-    comparisonWrapper.style.setProperty('--lb-bottom', '0px');
-    comparisonWrapper.style.setProperty('--lb-left', '0px');
-    comparisonWrapper.style.setProperty('--lb-right', '0px');
- } else {
-  clearInlineHeights();
-  await enterWrapperFullscreen();
-
- // stabiel her-meten zolang de browser‑UI verdwijnt
-pulseFsBars({ duration: 1400 });
+    updateFullscreenBars();
+    requestAnimationFrame(() => {
+      updateFullscreenBars();
+      resetSplitToMiddle();
+    });
+  })();
 }
 
-updateFullscreenBars();
-requestAnimationFrame(() => {
-  updateFullscreenBars();
-  resetSplitToMiddle();
-});
-
-}); // ← sluit de fullscreenButton click handler af
+document.getElementById("fullscreenButton")?.addEventListener("click", toggleFullscreen);
 
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
@@ -847,13 +845,16 @@ function pulseFsBars({ duration = 1400 } = {}) {
 }
 // === Keyboard shortcuts ===
 document.addEventListener("keydown", (e) => {
-  // alleen als je niet in een invoerveld zit
   if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
 
-  if (e.key.toLowerCase() === "f") {
-    document.getElementById("fullscreenButton")?.dispatchEvent(new Event("click"));
+  const k = e.key.toLowerCase();
+
+  if (k === "f") {
+    e.preventDefault();
+    toggleFullscreen(); // direct de functie i.p.v. synthetic click
   }
-  if (e.key.toLowerCase() === "d") {
-    document.getElementById("detailViewToggle")?.dispatchEvent(new Event("click"));
+  if (k === "d") {
+    e.preventDefault();
+    document.getElementById("detailViewToggle")?.click(); // of maak een toggleDetail() als je wilt
   }
 });
