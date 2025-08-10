@@ -550,13 +550,7 @@ function fitCover(srcW, srcH, boxW, boxH) {
   return { w, h, x, y };
 }
 
-function getContentBox(pageW, pageH) {
-  const x = PAGE_MARGIN;
-  const y = TOP_BAR + PAGE_MARGIN;
-  const w = pageW - PAGE_MARGIN * 2;
-  const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
-  return { x, y, w, h };
-}
+
 
 async function drawImageContain(pdf, imgData) {
   const pageW = pdf.internal.pageSize.getWidth();
@@ -588,9 +582,10 @@ async function drawImageCover(pdf, imgData) {
   const ctx = cvs.getContext("2d");
 
   const fit = fitCover(img.width, img.height, box.w, box.h);
+  ctx.imageSmoothingQuality = "high";
   ctx.drawImage(img, fit.x, fit.y, fit.w, fit.h);
 
-  const covered = cvs.toDataURL("image/jpeg", 0.95);
+  const covered = cvs.toDataURL("image/jpeg", 1.0);
   pdf.addImage(covered, "JPEG", box.x, box.y, box.w, box.h);
 }
  function drawTopBar(text) {
