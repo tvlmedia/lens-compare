@@ -36,12 +36,11 @@ select, #toggleButton, #fullscreenButton, #downloadPdfButton {
 
 select:hover,
 #toggleButton:hover,
-#fullscreenButton:hover,  /* ← deze */
+#fullscreenButton:hover,
 #downloadPdfButton:hover {
   background: #666;
   border-color: #666;
 }
-
 /* ========== Wrapper en sliderstructuur ========== */
 #comparisonWrapper {
   width: 100%;
@@ -450,25 +449,19 @@ body.dragging * {
 
 
 
-/* FULLSCREEN: vul het scherm; zwarte balken via padding-variabelen */
+/* FULLSCREEN: element vult scherm */
 #comparisonWrapper:fullscreen,
 #comparisonWrapper:-webkit-full-screen {
   width: 100vw;
-  height: 100vh;           /* ← altijd hele schermhoogte */
+  height: 100vh;
   margin: 0;
   background: #000;
-  box-sizing: border-box;  /* paddings tellen mee in de doos */
-  padding-top:    var(--lb-top, 0px);
-  padding-bottom: var(--lb-bottom, 0px);
-  padding-left:   var(--lb-left, 0px);
-  padding-right:  var(--lb-right, 0px);
+  box-sizing: border-box; /* mag blijven staan */
 }
 
-/* lagen vullen altijd de bruikbare ruimte */
-#comparisonWrapper:fullscreen #beforeImage,
-#comparisonWrapper:-webkit-full-screen #beforeImage,
-#comparisonWrapper:fullscreen #afterWrapper,
-#comparisonWrapper:-webkit-full-screen #afterWrapper,
+
+
+/* De <img> zelf blijft gewoon het 'bruikbare' vak vullen */
 #comparisonWrapper:fullscreen #beforeImage img,
 #comparisonWrapper:-webkit-full-screen #beforeImage img,
 #comparisonWrapper:fullscreen #afterWrapper #afterImage img,
@@ -478,3 +471,21 @@ body.dragging * {
   object-fit: cover;
 }
 
+/* In fullscreen: plaats content binnen de letter/pillarbox randen */
+#comparisonWrapper:fullscreen #beforeImage,
+#comparisonWrapper:-webkit-full-screen #beforeImage,
+#comparisonWrapper:fullscreen #afterWrapper,
+#comparisonWrapper:-webkit-full-screen #afterWrapper {
+  position: absolute;
+  top:    var(--lb-top, 0);
+  right:  var(--lb-right, 0);
+  bottom: var(--lb-bottom, 0);
+  left:   var(--lb-left, 0);
+}
+
+/* Slider alleen over het bruikbare vlak laten lopen */
+#comparisonWrapper:fullscreen #slider,
+#comparisonWrapper:-webkit-full-screen #slider {
+  top:    var(--lb-top, 0);
+  bottom: var(--lb-bottom, 0);
+}
