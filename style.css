@@ -535,3 +535,4 @@ body.dragging * {
   background: black;
 }
 
+#comparisonWrapper { aspect-ratio: auto !important; }
