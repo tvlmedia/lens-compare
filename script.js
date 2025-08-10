@@ -559,92 +559,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     return { x, y, w, h };
   }
 
-  // Helpers
-  function fitContain(srcW, srcH, boxW, boxH) {
-    const srcAR = srcW / srcH, boxAR = boxW / boxH;
-    let w, h;
-    if (srcAR > boxAR) { w = boxW; h = Math.round(w / srcAR); }
-    else { h = boxH; w = Math.round(h * srcAR); }
-    const x = Math.round((boxW - w) / 2);
-    const y = Math.round((boxH - h) / 2);
-    return { w, h, x, y };
-  }
-  function fitCover(srcW, srcH, boxW, boxH) {
-    const srcAR = srcW / srcH, boxAR = boxW / boxH;
-    let w, h, x, y;
-    if (srcAR < boxAR) { w = boxW; h = w / srcAR; x = 0; y = (boxH - h) / 2; }
-    else { h = boxH; w = h * srcAR; y = 0; x = (boxW - w) / 2; }
-    return { w, h, x, y };
-  }
-
-  async function drawImageContain(pdf, imgData) {
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const box = getContentBox(pageW, pageH);
-    const img = new Image();
-    img.src = imgData;
-    await new Promise(r => (img.onload = r));
-    const fit = fitContain(img.width, img.height, box.w, box.h);
-    pdf.addImage(imgData, "JPEG", box.x + fit.x, box.y + fit.y, fit.w, fit.h);
-  }
-
-  async function drawImageCoverInBox(pdf, imgData, box){
-  const img = new Image();
-  img.src = imgData;
-  await new Promise(r => (img.onload = r));
-
-  const srcAR = img.width / img.height;
-  const boxAR = box.w / box.h;
-
-  let w, h, x, y;
-  if (srcAR < boxAR) { w = box.w; h = w / srcAR; x = 0; y = (box.h - h) / 2; }
-  else { h = box.h; w = h * srcAR; y = 0; x = (box.w - w) / 2; }
-
-  const dpr = 6;
-  const cvs = document.createElement("canvas");
-  cvs.width  = Math.round(box.w * dpr);
-  cvs.height = Math.round(box.h * dpr);
-  const ctx = cvs.getContext("2d", { alpha:false });
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(img, Math.round(x*dpr), Math.round(y*dpr), Math.round(w*dpr), Math.round(h*dpr));
-
-  const covered = cvs.toDataURL("image/jpeg", 0.95);
-  pdf.addImage(covered, "JPEG", box.x, box.y, box.w, box.h);
-}
-
-  async function drawImageCover(pdf, imgData) {
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const box = getContentBox(pageW, pageH);
-
-
-
-    const img = new Image();
-    img.src = imgData;
-    await new Promise(r => (img.onload = r));
-
-    const fit = fitCover(img.width, img.height, box.w, box.h);
-
-    const dpr = 3;
-    const cvs = document.createElement("canvas");
-    cvs.width  = Math.round(box.w * dpr);
-    cvs.height = Math.round(box.h * dpr);
-    const ctx = cvs.getContext("2d", { alpha: false });
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(
-      img,
-      Math.round(fit.x * dpr),
-      Math.round(fit.y * dpr),
-      Math.round(fit.w * dpr),
-      Math.round(fit.h * dpr)
-    );
-
-    const covered = cvs.toDataURL("image/jpeg", 0.95);
-    pdf.addImage(covered, "JPEG", box.x, box.y, box.w, box.h);
-  }
-
+  
   function drawTopBar(text) {
     const pageWidth = pdf.internal.pageSize.getWidth();
     const barHeight = TOP_BAR;
@@ -727,7 +642,7 @@ const targetAR = sW / sH;
 const exportScale = 3; // 2.5–3 is meestal top; 3 geeft veel detail
 const exportH = Math.round(box.h * exportScale);
   
-  const boxAR = box.w / box.h;
+  
 
   const leftImg  = afterImgTag;   // L (left side van split)
   const rightImg = beforeImgTag;  // R (right side van split)
@@ -779,13 +694,13 @@ drawTopBar(`${leftText} vs ${rightText}`);
 await placeContain(pdf, splitData, fullBox);
 drawBottomBarPage1(logo);
   
-  pdf.addPage("a4", "landscape");
+  pdf.addPage();
   fillBlack();
   drawTopBar(leftText);
   await placeContain(pdf, leftData,  fullBox);
   drawBottomBar(lensDescriptions[leftName]?.text || "", lensDescriptions[leftName]?.url);
 
-  pdf.addPage("a4", "landscape");
+  pdf.addPage();
   fillBlack();
   drawTopBar(rightText);
   await placeContain(pdf, rightData, fullBox);
