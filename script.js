@@ -63,11 +63,18 @@ setWrapperSizeByAR(w, h);
 // vangnet: nog een keer in de volgende frame
 requestAnimationFrame(() => setWrapperSizeByAR(w, h));
 
-  // sensor-mode aan
-  document.body.classList.add("sensor-mode");
+ // sensor-mode aan
+document.body.classList.add("sensor-mode");
 
-  const scale = (Math.abs(BASE_SENSOR.w - w) < 0.2) ? 1 : Math.max(1, BASE_SENSOR.w / w);
-}
+// Schaal puur op horizontale breedte t.o.v. Venice 6K 3:2
+// - smallere sensor => scale > 1 (inzoomen, bv. S16)
+// - bredere sensor  => scale < 1 (uitzoomen, bv. Alexa 2K Ana)
+let scale = BASE_SENSOR.w / w;
+
+// mini-verschillen rond Venice afronden naar 1 om micro-zoom te voorkomen
+if (Math.abs(BASE_SENSOR.w - w) < 0.1) scale = 1;
+
+comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
 
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
