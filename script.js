@@ -584,7 +584,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const { jsPDF } = window.jspdf; // ← belangrijk
   // Zorg dat de cache (pillar/letterbox + slider) up-to-date is
 updateFullscreenBars();
-resetSplitToMiddle();
+
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
 
   // Layout constants
