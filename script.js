@@ -556,55 +556,80 @@ const leftDetailImg = leftDetail.querySelector("img");
 const rightDetailImg = rightDetail.querySelector("img");
 const detailToggleButton = document.getElementById("detailViewToggle");
 
+function syncDetailOverlayBox() {
+  const r = comparisonWrapper.getBoundingClientRect();
+  detailOverlay.style.left   = `${r.left}px`;
+  detailOverlay.style.top    = `${r.top}px`;
+  detailOverlay.style.width  = `${r.width}px`;
+  detailOverlay.style.height = `${r.height}px`;
+}
+
 let detailActive = false;
 
 detailToggleButton.addEventListener("click", () => {
   detailActive = !detailActive;
   detailOverlay.classList.toggle("active", detailActive);
-  detailToggleButton.classList.toggle("active", detailActive); // <== hier dus toevoegen
+  detailToggleButton.classList.toggle("active", detailActive);
 
-  if (!detailActive) {
+  if (detailActive) {
+    syncDetailOverlayBox();
+  } else {
     leftDetail.style.display = "none";
     rightDetail.style.display = "none";
   }
 });
-comparisonWrapper.addEventListener("mousemove", (e) => {
+document.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const r = comparisonWrapper.getBoundingClientRect();
 
- const zoom = 3.2;
-const size = 260;
+  // Alleen tonen wanneer je muis boven het beeld hangt
+  const inside =
+    e.clientX >= r.left && e.clientX <= r.right &&
+    e.clientY >= r.top  && e.clientY <= r.bottom;
+
+  if (!inside) {
+    leftDetail.style.display = "none";
+    rightDetail.style.display = "none";
+    return;
+  }
+
+  // Cursorpositie RELATIEF tot het beeld (voor zoom sampling)
+  const xIn = e.clientX - r.left;
+  const yIn = e.clientY - r.top;
+
+  // Vierkantjes POSITIONEREN op de echte muispositie (mag buiten vak)
+  // omdat #detailOverlay nu full-screen is
+  const xOut = e.clientX;
+  const yOut = e.clientY;
+
+  const zoom = 3.2;
+  const size = 260;
 
   const updateZoomViewer = (detail, detailImg, sourceImg) => {
-    // Alleen .src updaten als nodig
-    if (detailImg.src !== sourceImg.src) {
-      detailImg.src = sourceImg.src;
-    }
+    if (detailImg.src !== sourceImg.src) detailImg.src = sourceImg.src;
 
     const imageRect = sourceImg.getBoundingClientRect();
     const relX = (e.clientX - imageRect.left) / imageRect.width;
     const relY = (e.clientY - imageRect.top) / imageRect.height;
 
-    const zoomedWidth = imageRect.width * zoom;
+    const zoomedWidth  = imageRect.width * zoom;
     const zoomedHeight = imageRect.height * zoom;
-    const offsetX = -relX * zoomedWidth + size / 2;
+    const offsetX = -relX * zoomedWidth  + size / 2;
     const offsetY = -relY * zoomedHeight + size / 2;
 
-    detail.style.left = `${x - size / 2}px`;
-    detail.style.top = `${y - size / 2}px`;
+    // Zet de viewer OP de muis (full-screen overlay → kan buiten het vak)
+    detail.style.left = `${xOut - size / 2}px`;
+    detail.style.top  = `${yOut - size / 2}px`;
     detail.style.display = "block";
 
-    detailImg.style.width = `${zoomedWidth}px`;
+    detailImg.style.width  = `${zoomedWidth}px`;
     detailImg.style.height = `${zoomedHeight}px`;
     detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
   };
 
-  // Altijd beide tonen:
-  updateZoomViewer(leftDetail, leftDetailImg, afterImgTag);   // Left = after
-  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag); // Right = before
+  updateZoomViewer(leftDetail,  leftDetailImg,  afterImgTag);
+  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag);
 });
 
 
