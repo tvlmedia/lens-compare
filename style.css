@@ -36,7 +36,7 @@ select, #toggleButton, #fullscreenButton, #downloadPdfButton {
 
 select:hover,
 #toggleButton:hover,
-#nButton:hover,
+#fullscreenButton:hover,  /* ← deze */
 #downloadPdfButton:hover {
   background: #666;
   border-color: #666;
