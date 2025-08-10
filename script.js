@@ -131,7 +131,7 @@ function resetSplitToMiddle() {
   slider.style.left = (lbLeft + usableWidth / 2) + 'px';
 }
 
-function applyCurrentFormat() {
+
   // ...
 function applyCurrentFormat() {
   const cam = cameraSelect.value;
@@ -205,10 +205,13 @@ cameraSelect.addEventListener("change", () => {
 sensorFormatSelect.addEventListener("change", applyCurrentFormat);
 function onFsChange() {
   if (isWrapperFullscreen()) {
-    clearInlineHeights();            // nooit inline heights in fullscreen
+    clearInlineHeights();                     // nooit inline heights in fullscreen
   }
-  updateFullscreenBars();            // 1e pass
-  requestAnimationFrame(updateFullscreenBars); // 2e pass na layout
+  updateFullscreenBars();                     // 1e pass
+  requestAnimationFrame(() => {
+    updateFullscreenBars();                   // 2e pass na layout
+    resetSplitToMiddle();                     // <<< nieuw
+  });
 }
 document.addEventListener('fullscreenchange', onFsChange);
 document.addEventListener('webkitfullscreenchange', onFsChange);
@@ -219,8 +222,8 @@ cameraSelect.dispatchEvent(new Event("change"));
 // fullscreen-balken direct goedzetten (ook als je al fullscreen zit)
 updateFullscreenBars();
 clearInlineHeights();
+resetSplitToMiddle();                 // <<< nieuw
 
-// Eigen resize-handler (GEEN extra listeners hier binnen toevoegen)
 window.addEventListener("resize", () => {
   // mobile-mode togglen
   if (window.innerWidth < 768) {
@@ -237,13 +240,19 @@ window.addEventListener("resize", () => {
   const { w, h } = cameras[cam][fmt];
 
   if (isWrapperFullscreen()) {
-  clearInlineHeights();
-  updateFullscreenBars();
-  requestAnimationFrame(updateFullscreenBars);
-} else {
-  setWrapperSizeByAR(w, h);
-  requestAnimationFrame(() => setWrapperSizeByAR(w, h));
-}
+    clearInlineHeights();
+    updateFullscreenBars();
+    requestAnimationFrame(() => {
+      updateFullscreenBars();
+      resetSplitToMiddle();                // <<< nieuw
+    });
+  } else {
+    setWrapperSizeByAR(w, h);
+    requestAnimationFrame(() => {
+      setWrapperSizeByAR(w, h);
+      resetSplitToMiddle();                // <<< nieuw
+    });
+  }
 });
 
 const lenses = [
@@ -507,7 +516,10 @@ document.getElementById("fullscreenButton")?.addEventListener("click", async () 
     await enterWrapperFullscreen();
   }
   updateFullscreenBars();
-  requestAnimationFrame(updateFullscreenBars);
+  requestAnimationFrame(() => {
+    updateFullscreenBars();
+    resetSplitToMiddle();          // <<< nieuw
+  });
 });
 
 
