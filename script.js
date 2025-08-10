@@ -74,6 +74,7 @@ function getCurrentWH() {
 
 // Zet CSS-variabelen met de benodigde letter-/pillarbox in px
 function updateFullscreenBars() {
+  // Niet fullscreen? Geen balken.
   if (!isWrapperFullscreen()) {
     comparisonWrapper.style.setProperty('--lb-top', '0px');
     comparisonWrapper.style.setProperty('--lb-bottom', '0px');
@@ -82,27 +83,31 @@ function updateFullscreenBars() {
     return;
   }
 
+  // 1) Neem ALTIJD het echte rect van de wrapper
+  const rect = comparisonWrapper.getBoundingClientRect();
+  const viewW = Math.max(1, Math.round(rect.width));
+  const viewH = Math.max(1, Math.round(rect.height));
+
+  // 2) Doelformaat (mm) → aspect ratio
   const { w, h } = getCurrentWH();
   const targetAR = w / h;
-
-  const viewW = window.innerWidth;
-  const viewH = window.innerHeight;
-  const viewAR = viewW / viewH;
+  const viewAR   = viewW / viewH;
 
   let top = 0, bottom = 0, left = 0, right = 0;
 
   if (viewAR > targetAR) {
-    // scherm breder → pillarbox links/rechts
+    // breder scherm → pillarbox links/rechts
     const usedW = Math.round(viewH * targetAR);
     const side  = Math.max(0, Math.floor((viewW - usedW) / 2));
     left = right = side;
   } else {
-    // scherm hoger → letterbox boven/onder
+    // hoger scherm → letterbox boven/onder
     const usedH = Math.round(viewW / targetAR);
     const bar   = Math.max(0, Math.floor((viewH - usedH) / 2));
     top = bottom = bar;
   }
 
+  // 3) Zet CSS-variabelen (integers om subpixel-clip artefacts te vermijden)
   comparisonWrapper.style.setProperty('--lb-top',    `${top}px`);
   comparisonWrapper.style.setProperty('--lb-bottom', `${bottom}px`);
   comparisonWrapper.style.setProperty('--lb-left',   `${left}px`);
