@@ -556,7 +556,17 @@ const leftDetailImg = leftDetail.querySelector("img");
 const rightDetailImg = rightDetail.querySelector("img");
 const detailToggleButton = document.getElementById("detailViewToggle");
 
+let detailActive = false;
 
+detailToggleButton.addEventListener("click", () => {
+  detailActive = !detailActive;
+  detailOverlay.classList.toggle("active", detailActive);
+  detailToggleButton.classList.toggle("active", detailActive);
+  if (!detailActive) {
+    leftDetail.style.display = "none";
+    rightDetail.style.display = "none";
+  }
+});
 document.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
