@@ -142,9 +142,8 @@ function onFsChange() {
     // In fullscreen: nooit inline heights
     clearInlineHeights();
 
-    // extra pulses als de fullscreen‑UI nog schuift
-    pulseFsBars(12);
-    pulseFsBars(12, 250);
+   // stabiel her-meten zolang de browserbalk in- en uitfadet
+pulseFsBars({ duration: 1400 });
   } else {
     // UIT fullscreen: direct de juiste hoogte terugzetten
     const { w, h } = getCurrentWH();
@@ -448,9 +447,8 @@ document.getElementById("fullscreenButton")?.addEventListener("click", async () 
   clearInlineHeights();
   await enterWrapperFullscreen();
 
-  // herbereken meerdere frames terwijl de browser‑UI verdwijnt
-  pulseFsBars(12);
-  pulseFsBars(12, 250);
+ // stabiel her-meten zolang de browser‑UI verdwijnt
+pulseFsBars({ duration: 1400 });
 }
 
 updateFullscreenBars();
@@ -793,14 +791,12 @@ function updateSliderPosition(clientX) {
   afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
   slider.style.left = (lbLeft + clamped) + 'px';
 }
-function pulseFsBars(times = 12, delayMs = 0) {
-  let i = 0;
-  const tick = () => {
+function pulseFsBars({ duration = 1400 } = {}) {
+  const start = performance.now();
+  (function tick(now) {
     if (!isWrapperFullscreen()) return;
     updateFullscreenBars();
     resetSplitToMiddle();
-    if (++i < times) requestAnimationFrame(tick);
-  };
-  if (delayMs) setTimeout(() => requestAnimationFrame(tick), delayMs);
-  else requestAnimationFrame(tick);
+    if (now - start < duration) requestAnimationFrame(tick);
+  })(start);
 }
