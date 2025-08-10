@@ -644,8 +644,7 @@ const exportH = Math.round(box.h * exportScale);
   
   
 
-  const leftImg  = afterImgTag;   // L (left side van split)
-  const rightImg = beforeImgTag;  // R (right side van split)
+  
   const leftText  = leftLabel.textContent;
   const rightText = rightLabel.textContent;
   const leftName  = leftSelect.value;
@@ -654,24 +653,9 @@ const exportH = Math.round(box.h * exportScale);
   const t         = tStopSelect.value;
 
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
-  const logo = await (async function loadImage(url){
-    return new Promise(res => { const im = new Image(); im.crossOrigin = "anonymous"; im.onload = () => res(im); im.src = url; });
-  })(logoUrl);
+const logo = await loadHTMLImage(logoUrl);
 
-  async function renderImage(imgEl) {
-    const cvs = document.createElement("canvas");
-    cvs.width  = imgEl.naturalWidth  || imgEl.width;
-    cvs.height = imgEl.naturalHeight || imgEl.height;
-    const ctx = cvs.getContext("2d", { alpha: false });
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
-    const im = new Image();
-    im.crossOrigin = "anonymous";
-    im.src = imgEl.src;
-    await new Promise(r => (im.onload = r));
-    ctx.drawImage(im, 0, 0, cvs.width, cvs.height);
-    return cvs.toDataURL("image/jpeg", 1.0);
-  }
+  
 
   // === Sensor-canvas render (1:1 met viewer) ===
 const li = await loadHTMLImage(afterImgTag.src);   // left = after
@@ -714,14 +698,7 @@ drawBottomBarPage1(logo);
 
  
 
-async function loadImage(url) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.src = url;
-  });
-}
+
 // ==== DETAIL VIEWER ====
 const detailOverlay = document.getElementById("detailOverlay");
 const leftDetail = document.getElementById("leftDetail");
