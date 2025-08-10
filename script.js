@@ -79,10 +79,11 @@ const { w, h } = cameras[cam][fmt];
 const sameWidthAsBase = Math.abs(w - BASE_SENSOR.w) < 0.2;
 const isVenice6K = cam === "Sony Venice" && fmt.startsWith("6K");
 
-// Venice 6K varianten → wrapper op basis 3:2 laten
-if (isVenice6K && sameWidthAsBase) {
+// Special case: 6K 17:9 en 6K 1.85:1 blijven op basis 3:2 ratio voor duidelijke zoom
+if (isVenice6K && (fmt.includes("17:9") || fmt.includes("1.85:1"))) {
   comparisonWrapper.style.aspectRatio = `${BASE_SENSOR.w} / ${BASE_SENSOR.h}`;
 } else {
+  // Alle andere modi (inclusief 6K 2.39:1) krijgen hun echte verhouding
   comparisonWrapper.style.aspectRatio = `${w} / ${h}`;
 }
 
