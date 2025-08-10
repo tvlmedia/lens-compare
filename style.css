@@ -467,3 +467,18 @@ body.dragging * {
   object-fit: cover !important;  /* fix t.o.v. contain */
   background: black;
 }
+/* beide beeld-lagen altijd full size van de wrapper */
+#beforeImage,
+#afterImage { position:absolute; inset:0; width:100%; height:100%; }
+
+/* hard override tegen theme img{height:auto}, etc. */
+#comparisonWrapper #beforeImage img,
+#comparisonWrapper #afterWrapper #afterImage img {
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:cover !important;
+  object-position:center;
+  display:block;
+}
