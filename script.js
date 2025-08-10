@@ -523,7 +523,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   if (srcAR < boxAR) { w = box.w; h = w / srcAR; x = 0; y = (box.h - h) / 2; }
   else { h = box.h; w = h * srcAR; y = 0; x = (box.w - w) / 2; }
 
-  const dpr = 3;
+  const dpr = 6;
   const cvs = document.createElement("canvas");
   cvs.width  = Math.round(box.w * dpr);
   cvs.height = Math.round(box.h * dpr);
