@@ -470,6 +470,21 @@ body.dragging * {
   height: 100%;
   object-fit: cover;
 }
+#comparisonWrapper:fullscreen #beforeImage img,
+#comparisonWrapper:-webkit-full-screen #beforeImage img,
+#comparisonWrapper:fullscreen #afterWrapper #afterImage img,
+#comparisonWrapper:-webkit-full-screen #afterWrapper #afterImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center; /* 👈 dit zorgt dat crop in hoogte gecentreerd is */
+}
+.sensor-mode #comparisonWrapper #beforeImage img,
+.sensor-mode #comparisonWrapper #afterWrapper #afterImage img {
+  object-fit: cover !important;
+  object-position: center center; /* ook hier */
+  background: black;
+}
 
 /* In fullscreen: plaats content binnen de letter/pillarbox randen */
 #comparisonWrapper:fullscreen #beforeImage,
