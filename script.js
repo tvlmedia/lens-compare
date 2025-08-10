@@ -75,7 +75,7 @@ let scale = BASE_SENSOR.w / w;
 if (Math.abs(BASE_SENSOR.w - w) < 0.1) scale = 1;
 
 comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
-
+}
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
   cameraSelect.add(new Option(cam, cam));
