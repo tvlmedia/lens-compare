@@ -39,8 +39,9 @@ const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← v
 function setWrapperSizeByAR(w, h) {
   const width  = comparisonWrapper.clientWidth || comparisonWrapper.offsetWidth;
   const height = width * (h / w);
-  comparisonWrapper.style.setProperty('aspect-ratio', 'auto'); // AR niet forceren
-  comparisonWrapper.style.height = `${height}px`;              // expliciet in px
+  // haal AR volledig weg en zet alleen een px-hoogte
+  comparisonWrapper.style.removeProperty('aspect-ratio');
+  comparisonWrapper.style.height = `${height}px`;
 }
 
 function applyCurrentFormat() {
