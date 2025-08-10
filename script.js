@@ -435,8 +435,8 @@ cameraSelect.value = "Sony Venice";
 cameraSelect.dispatchEvent(new Event("change"));
 // fullscreen-balken direct goedzetten (ook als je al fullscreen zit)
 updateFullscreenBars();
-clearInlineHeights();
-resetSplitToMiddle();                 // <<< nieuw
+resetSplitToMiddle();   
+if (isWrapperFullscreen()) clearInlineHeights();// <<< nieuw
 
 
 
