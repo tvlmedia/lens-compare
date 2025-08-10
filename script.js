@@ -466,66 +466,14 @@ document.getElementById("fullscreenButton")?.addEventListener("click", toggleFul
 
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
- const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+  const { jsPDF } = window.jspdf; // ← belangrijk
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
 
-// meet het content-vlak van de pagina (excl. top/bottom bar & marges)
-const pageW = pdf.internal.pageSize.getWidth();
-const pageH = pdf.internal.pageSize.getHeight();
-const box   = getContentBox(pageW, pageH);
-const boxAR = box.w / box.h;   // ← deze AR gaan we gebruiken voor de split
+  // Layout constants
+  const TOP_BAR = 40;
+  const BOTTOM_BAR = 80;
+  const PAGE_MARGIN = 24;
 
-  // --- Oriëntatie op basis van aspect ratio ---
-
-
-// Afmetingen ophalen uit dataURL
-async function getImageDimsFromDataURL(dataUrl) {
-  const img = new Image();
-  img.src = dataUrl;
-  await new Promise(res => img.onload = res);
-  return { w: img.naturalWidth || img.width, h: img.naturalHeight || img.height };
-}
-
-    // PDF layout constants
-  const TOP_BAR = 40;      // bovenbalk (titel)
-  const BOTTOM_BAR = 80;   // onderbalk (omschrijving/CTA/logo)
-  const PAGE_MARGIN = 24;  // veilige marge rond het beeld
-  
-  const comparison = document.getElementById("comparisonWrapper");
-  const leftImg = afterImgTag;
-  const rightImg = beforeImgTag;
-  const leftText = leftLabel.textContent;
-  const rightText = rightLabel.textContent;
-  const left = leftSelect.value;
-  const right = rightSelect.value;
-  const focal = focalLengthSelect.value;
-  const t = tStopSelect.value;
- 
-
-  
-  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
-  const logo = await loadImage(logoUrl);
-
- async function renderImage(imgEl) {
-  const canvas = document.createElement("canvas");
-  canvas.width  = imgEl.naturalWidth  || imgEl.width;
-  canvas.height = imgEl.naturalHeight || imgEl.height;
-
-  const ctx = canvas.getContext("2d", { alpha: false });
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = imgEl.src;
-  await new Promise(resolve => (img.onload = resolve));
-
-  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/jpeg", 1.0);
-}
-
-  
-
-    
   function getContentBox(pageW, pageH) {
     const x = PAGE_MARGIN;
     const y = TOP_BAR + PAGE_MARGIN;
@@ -534,86 +482,236 @@ async function getImageDimsFromDataURL(dataUrl) {
     return { x, y, w, h };
   }
 
+  // Helpers
   function fitContain(srcW, srcH, boxW, boxH) {
-  const srcAR = srcW / srcH, boxAR = boxW / boxH;
-  let w, h;
-  if (srcAR > boxAR) { w = boxW; h = Math.round(w / srcAR); }
-  else { h = boxH; w = Math.round(h * srcAR); }
-  const x = Math.round((boxW - w) / 2);
-  const y = Math.round((boxH - h) / 2);
-  return { w, h, x, y };
-}
-
-function fitCover(srcW, srcH, boxW, boxH) {
-  const srcAR = srcW / srcH;
-  const boxAR = boxW / boxH;
-
-  let w, h, x, y;
-
-  if (srcAR < boxAR) {
-    // bron is "smaller/botter" (verticaler) → breedte moet box vullen
-    w = boxW;
-    h = w / srcAR;          // wordt hoger dan box
-    x = 0;
-    y = (boxH - h) / 2;     // negatief → boven/onder afsnijden
-  } else {
-    // bron is breder → hoogte moet box vullen
-    h = boxH;
-    w = h * srcAR;          // wordt breder dan box
-    y = 0;
-    x = (boxW - w) / 2;     // negatief → links/rechts afsnijden
+    const srcAR = srcW / srcH, boxAR = boxW / boxH;
+    let w, h;
+    if (srcAR > boxAR) { w = boxW; h = Math.round(w / srcAR); }
+    else { h = boxH; w = Math.round(h * srcAR); }
+    const x = Math.round((boxW - w) / 2);
+    const y = Math.round((boxH - h) / 2);
+    return { w, h, x, y };
+  }
+  function fitCover(srcW, srcH, boxW, boxH) {
+    const srcAR = srcW / srcH, boxAR = boxW / boxH;
+    let w, h, x, y;
+    if (srcAR < boxAR) { w = boxW; h = w / srcAR; x = 0; y = (boxH - h) / 2; }
+    else { h = boxH; w = h * srcAR; y = 0; x = (boxW - w) / 2; }
+    return { w, h, x, y };
   }
 
-  return { w, h, x, y };
-}
+  async function drawImageContain(pdf, imgData) {
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const box = getContentBox(pageW, pageH);
+    const img = new Image();
+    img.src = imgData;
+    await new Promise(r => (img.onload = r));
+    const fit = fitContain(img.width, img.height, box.w, box.h);
+    pdf.addImage(imgData, "JPEG", box.x + fit.x, box.y + fit.y, fit.w, fit.h);
+  }
 
+  async function drawImageCover(pdf, imgData) {
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const box = getContentBox(pageW, pageH);
 
+    const img = new Image();
+    img.src = imgData;
+    await new Promise(r => (img.onload = r));
 
-async function drawImageContain(pdf, imgData) {
+    const fit = fitCover(img.width, img.height, box.w, box.h);
+
+    const dpr = 3;
+    const cvs = document.createElement("canvas");
+    cvs.width  = Math.round(box.w * dpr);
+    cvs.height = Math.round(box.h * dpr);
+    const ctx = cvs.getContext("2d", { alpha: false });
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(
+      img,
+      Math.round(fit.x * dpr),
+      Math.round(fit.y * dpr),
+      Math.round(fit.w * dpr),
+      Math.round(fit.h * dpr)
+    );
+
+    const covered = cvs.toDataURL("image/jpeg", 0.95);
+    pdf.addImage(covered, "JPEG", box.x, box.y, box.w, box.h);
+  }
+
+  function drawTopBar(text) {
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const barHeight = TOP_BAR;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, barHeight, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, {
+      align: "center",
+      baseline: "middle"
+    });
+  }
+  function drawBottomBar(text = "", link = "") {
+    const pageWidth  = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const barHeight  = BOTTOM_BAR;
+
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
+
+    if (link) {
+      const displayText = "Klik hier voor alle info over deze lens";
+      const x = 20, y = pageHeight - barHeight + 55;
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 102, 255);
+      pdf.textWithLink(displayText, x, y, { url: link });
+    }
+  }
+  function drawBottomBarPage1(logo) {
+    const pageWidth  = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const barHeight  = BOTTOM_BAR;
+
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+    const text = "Benieuwd naar alle lenzen? Klik hier";
+    const fontSize = 22;
+    const textY = pageHeight - Math.round(barHeight / 2);
+    pdf.setFontSize(fontSize);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, pageWidth / 2, textY, { align: "center", baseline: "middle" });
+
+    const textWidth = pdf.getTextWidth(text);
+    const linkX = (pageWidth - textWidth) / 2;
+    const linkY = textY - Math.round(fontSize / 2) - 4;
+    const linkHeight = fontSize + 8;
+    pdf.link(linkX, linkY, textWidth, linkHeight, { url: "https://tvlrental.nl/lenses/" });
+
+    if (logo) {
+      const targetHeight = 50;
+      const ratio = logo.width / logo.height;
+      const targetWidth = targetHeight * ratio;
+      const xLogo = pageWidth - targetWidth - 12;
+      const yLogo = pageHeight - targetHeight - 12;
+      pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+    }
+  }
+  function fillBlack() {
+    const pw = pdf.internal.pageSize.getWidth();
+    const ph = pdf.internal.pageSize.getHeight();
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pw, ph, "F");
+  }
+
+  // Data uit UI
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
-  const box = getContentBox(pageW, pageH);
+  const box   = getContentBox(pageW, pageH);
+  const boxAR = box.w / box.h;
 
-  const img = new Image();
-  img.src = imgData;
-  await new Promise(r => img.onload = r);
+  const leftImg  = afterImgTag;   // L (left side van split)
+  const rightImg = beforeImgTag;  // R (right side van split)
+  const leftText  = leftLabel.textContent;
+  const rightText = rightLabel.textContent;
+  const leftName  = leftSelect.value;
+  const rightName = rightSelect.value;
+  const focal     = focalLengthSelect.value;
+  const t         = tStopSelect.value;
 
-  const fit = fitContain(img.width, img.height, box.w, box.h);
-  pdf.addImage(imgData, "JPEG", box.x + fit.x, box.y + fit.y, fit.w, fit.h);
-}
+  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
+  const logo = await (async function loadImage(url){
+    return new Promise(res => { const im = new Image(); im.crossOrigin = "anonymous"; im.onload = () => res(im); im.src = url; });
+  })(logoUrl);
 
-// Cropt naar het vlak (cover)
-async function drawImageCover(pdf, imgData) {
-  const pageW = pdf.internal.pageSize.getWidth();
-  const pageH = pdf.internal.pageSize.getHeight();
-  const box = getContentBox(pageW, pageH);
+  async function renderImage(imgEl) {
+    const cvs = document.createElement("canvas");
+    cvs.width  = imgEl.naturalWidth  || imgEl.width;
+    cvs.height = imgEl.naturalHeight || imgEl.height;
+    const ctx = cvs.getContext("2d", { alpha: false });
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    const im = new Image();
+    im.crossOrigin = "anonymous";
+    im.src = imgEl.src;
+    await new Promise(r => (im.onload = r));
+    ctx.drawImage(im, 0, 0, cvs.width, cvs.height);
+    return cvs.toDataURL("image/jpeg", 1.0);
+  }
 
-  const img = new Image();
-  img.src = imgData;
-  await new Promise(r => (img.onload = r));
+  // Beelden echt inladen en native breedtes pakken
+  const li = new Image(); li.crossOrigin = "anonymous"; li.src = leftImg.src;  await new Promise(r => (li.onload = r));
+  const ri = new Image(); ri.crossOrigin = "anonymous"; ri.src = rightImg.src; await new Promise(r => (ri.onload = r));
+  const leftNatW  = li.naturalWidth  || li.width;
+  const rightNatW = ri.naturalWidth  || ri.width;
 
-  // 1) Bepaal ‘cover’ fit binnen het content-vlak
-  const fit = fitCover(img.width, img.height, box.w, box.h);
+  // Split opbouwen met AR van PDF contentvlak → p1 matcht p2/p3 framing
+  const outW = Math.min(leftNatW, rightNatW);
+  const outH = Math.round(outW / boxAR);
 
-  // 2) Render op hogere resolutie om blur te voorkomen
-  const dpr = 3; // of Math.min(3, window.devicePixelRatio || 3)
-  const cvs = document.createElement("canvas");
-  cvs.width  = Math.round(box.w * dpr);
-  cvs.height = Math.round(box.h * dpr);
-  const ctx = cvs.getContext("2d", { alpha: false });
+  const splitCvs = document.createElement("canvas");
+  splitCvs.width  = outW;
+  splitCvs.height = outH;
+  const sctx = splitCvs.getContext("2d", { alpha: false });
+  sctx.imageSmoothingEnabled = true;
+  sctx.imageSmoothingQuality = "high";
 
-  // Belangrijk: smoothing aan + high quality
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
+  const coverFit = (srcW, srcH, boxW, boxH) => {
+    const srcAR = srcW / srcH, boxAR2 = boxW / boxH;
+    if (srcAR < boxAR2) { const w = boxW, h = w / srcAR; return { x: 0, y: (boxH - h) / 2, w, h }; }
+    else { const h = boxH, w = h * srcAR; return { x: (boxW - w) / 2, y: 0, w, h }; }
+  };
 
-  // 3) Teken de afbeelding met dezelfde cover-offsets, opgeschaald naar dpr
-  ctx.drawImage(
-    img,
-    Math.round(fit.x * dpr),
-    Math.round(fit.y * dpr),
-    Math.round(fit.w * dpr),
-    Math.round(fit.h * dpr)
-  );
+  // Links tekenen
+  let fit = coverFit(li.naturalWidth || li.width, li.naturalHeight || li.height, outW, outH);
+  sctx.drawImage(li, fit.x, fit.y, fit.w, fit.h);
+
+  // Rechts tekenen met clip (alleen rechter helft)
+  fit = coverFit(ri.naturalWidth || ri.width, ri.naturalHeight || ri.height, outW, outH);
+  sctx.save();
+  sctx.beginPath();
+  sctx.rect(Math.round(outW / 2), 0, Math.round(outW / 2), outH);
+  sctx.clip();
+  sctx.drawImage(ri, fit.x, fit.y, fit.w, fit.h);
+  sctx.restore();
+
+  // Middenlijn
+  sctx.fillStyle = "#FFFFFF";
+  sctx.fillRect(Math.round(outW / 2) - 1, 0, 2, outH);
+
+  const splitData = splitCvs.toDataURL("image/jpeg", 0.98);
+  const leftData  = await renderImage(leftImg);
+  const rightData = await renderImage(rightImg);
+
+  // === PDF render ===
+  fillBlack();
+  drawTopBar(`${leftText} vs ${rightText}`);
+  await drawImageContain(pdf, splitData);
+  drawBottomBarPage1(logo);
+
+  pdf.addPage("a4", "landscape");
+  fillBlack();
+  drawTopBar(leftText);
+  await drawImageCover(pdf, leftData);
+  drawBottomBar(lensDescriptions[leftName]?.text || "", lensDescriptions[leftName]?.url);
+
+  pdf.addPage("a4", "landscape");
+  fillBlack();
+  drawTopBar(rightText);
+  await drawImageCover(pdf, rightData);
+  drawBottomBar(lensDescriptions[rightName]?.text || "", lensDescriptions[rightName]?.url);
+
+  const safeLeft  = leftName.replace(/\s+/g, "");
+  const safeRight = rightName.replace(/\s+/g, "");
+  const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
+  pdf.save(filename);
+});
 
   // 4) Zet om naar JPEG en plaats exact passend in het content-vlak
   const covered = cvs.toDataURL("image/jpeg", 0.95); // 0.95 is praktisch identiek aan 1.0 maar kleinere file
