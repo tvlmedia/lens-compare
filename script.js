@@ -150,32 +150,13 @@ cameraSelect.addEventListener("change", () => {
 
 
 sensorFormatSelect.addEventListener("change", applyCurrentFormat);
-function onFsChange() {
-  if (isWrapperFullscreen()) {
-    // In fullscreen: nooit inline heights
-    clearInlineHeights();
-  } else {
-    // UIT fullscreen: direct de juiste hoogte terugzetten
-    const { w, h } = getCurrentWH();
-    comparisonWrapper.style.setProperty('aspect-ratio', 'auto'); // vangnet
-    setWrapperSizeByAR(w, h);
-    requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+function onFsChange
+// Luister naar fullscreen wissels
+document.addEventListener('fullscreenchange', onFsChange);
+document.addEventListener('webkitfullscreenchange', onFsChange); // Safari
 
-    // FS-balk variabelen naar 0 zodat er niets klemt
-    comparisonWrapper.style.setProperty('--lb-top', '0px');
-    comparisonWrapper.style.setProperty('--lb-bottom', '0px');
-    comparisonWrapper.style.setProperty('--lb-left', '0px');
-    comparisonWrapper.style.setProperty('--lb-right', '0px');
-  }
-
-  // Bars opnieuw berekenen + slider centreren
-  updateFullscreenBars();
-  requestAnimationFrame(() => {
-    updateFullscreenBars();
-    resetSplitToMiddle();
-  });
-}
-
+// Direct bij pageload al één keer checken
+onFsChange();
 window.addEventListener("resize", () => {
   // mobile-mode togglen
   if (window.innerWidth < 768) {
