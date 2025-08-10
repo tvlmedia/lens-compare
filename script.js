@@ -468,6 +468,21 @@ document.getElementById("fullscreenButton")?.addEventListener("click", toggleFul
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
 
+  // --- Oriëntatie op basis van aspect ratio ---
+function decideOrientationByAR(w, h) {
+  const ar = w / h;
+  // < 1.35 is portrait: 4:3, 6:5, square
+  return ar < 1.35 ? "portrait" : "landscape";
+}
+
+// Afmetingen ophalen uit dataURL
+async function getImageDimsFromDataURL(dataUrl) {
+  const img = new Image();
+  img.src = dataUrl;
+  await new Promise(res => img.onload = res);
+  return { w: img.naturalWidth || img.width, h: img.naturalHeight || img.height };
+}
+
     // PDF layout constants
   const TOP_BAR = 40;      // bovenbalk (titel)
   const BOTTOM_BAR = 80;   // onderbalk (omschrijving/CTA/logo)
@@ -484,9 +499,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const t = tStopSelect.value;
   const barHeight = 80;
 
-  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
+  
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
   const logo = await loadImage(logoUrl);
 
@@ -645,6 +658,16 @@ const splitData = splitCanvas.toDataURL("image/jpeg", 0.95);
 
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
+
+  const { w: sw, h: sh } = await getImageDimsFromDataURL(splitData);
+const { w: lw, h: lh } = await getImageDimsFromDataURL(leftData);
+const { w: rw, h: rh } = await getImageDimsFromDataURL(rightData);
+
+const ori1 = decideOrientationByAR(sw, sh); // split
+const ori2 = decideOrientationByAR(lw, lh); // left
+const ori3 = decideOrientationByAR(rw, rh); // right
+
+  const pdf = new jsPDF({ orientation: ori1, unit: "px", format: "a4" });
 
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
