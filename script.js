@@ -527,42 +527,72 @@ async function getImageDimsFromDataURL(dataUrl) {
     return { x, y, w, h };
   }
 
-  function fitRectIntoBox(srcW, srcH, boxW, boxH) {
-    const srcAR = srcW / srcH;
-    const boxAR = boxW / boxH;
-    let w, h;
-    if (srcAR > boxAR) {
-      w = boxW;
-      h = Math.round(w / srcAR);
-    } else {
-      h = boxH;
-      w = Math.round(h * srcAR);
-    }
-    const x = Math.round((boxW - w) / 2);
-    const y = Math.round((boxH - h) / 2);
-    return { w, h, x, y };
+  function fitContain(srcW, srcH, boxW, boxH) {
+  const srcAR = srcW / srcH, boxAR = boxW / boxH;
+  let w, h;
+  if (srcAR > boxAR) { w = boxW; h = Math.round(w / srcAR); }
+  else { h = boxH; w = Math.round(h * srcAR); }
+  const x = Math.round((boxW - w) / 2);
+  const y = Math.round((boxH - h) / 2);
+  return { w, h, x, y };
+}
+
+function fitCover(srcW, srcH, boxW, boxH) {
+  const srcAR = srcW / srcH, boxAR = boxW / boxH;
+  let w, h;
+  if (srcAR < boxAR) { // breder nodig → hoogte vullen, breedte over
+    h = boxH; w = Math.round(h * srcAR);
+  } else {            // hoger nodig → breedte vullen, hoogte over
+    w = boxW; h = Math.round(w / srcAR);
   }
+  const x = Math.round((boxW - w) / 2);
+  const y = Math.round((boxH - h) / 2);
+  return { w, h, x, y };
+}
 
-  async function drawImagePreserveAR(pdf, imgData) {
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
+function getContentBox(pageW, pageH) {
+  const x = PAGE_MARGIN;
+  const y = TOP_BAR + PAGE_MARGIN;
+  const w = pageW - PAGE_MARGIN * 2;
+  const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
+  return { x, y, w, h };
+}
 
-    const img = new Image();
-    img.src = imgData;
-    await new Promise(res => { img.onload = res; });
+async function drawImageContain(pdf, imgData) {
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  const box = getContentBox(pageW, pageH);
 
-    const box = getContentBox(pageW, pageH);
-    const fit = fitRectIntoBox(img.width, img.height, box.w, box.h);
+  const img = new Image();
+  img.src = imgData;
+  await new Promise(r => img.onload = r);
 
-    pdf.addImage(
-      imgData,
-      "JPEG",
-      box.x + fit.x,
-      box.y + fit.y,
-      fit.w,
-      fit.h
-    );
-  }
+  const fit = fitContain(img.width, img.height, box.w, box.h);
+  pdf.addImage(imgData, "JPEG", box.x + fit.x, box.y + fit.y, fit.w, fit.h);
+}
+
+// Cropt naar het vlak (cover)
+async function drawImageCover(pdf, imgData) {
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  const box = getContentBox(pageW, pageH);
+
+  const img = new Image();
+  img.src = imgData;
+  await new Promise(r => img.onload = r);
+
+  // Teken eerst op een offscreen canvas met cover (dus gecropt)
+  const cvs = document.createElement("canvas");
+  cvs.width = Math.round(box.w);
+  cvs.height = Math.round(box.h);
+  const ctx = cvs.getContext("2d");
+
+  const fit = fitCover(img.width, img.height, box.w, box.h);
+  ctx.drawImage(img, fit.x, fit.y, fit.w, fit.h);
+
+  const covered = cvs.toDataURL("image/jpeg", 0.95);
+  pdf.addImage(covered, "JPEG", box.x, box.y, box.w, box.h);
+}
  function drawTopBar(text) {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const barHeight = TOP_BAR;
