@@ -511,61 +511,37 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     pdf.addImage(imgData, "JPEG", box.x + fit.x, box.y + fit.y, fit.w, fit.h);
   }
 
+  async function drawImageCoverInBox(pdf, imgData, box){
+  const img = new Image();
+  img.src = imgData;
+  await new Promise(r => (img.onload = r));
+
+  const srcAR = img.width / img.height;
+  const boxAR = box.w / box.h;
+
+  let w, h, x, y;
+  if (srcAR < boxAR) { w = box.w; h = w / srcAR; x = 0; y = (box.h - h) / 2; }
+  else { h = box.h; w = h * srcAR; y = 0; x = (box.w - w) / 2; }
+
+  const dpr = 3;
+  const cvs = document.createElement("canvas");
+  cvs.width  = Math.round(box.w * dpr);
+  cvs.height = Math.round(box.h * dpr);
+  const ctx = cvs.getContext("2d", { alpha:false });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, Math.round(x*dpr), Math.round(y*dpr), Math.round(w*dpr), Math.round(h*dpr));
+
+  const covered = cvs.toDataURL("image/jpeg", 0.95);
+  pdf.addImage(covered, "JPEG", box.x, box.y, box.w, box.h);
+}
+
   async function drawImageCover(pdf, imgData) {
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
     const box = getContentBox(pageW, pageH);
 
-// ⬇️ nieuw: full‑bleed cover in een arbitraire box
-async function drawImageCoverInBox(pdf, imgData, box){
-  const img = new Image();
-  img.src = imgData;
-  await new Promise(r => (img.onload = r));
 
-  const srcAR = img.width / img.height;
-  const boxAR = box.w / box.h;
-
-  let w, h, x, y;
-  if (srcAR < boxAR) { w = box.w; h = w / srcAR; x = 0; y = (box.h - h) / 2; }
-  else { h = box.h; w = h * srcAR; y = 0; x = (box.w - w) / 2; }
-
-  const dpr = 3;
-  const cvs = document.createElement("canvas");
-  cvs.width  = Math.round(box.w * dpr);
-  cvs.height = Math.round(box.h * dpr);
-  const ctx = cvs.getContext("2d", { alpha:false });
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(img, Math.round(x*dpr), Math.round(y*dpr), Math.round(w*dpr), Math.round(h*dpr));
-
-  const covered = cvs.toDataURL("image/jpeg", 0.95);
-  pdf.addImage(covered, "JPEG", box.x, box.y, box.w, box.h);
-}
-    
-    async function drawImageCoverInBox(pdf, imgData, box){
-  const img = new Image();
-  img.src = imgData;
-  await new Promise(r => (img.onload = r));
-
-  const srcAR = img.width / img.height;
-  const boxAR = box.w / box.h;
-
-  let w, h, x, y;
-  if (srcAR < boxAR) { w = box.w; h = w / srcAR; x = 0; y = (box.h - h) / 2; }
-  else { h = box.h; w = h * srcAR; y = 0; x = (box.w - w) / 2; }
-
-  const dpr = 3;
-  const cvs = document.createElement("canvas");
-  cvs.width  = Math.round(box.w * dpr);
-  cvs.height = Math.round(box.h * dpr);
-  const ctx = cvs.getContext("2d", { alpha:false });
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(img, Math.round(x*dpr), Math.round(y*dpr), Math.round(w*dpr), Math.round(h*dpr));
-
-  const covered = cvs.toDataURL("image/jpeg", 0.95);
-  pdf.addImage(covered, "JPEG", box.x, box.y, box.w, box.h);
-}
 
     const img = new Image();
     img.src = imgData;
