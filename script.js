@@ -66,12 +66,7 @@ requestAnimationFrame(() => setWrapperSizeByAR(w, h));
   // sensor-mode aan
   document.body.classList.add("sensor-mode");
 
-  // schaal tov diagonaal (kleiner target => inzoomen)
-  const diagBase   = Math.hypot(BASE_SENSOR.w, BASE_SENSOR.h);
-  const diagTarget = Math.hypot(w, h);
-  const scale = Math.max(1, diagBase / diagTarget);
-
-  comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
+  const scale = (Math.abs(BASE_SENSOR.w - w) < 0.2) ? 1 : Math.max(1, BASE_SENSOR.w / w);
 }
 
 // Vul camera dropdown
