@@ -683,8 +683,8 @@ const logo = await loadHTMLImage(logoUrl);
 const li = await loadHTMLImage(afterImgTag.src);   // left = after
 const ri = await loadHTMLImage(beforeImgTag.src);  // right = before
 
-const leftSensor  = await renderToSensorAR(li, targetAR, exportH);
-const rightSensor = await renderToSensorAR(ri, targetAR, exportH);
+const leftSensor  = await renderToSensorAR(li, targetAR, exportH, zoom);
+const rightSensor = await renderToSensorAR(ri, targetAR, exportH, zoom);
 
 // Split canvas met dezelfde (W,H) als sensor-canvassen
 const splitData = await buildSplitFromSensor(leftSensor.dataURL, rightSensor.dataURL, leftSensor.W, leftSensor.H);
