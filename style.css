@@ -463,7 +463,54 @@ body.dragging * {
   padding-left:   var(--lb-left, 0px);
   padding-right:  var(--lb-right, 0px);
 }
+/* ==== Fullscreen: aspect-ratio per gekozen sensorformaat (met !important) ==== */
+body.fs-3-2  #comparisonWrapper:fullscreen,
+body.fs-3-2  #comparisonWrapper:-webkit-full-screen {
+  aspect-ratio: 3 / 2 !important;
+  padding: 0 !important;
+}
 
+body.fs-185  #comparisonWrapper:fullscreen,
+body.fs-185  #comparisonWrapper:-webkit-full-screen {
+  aspect-ratio: 185 / 100 !important; /* 1.85:1 */
+  padding: 0 !important;
+}
+
+body.fs-17-9 #comparisonWrapper:fullscreen,
+body.fs-17-9 #comparisonWrapper:-webkit-full-screen {
+  aspect-ratio: 17 / 9 !important;
+  padding: 0 !important;
+}
+
+body.fs-239  #comparisonWrapper:fullscreen,
+body.fs-239  #comparisonWrapper:-webkit-full-screen {
+  aspect-ratio: 239 / 100 !important; /* 2.39:1 */
+  padding: 0 !important;
+}
+
+body.fs-16-9 #comparisonWrapper:fullscreen,
+body.fs-16-9 #comparisonWrapper:-webkit-full-screen {
+  aspect-ratio: 16 / 9 !important;
+  padding: 0 !important;
+}
+
+body.fs-6-5  #comparisonWrapper:fullscreen,
+body.fs-6-5  #comparisonWrapper:-webkit-full-screen {
+  aspect-ratio: 6 / 5 !important;
+  padding: 0 !important;
+}
+
+body.fs-4-3  #comparisonWrapper:fullscreen,
+body.fs-4-3  #comparisonWrapper:-webkit-full-screen {
+  aspect-ratio: 4 / 3 !important;
+  padding: 0 !important;
+}
+
+body.fs-155  #comparisonWrapper:fullscreen,
+body.fs-155  #comparisonWrapper:-webkit-full-screen {
+  aspect-ratio: 155 / 100 !important; /* Open Gate ~1.55:1 */
+  padding: 0 !important;
+}
 /* lagen vullen altijd de bruikbare ruimte */
 #comparisonWrapper:fullscreen #beforeImage,
 #comparisonWrapper:-webkit-full-screen #beforeImage,
