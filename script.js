@@ -532,30 +532,50 @@ async function placeContain(pdf, dataURL, box) {
   pdf.addImage(dataURL, "JPEG", box.x + fit.x, box.y + fit.y, fit.w, fit.h);
 }
 
+function getCurrentSplitFraction() {
+  const wrapperRect = comparisonWrapper.getBoundingClientRect();
+  const lbLeft  = comparisonWrapper._lbLeft  || 0;
+  const lbRight = comparisonWrapper._lbRight || 0;
+  const usableW = Math.max(1, Math.round(wrapperRect.width - lbLeft - lbRight));
+
+  const sliderRect = slider.getBoundingClientRect();
+  const xInUsable = (sliderRect.left + sliderRect.width / 2) - wrapperRect.left - lbLeft;
+
+  return Math.min(1, Math.max(0, xInUsable / usableW));
+}
+
 // Bouw split uit twee sensor‑canvassen (zelfde W,H) + witte middenlijn
+// Bouw split uit twee sensor‑canvassen (zelfde W,H) en neem de actuele viewer‑split over
 async function buildSplitFromSensor(leftURL, rightURL, W, H) {
   const L = await loadHTMLImage(leftURL);
   const R = await loadHTMLImage(rightURL);
+
   const cvs = document.createElement("canvas");
-  cvs.width = W; cvs.height = H;
-  const ctx = cvs.getContext("2d", { alpha:false });
+  cvs.width = W;
+  cvs.height = H;
+
+  const ctx = cvs.getContext("2d", { alpha: false });
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  // Links volledig
-  ctx.drawImage(L, 0, 0, W, H);
+  // Gebruik de echte slider-positie uit de viewer (gecorrigeerd voor pillar/letterbox)
+  const frac = getCurrentSplitFraction();   // 0..1
+  const splitX = Math.round(W * frac);      // px in de sensor-canvas
 
-  // Rechts alleen rechter helft
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(Math.floor(W/2), 0, Math.ceil(W/2), H);
-  ctx.clip();
-  ctx.drawImage(R, 0, 0, W, H);
-  ctx.restore();
+  // Links tot split
+  if (splitX > 0) {
+    ctx.drawImage(L, 0, 0, splitX, H, 0, 0, splitX, H);
+  }
+
+  // Rechts vanaf split
+  if (splitX < W) {
+    const wRight = W - splitX;
+    ctx.drawImage(R, splitX, 0, wRight, H, splitX, 0, wRight, H);
+  }
 
   // Middenlijn
   ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(Math.round(W/2)-1, 0, 2, H);
+  ctx.fillRect(Math.max(0, splitX - 1), 0, 2, H);
 
   return cvs.toDataURL("image/jpeg", 1.0);
 }
