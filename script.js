@@ -464,6 +464,83 @@ document.getElementById("toggleButton").addEventListener("click", () => {
 
 document.getElementById("fullscreenButton")?.addEventListener("click", toggleFullscreen);
 
+// ==== PDF helpers: sensor-canvas + contain placement ====
+function loadHTMLImage(src) {
+  return new Promise((res, rej) => {
+    const im = new Image();
+    im.crossOrigin = "anonymous";
+    im.onload = () => res(im);
+    im.onerror = rej;
+    im.src = src;
+  });
+}
+
+function fitContain(srcW, srcH, boxW, boxH) {
+  const srcAR = srcW / srcH, boxAR = boxW / boxH;
+  let w, h;
+  if (srcAR > boxAR) { w = boxW; h = Math.round(w / srcAR); }
+  else { h = boxH; w = Math.round(h * srcAR); }
+  const x = Math.round((boxW - w) / 2);
+  const y = Math.round((boxH - h) / 2);
+  return { w, h, x, y };
+}
+
+// Render een image naar exact de SENSOR aspect ratio (cover) op gewenste uit-hoogte
+async function renderToSensorAR(imgOrURL, targetAR, outH) {
+  const img = typeof imgOrURL === "string" ? await loadHTMLImage(imgOrURL) : imgOrURL;
+  const H = outH;
+  const W = Math.round(H * targetAR);
+
+  const cvs = document.createElement("canvas");
+  cvs.width = W; cvs.height = H;
+  const ctx = cvs.getContext("2d", { alpha:false });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  // coverFit naar (W,H)
+  const srcAR = (img.naturalWidth || img.width) / (img.naturalHeight || img.height);
+  let drawW, drawH, offX, offY;
+  if (srcAR < targetAR) { drawW = W; drawH = W / srcAR; offX = 0; offY = (H - drawH) / 2; }
+  else { drawH = H; drawW = H * srcAR; offY = 0; offX = (W - drawW) / 2; }
+
+  ctx.drawImage(img, Math.round(offX), Math.round(offY), Math.round(drawW), Math.round(drawH));
+  return { dataURL: cvs.toDataURL("image/jpeg", 0.98), W, H };
+}
+
+// Plaats een (W,H) image contain in PDF-box
+async function placeContain(pdf, dataURL, box) {
+  const im = await loadHTMLImage(dataURL);
+  const fit = fitContain(im.naturalWidth || im.width, im.naturalHeight || im.height, box.w, box.h);
+  pdf.addImage(dataURL, "JPEG", box.x + fit.x, box.y + fit.y, fit.w, fit.h);
+}
+
+// Bouw split uit twee sensor‑canvassen (zelfde W,H) + witte middenlijn
+async function buildSplitFromSensor(leftURL, rightURL, W, H) {
+  const L = await loadHTMLImage(leftURL);
+  const R = await loadHTMLImage(rightURL);
+  const cvs = document.createElement("canvas");
+  cvs.width = W; cvs.height = H;
+  const ctx = cvs.getContext("2d", { alpha:false });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  // Links volledig
+  ctx.drawImage(L, 0, 0, W, H);
+
+  // Rechts alleen rechter helft
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(Math.floor(W/2), 0, Math.ceil(W/2), H);
+  ctx.clip();
+  ctx.drawImage(R, 0, 0, W, H);
+  ctx.restore();
+
+  // Middenlijn
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(Math.round(W/2)-1, 0, 2, H);
+
+  return cvs.toDataURL("image/jpeg", 0.98);
+}
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf; // ← belangrijk
@@ -641,6 +718,15 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
   const box   = getContentBox(pageW, pageH);
+
+// Sensor‑AR uit de huidige selectie (exact zoals de viewer)
+const { w: sW, h: sH } = getCurrentWH();
+const targetAR = sW / sH;
+
+// Export-resolutie (scherpte).  ~300 DPI benadering op A4 landscape content-box
+const exportScale = 3; // 2.5–3 is meestal top; 3 geeft veel detail
+const exportH = Math.round(box.h * exportScale);
+  
   const boxAR = box.w / box.h;
 
   const leftImg  = afterImgTag;   // L (left side van split)
@@ -672,67 +758,37 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
     return cvs.toDataURL("image/jpeg", 1.0);
   }
 
-  // Beelden echt inladen en native breedtes pakken
-  const li = new Image(); li.crossOrigin = "anonymous"; li.src = leftImg.src;  await new Promise(r => (li.onload = r));
-  const ri = new Image(); ri.crossOrigin = "anonymous"; ri.src = rightImg.src; await new Promise(r => (ri.onload = r));
-  const leftNatW  = li.naturalWidth  || li.width;
-  const rightNatW = ri.naturalWidth  || ri.width;
+  // === Sensor-canvas render (1:1 met viewer) ===
+const li = await loadHTMLImage(afterImgTag.src);   // left = after
+const ri = await loadHTMLImage(beforeImgTag.src);  // right = before
 
-  // Split opbouwen met AR van PDF contentvlak → p1 matcht p2/p3 framing
-  const outW = Math.min(leftNatW, rightNatW);
-  const outH = Math.round(outW / boxAR);
+const leftSensor  = await renderToSensorAR(li, targetAR, exportH);
+const rightSensor = await renderToSensorAR(ri, targetAR, exportH);
 
-  const splitCvs = document.createElement("canvas");
-  splitCvs.width  = outW;
-  splitCvs.height = outH;
-  const sctx = splitCvs.getContext("2d", { alpha: false });
-  sctx.imageSmoothingEnabled = true;
-  sctx.imageSmoothingQuality = "high";
+// Split canvas met dezelfde (W,H) als sensor-canvassen
+const splitData = await buildSplitFromSensor(leftSensor.dataURL, rightSensor.dataURL, leftSensor.W, leftSensor.H);
 
-  const coverFit = (srcW, srcH, boxW, boxH) => {
-    const srcAR = srcW / srcH, boxAR2 = boxW / boxH;
-    if (srcAR < boxAR2) { const w = boxW, h = w / srcAR; return { x: 0, y: (boxH - h) / 2, w, h }; }
-    else { const h = boxH, w = h * srcAR; return { x: (boxW - w) / 2, y: 0, w, h }; }
-  };
-
-  // Links tekenen
-  let fit = coverFit(li.naturalWidth || li.width, li.naturalHeight || li.height, outW, outH);
-  sctx.drawImage(li, fit.x, fit.y, fit.w, fit.h);
-
-  // Rechts tekenen met clip (alleen rechter helft)
-  fit = coverFit(ri.naturalWidth || ri.width, ri.naturalHeight || ri.height, outW, outH);
-  sctx.save();
-  sctx.beginPath();
-  sctx.rect(Math.round(outW / 2), 0, Math.round(outW / 2), outH);
-  sctx.clip();
-  sctx.drawImage(ri, fit.x, fit.y, fit.w, fit.h);
-  sctx.restore();
-
-  // Middenlijn
-  sctx.fillStyle = "#FFFFFF";
-  sctx.fillRect(Math.round(outW / 2) - 1, 0, 2, outH);
-
-  const splitData = splitCvs.toDataURL("image/jpeg", 0.98);
-  const leftData  = await renderImage(leftImg);
-  const rightData = await renderImage(rightImg);
+// Voor losse pagina's gebruiken we de sensor-canvassen zelf
+const leftData  = leftSensor.dataURL;
+const rightData = rightSensor.dataURL;
 
   // === PDF render ===
   fillBlack();
 drawTopBar(`${leftText} vs ${rightText}`);
   const fullBox = { x: 0, y: TOP_BAR, w: pageW, h: pageH - TOP_BAR - BOTTOM_BAR };
-await drawImageCoverInBox(pdf, splitData, fullBox); // full‑bleed breedte
+await placeContain(pdf, splitData, fullBox);
 drawBottomBarPage1(logo);
   
   pdf.addPage("a4", "landscape");
   fillBlack();
   drawTopBar(leftText);
-  await drawImageCoverInBox(pdf, leftData,  fullBox);
+  await placeContain(pdf, leftData,  fullBox);
   drawBottomBar(lensDescriptions[leftName]?.text || "", lensDescriptions[leftName]?.url);
 
   pdf.addPage("a4", "landscape");
   fillBlack();
   drawTopBar(rightText);
-  await drawImageCoverInBox(pdf, rightData, fullBox);
+  await placeContain(pdf, rightData, fullBox);
   drawBottomBar(lensDescriptions[rightName]?.text || "", lensDescriptions[rightName]?.url);
 
   const safeLeft  = leftName.replace(/\s+/g, "");
