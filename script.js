@@ -36,11 +36,20 @@ const BASE_SENSOR = cameras["Sony Venice"]["6K 3:2"]; // jouw referentie
 const sensorFormatSelect = document.getElementById("sensorFormatSelect");
 const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← verplaatst naar boven
 
-
+function isWrapperFullscreen() {
+  const fe = document.fullscreenElement || document.webkitFullscreenElement;
+  return fe === comparisonWrapper;
+}
+async function enterWrapperFullscreen() {
+  if (comparisonWrapper.requestFullscreen) return comparisonWrapper.requestFullscreen();
+  if (comparisonWrapper.webkitRequestFullscreen) return comparisonWrapper.webkitRequestFullscreen();
+}
+async function exitAnyFullscreen() {
+  if (document.exitFullscreen) return document.exitFullscreen();
+  if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
+}
 function setWrapperSizeByAR(w, h) {
-  // In fullscreen nooit inline heights forceren; CSS + letterbox regelen dat
-  if (document.fullscreenElement === comparisonWrapper) return;
-
+  if (isWrapperFullscreen()) return; // in fullscreen geen inline heights forceren
   const width  = comparisonWrapper.getBoundingClientRect().width;
   const height = Math.round(width * (h / w)); // puur AR
 
@@ -65,8 +74,7 @@ function getCurrentWH() {
 
 // Zet CSS-variabelen met de benodigde letter-/pillarbox in px
 function updateFullscreenBars() {
-  // reset als niet fullscreen of als een ander element fullscreen is
-  if (document.fullscreenElement !== comparisonWrapper) {
+  if (!isWrapperFullscreen()) {
     comparisonWrapper.style.setProperty('--lb-top', '0px');
     comparisonWrapper.style.setProperty('--lb-bottom', '0px');
     comparisonWrapper.style.setProperty('--lb-left', '0px');
@@ -75,20 +83,21 @@ function updateFullscreenBars() {
   }
 
   const { w, h } = getCurrentWH();
-  const targetAR = w / h;               // gewenste aspect ratio
-  const viewW = window.innerWidth;      // scherm in fullscreen
+  const targetAR = w / h;
+
+  const viewW = window.innerWidth;
   const viewH = window.innerHeight;
   const viewAR = viewW / viewH;
 
   let top = 0, bottom = 0, left = 0, right = 0;
 
   if (viewAR > targetAR) {
-    // Scherm is breder → pillarbox links/rechts
+    // scherm breder → pillarbox links/rechts
     const usedW = Math.round(viewH * targetAR);
     const side  = Math.max(0, Math.floor((viewW - usedW) / 2));
     left = right = side;
   } else {
-    // Scherm is hoger → letterbox boven/onder
+    // scherm hoger → letterbox boven/onder
     const usedH = Math.round(viewW / targetAR);
     const bar   = Math.max(0, Math.floor((viewH - usedH) / 2));
     top = bottom = bar;
@@ -109,25 +118,7 @@ function applyCurrentFormat() {
 
  updateFullscreenBars();
 
-function setFullscreenARClass(fmtLabel) {
-  document.body.classList.remove(
-    "fs-3-2","fs-185","fs-17-9","fs-239","fs-16-9","fs-6-5","fs-4-3","fs-155"
-  );
-  const f = (fmtLabel || "").toLowerCase();
 
-  if (f.includes("open gate"))   return document.body.classList.add("fs-155"); // ~1.55:1
-  if (f.includes("3:2"))         return document.body.classList.add("fs-3-2");
-  if (f.includes("1.85:1"))      return document.body.classList.add("fs-185");
-  if (f.includes("17:9"))        return document.body.classList.add("fs-17-9");
-  if (f.includes("2.39:1"))      return document.body.classList.add("fs-239");
-  if (f.includes("16:9"))        return document.body.classList.add("fs-16-9");
-  if (f.includes("6:5"))         return document.body.classList.add("fs-6-5");
-  if (f.includes("4:3"))         return document.body.classList.add("fs-4-3");
-}
-
-// ... in applyCurrentFormat():
-const fmtLabel = cameras[cam][fmt].label || fmt;  // jouw labels bevatten bv. "6K 2.39:1"
-setFullscreenARClass(fmtLabel);
 
 // (laat je bestaande updateFullscreenBars() calls staan;
 //   in fullscreen wint de fs-* CSS en is padding toch 0)
@@ -188,12 +179,15 @@ cameraSelect.addEventListener("change", () => {
 
 
 sensorFormatSelect.addEventListener("change", applyCurrentFormat);
-document.addEventListener('fullscreenchange', () => {
-  if (document.fullscreenElement === comparisonWrapper) {
-    clearInlineHeights();   // kill inline heights zodra we fullscreen zijn
+function onFsChange() {
+  if (isWrapperFullscreen()) {
+    clearInlineHeights();            // nooit inline heights in fullscreen
   }
-  updateFullscreenBars();    // herbereken letter/pillarbox altijd
-});
+  updateFullscreenBars();            // 1e pass
+  requestAnimationFrame(updateFullscreenBars); // 2e pass na layout
+}
+document.addEventListener('fullscreenchange', onFsChange);
+document.addEventListener('webkitfullscreenchange', onFsChange);
 
 // Init (optioneel: standaard op Venice 6K 3:2)
 cameraSelect.value = "Sony Venice";
@@ -218,16 +212,14 @@ window.addEventListener("resize", () => {
 
   const { w, h } = cameras[cam][fmt];
 
-  if (document.fullscreenElement === comparisonWrapper) {
-    // In fullscreen geen heights forceren; alleen balken herberekenen
-    clearInlineHeights();
-    updateFullscreenBars();
-    requestAnimationFrame(updateFullscreenBars);
-  } else {
-    // Niet fullscreen → wrapperhoogte volgens gekozen AR
-    setWrapperSizeByAR(w, h);
-    requestAnimationFrame(() => setWrapperSizeByAR(w, h));
-  }
+  if (isWrapperFullscreen()) {
+  clearInlineHeights();
+  updateFullscreenBars();
+  requestAnimationFrame(updateFullscreenBars);
+} else {
+  setWrapperSizeByAR(w, h);
+  requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+}
 });
 
 const lenses = [
@@ -476,13 +468,15 @@ document.getElementById("toggleButton").addEventListener("click", () => {
 });
 
 document.getElementById("fullscreenButton")?.addEventListener("click", async () => {
-  if (document.fullscreenElement === comparisonWrapper) {
-    await document.exitFullscreen();
+  if (isWrapperFullscreen()) {
+    await exitAnyFullscreen();
   } else {
-    // vóór fullscreen: inline heights weg zodat CSS/letterbox werkt
-    clearInlineHeights();
-    await comparisonWrapper.requestFullscreen();
+    clearInlineHeights();          // vóór je fullscreen gaat
+    await enterWrapperFullscreen();
   }
+  updateFullscreenBars();
+  requestAnimationFrame(updateFullscreenBars);
+});
   // na toggle: opruimen + balken rekenen
   requestAnimationFrame(() => {
     clearInlineHeights();
