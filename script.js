@@ -845,8 +845,8 @@ function pulseFsBars({ duration = 1400 } = {}) {
 }
 // === Keyboard shortcuts ===
 document.addEventListener("keydown", (e) => {
-  if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
-
+  if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+// SELECT laten we door, zodat f/d ook werken als een dropdown focus heeft
   const k = e.key.toLowerCase();
 
   if (k === "f") {
