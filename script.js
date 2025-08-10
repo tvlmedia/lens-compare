@@ -142,8 +142,8 @@ function onFsChange() {
     // In fullscreen: nooit inline heights
     clearInlineHeights();
 
-   // stabiel her-meten zolang de browserbalk in- en uitfadet
-pulseFsBars({ duration: 1400 });
+    // stabiel her-meten zolang de browserbalk in- en uitfadet
+    pulseFsBars({ duration: 1400 });
   } else {
     // UIT fullscreen: direct de juiste hoogte terugzetten
     const { w, h } = getCurrentWH();
@@ -156,12 +156,12 @@ pulseFsBars({ duration: 1400 });
     comparisonWrapper.style.setProperty('--lb-bottom', '0px');
     comparisonWrapper.style.setProperty('--lb-left', '0px');
     comparisonWrapper.style.setProperty('--lb-right', '0px');
-  }
+
     // Slider meteen terug op volle hoogte buiten fullscreen
-  slider.style.top = '0px';
-  slider.style.height = '100%';
-  slider.style.bottom = '0';
-}
+    slider.style.top = '0px';
+    slider.style.height = '100%';
+    slider.style.bottom = '0';
+  }
 
   // Balken + slider opnieuw
   updateFullscreenBars();
