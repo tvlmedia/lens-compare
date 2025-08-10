@@ -691,9 +691,9 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
 
   // === PDF render ===
   fillBlack();
-  drawTopBar(`${leftText} vs ${rightText}`);
-  await drawImageContain(pdf, splitData);
-  drawBottomBarPage1(logo);
+drawTopBar(`${leftText} vs ${rightText}`);
+await drawImageCover(pdf, splitData);   // ← gebruik cover in plaats van contain
+drawBottomBarPage1(logo);
 
   pdf.addPage("a4", "landscape");
   fillBlack();
