@@ -203,18 +203,13 @@ updateFullscreenBars();
 clearInlineHeights();
 
 // Eigen resize-handler (GEEN extra listeners hier binnen toevoegen)
-const { w, h } = cameras[cam][fmt];
-
-if (document.fullscreenElement === comparisonWrapper) {
-  // In fullscreen geen heights forceren; alleen balken herberekenen
-  clearInlineHeights();
-  updateFullscreenBars();
-  requestAnimationFrame(updateFullscreenBars);
-} else {
-  // Niet fullscreen → wrapperhoogte volgens gekozen AR
-  setWrapperSizeByAR(w, h);
-  requestAnimationFrame(() => setWrapperSizeByAR(w, h));
-}
+window.addEventListener("resize", () => {
+  // mobile-mode togglen
+  if (window.innerWidth < 768) {
+    document.body.classList.add("mobile-mode");
+  } else {
+    document.body.classList.remove("mobile-mode");
+  }
 
   // opnieuw toepassen voor huidige keuze
   const cam = cameraSelect.value;
@@ -222,12 +217,17 @@ if (document.fullscreenElement === comparisonWrapper) {
   if (!cam || !fmt) return;
 
   const { w, h } = cameras[cam][fmt];
-  setWrapperSizeByAR(w, h);
-  requestAnimationFrame(() => setWrapperSizeByAR(w, h));
 
-  // letterbox/pillarbox waardes na resize bijwerken
-  updateFullscreenBars();
-  requestAnimationFrame(updateFullscreenBars);
+  if (document.fullscreenElement === comparisonWrapper) {
+    // In fullscreen geen heights forceren; alleen balken herberekenen
+    clearInlineHeights();
+    updateFullscreenBars();
+    requestAnimationFrame(updateFullscreenBars);
+  } else {
+    // Niet fullscreen → wrapperhoogte volgens gekozen AR
+    setWrapperSizeByAR(w, h);
+    requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+  }
 });
 
 const lenses = [
