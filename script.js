@@ -46,12 +46,60 @@ function setWrapperSizeByAR(w, h) {
   comparisonWrapper.style.setProperty('min-height', `${height}px`, 'important');
   comparisonWrapper.style.setProperty('max-height', `${height}px`, 'important');
 }
+
+ // Geeft de width/height van het huidige sensor-formaat terug
+function getCurrentWH() {
+  const cam = cameraSelect.value;
+  const fmt = sensorFormatSelect.value;
+  if (!cam || !fmt) return { w: BASE_SENSOR.w, h: BASE_SENSOR.h };
+  return cameras[cam][fmt];
+}
+
+// Zet CSS-variabelen met de benodigde letter-/pillarbox in px
+function updateFullscreenBars() {
+  // reset als niet fullscreen of als een ander element fullscreen is
+  if (document.fullscreenElement !== comparisonWrapper) {
+    comparisonWrapper.style.setProperty('--lb-top', '0px');
+    comparisonWrapper.style.setProperty('--lb-bottom', '0px');
+    comparisonWrapper.style.setProperty('--lb-left', '0px');
+    comparisonWrapper.style.setProperty('--lb-right', '0px');
+    return;
+  }
+
+  const { w, h } = getCurrentWH();
+  const targetAR = w / h;               // gewenste aspect ratio
+  const viewW = window.innerWidth;      // scherm in fullscreen
+  const viewH = window.innerHeight;
+  const viewAR = viewW / viewH;
+
+  let top = 0, bottom = 0, left = 0, right = 0;
+
+  if (viewAR > targetAR) {
+    // Scherm is breder → pillarbox links/rechts
+    const usedW = Math.round(viewH * targetAR);
+    const side  = Math.max(0, Math.floor((viewW - usedW) / 2));
+    left = right = side;
+  } else {
+    // Scherm is hoger → letterbox boven/onder
+    const usedH = Math.round(viewW / targetAR);
+    const bar   = Math.max(0, Math.floor((viewH - usedH) / 2));
+    top = bottom = bar;
+  }
+
+  comparisonWrapper.style.setProperty('--lb-top',    `${top}px`);
+  comparisonWrapper.style.setProperty('--lb-bottom', `${bottom}px`);
+  comparisonWrapper.style.setProperty('--lb-left',   `${left}px`);
+  comparisonWrapper.style.setProperty('--lb-right',  `${right}px`);
+}
+
 function applyCurrentFormat() {
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
   if (!cam || !fmt) return;
 
   const { w, h } = cameras[cam][fmt];
+
+ updateFullscreenBars();
 
  // reset schaal var
 comparisonWrapper.style.removeProperty("--sensor-scale");
@@ -373,12 +421,13 @@ document.getElementById("toggleButton").addEventListener("click", () => {
   updateImages();
 });
 
-document.getElementById("fullscreenButton")?.addEventListener("click", () => {
-  if (!document.fullscreenElement) {
-    comparisonWrapper.requestFullscreen();
+document.getElementById("fullscreenButton")?.addEventListener("click", async () => {
+  if (document.fullscreenElement === comparisonWrapper) {
+    await document.exitFullscreen();
   } else {
-    document.exitFullscreen();
+    await comparisonWrapper.requestFullscreen();
   }
+  requestAnimationFrame(updateFullscreenBars);
 });
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
