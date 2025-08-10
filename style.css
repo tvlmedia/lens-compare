@@ -479,39 +479,11 @@ body.dragging * {
   height: 100%;
   object-fit: cover;
 
-  /* Fullscreen letter/pillarbox via JS-variabelen */
-#comparisonWrapper:fullscreen,
-#comparisonWrapper:-webkit-full-screen {
-  box-sizing: content-box;
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  background: #000;
-  padding-top:    var(--lb-top, 0px);
-  padding-bottom: var(--lb-bottom, 0px);
-  padding-left:   var(--lb-left, 0px);
-  padding-right:  var(--lb-right, 0px);
-  overflow: hidden; /* handig tegen eventuele ‘bleed’ */
-}
-
-/* In fullscreen moeten de lagen de CONTENT box vullen (dus geen absolute/inset meer) */
-#comparisonWrapper:fullscreen #beforeImage,
-#comparisonWrapper:-webkit-full-screen #beforeImage,
-#comparisonWrapper:fullscreen #afterWrapper,
-#comparisonWrapper:-webkit-full-screen #afterWrapper {
-  position: relative;
-  inset: auto;
-  width: 100%;
-  height: 100%;
-}
-
-/* De images vullen de laag zelf */
-#comparisonWrapper:fullscreen #beforeImage img,
-#comparisonWrapper:-webkit-full-screen #beforeImage img,
-#comparisonWrapper:fullscreen #afterWrapper #afterImage img,
-#comparisonWrapper:-webkit-full-screen #afterWrapper #afterImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+ /* Fullscreen specifieke crop voor 6K 2.39:1 */
+body.fullscreen-239 #comparisonWrapper:fullscreen,
+body.fullscreen-239 #comparisonWrapper:-webkit-full-screen {
+  aspect-ratio: 239 / 100; /* 2.39:1 */
+  max-width: 100vw;
+  max-height: 100vh;
+  margin: auto;
 }
