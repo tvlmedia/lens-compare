@@ -477,12 +477,7 @@ document.getElementById("fullscreenButton")?.addEventListener("click", async () 
   updateFullscreenBars();
   requestAnimationFrame(updateFullscreenBars);
 });
-  // na toggle: opruimen + balken rekenen
-  requestAnimationFrame(() => {
-    clearInlineHeights();
-    updateFullscreenBars();
-  });
-});
+
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
