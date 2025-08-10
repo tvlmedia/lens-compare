@@ -493,3 +493,14 @@ body.dragging * {
 #comparisonWrapper:-webkit-full-screen {
   overflow: hidden; /* geen lekken buiten bruikbare vlak */
 }
+/* Zwarte balken die de door JS berekende letter/pillarbox exact afdekken */
+#fsBars { position:absolute; inset:0; pointer-events:none; z-index:9; }
+#fsBars .bar { position:absolute; background:#000; }
+
+#fsBars .top    { top:0;    left:var(--lb-left,0); right:var(--lb-right,0); height:var(--lb-top,0); }
+#fsBars .bottom { bottom:0; left:var(--lb-left,0); right:var(--lb-right,0); height:var(--lb-bottom,0); }
+#fsBars .left   { top:var(--lb-top,0); bottom:var(--lb-bottom,0); left:0;  width:var(--lb-left,0); }
+#fsBars .right  { top:var(--lb-top,0); bottom:var(--lb-bottom,0); right:0; width:var(--lb-right,0); }
+
+/* Slider moet boven de balken liggen */
+#slider { z-index: 10; }
