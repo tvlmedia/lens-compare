@@ -518,8 +518,7 @@ async function getImageDimsFromDataURL(dataUrl) {
 
   
 
-    pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
-  }
+    
   function getContentBox(pageW, pageH) {
     const x = PAGE_MARGIN;
     const y = TOP_BAR + PAGE_MARGIN;
