@@ -472,3 +472,21 @@ body.dragging * {
   object-position:center;
   display:block;
 }
+/* ===== Fullscreen black bars fix voor 2.39:1 ===== */
+#comparisonWrapper:fullscreen,
+#comparisonWrapper:-webkit-full-screen {
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#comparisonWrapper:fullscreen #beforeImage,
+#comparisonWrapper:-webkit-full-screen #beforeImage,
+#comparisonWrapper:fullscreen #afterWrapper,
+#comparisonWrapper:-webkit-full-screen #afterWrapper {
+  aspect-ratio: 2.39 / 1; /* Cinemascope verhouding */
+  max-height: 100%;
+  max-width: 100%;
+  background: black;
+}
