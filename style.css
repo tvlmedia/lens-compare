@@ -535,3 +535,11 @@ body.dragging * {
 }
 
 #comparisonWrapper { aspect-ratio: auto !important; }
+
+
+/* SENSOR-MODE: hou cover, geen contain */
+.sensor-mode #comparisonWrapper #beforeImage img,
+.sensor-mode #comparisonWrapper #afterWrapper #afterImage img {
+  object-fit: cover !important;  /* fix t.o.v. contain */
+  background: black;
+}
