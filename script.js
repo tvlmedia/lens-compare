@@ -766,13 +766,22 @@ function updateFullscreenBars() {
 
 // VERVANGT resetSplitToMiddle()
 function resetSplitToMiddle() {
-  const usable = Math.max(1, comparisonWrapper._usableW || comparisonWrapper.getBoundingClientRect().width);
-  const lbLeft = comparisonWrapper._lbLeft || 0;
-  const mid = Math.round(usable / 2);
-  const rightInsetPx = usable - mid;
+  const rect    = comparisonWrapper.getBoundingClientRect();
+  const lbLeft  = comparisonWrapper._lbLeft  || 0;
+  const lbRight = comparisonWrapper._lbRight || 0;
+  const usable  = Math.max(1, Math.round(rect.width - lbLeft - lbRight));
 
-  afterWrapper.style.clipPath = `inset(0 ${rightInsetPx}px 0 0)`;
-  afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
+  const mid = Math.round(usable / 2);
+
+  // clip aan beide kanten: links = lbLeft, rechts = lbRight + rest
+  const leftInsetPx  = lbLeft;
+  const rightInsetPx = lbRight + (usable - mid);
+
+  const inset = `inset(0 ${rightInsetPx}px 0 ${leftInsetPx}px)`;
+  afterWrapper.style.clipPath = inset;
+  afterWrapper.style.webkitClipPath = inset;
+
+  // lijn precies midden in bruikbare beeldvlak
   slider.style.left = (lbLeft + mid) + 'px';
 }
 
