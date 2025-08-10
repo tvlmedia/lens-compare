@@ -450,14 +450,14 @@ body.dragging * {
 
 
 
-/* GENERIC fullscreen basis (zonder vaste height) */
+/* FULLSCREEN: vul het scherm; zwarte balken via padding-variabelen */
 #comparisonWrapper:fullscreen,
 #comparisonWrapper:-webkit-full-screen {
-  box-sizing: content-box;
   width: 100vw;
-  height: auto; /* ← hoogte wordt bepaald door aspect-ratio */
+  height: 100vh;           /* ← altijd hele schermhoogte */
   margin: 0;
   background: #000;
+  box-sizing: border-box;  /* paddings tellen mee in de doos */
   padding-top:    var(--lb-top, 0px);
   padding-bottom: var(--lb-bottom, 0px);
   padding-left:   var(--lb-left, 0px);
