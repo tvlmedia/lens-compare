@@ -37,17 +37,16 @@ const sensorFormatSelect = document.getElementById("sensorFormatSelect");
 const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← verplaatst naar boven
 
 
-  function setWrapperSizeByAR(w, h) {
+ function setWrapperSizeByAR(w, h) {
+  const scale = BASE_SENSOR.w / w; // horizontale schaal t.o.v. Venice 6K 3:2
   const width  = comparisonWrapper.getBoundingClientRect().width;
-  const height = Math.round(width * (h / w));
+  const height = Math.round((width / scale) * (h / w));
 
-  // aspect-ratio uit, harde hoogte erin
   comparisonWrapper.style.removeProperty('aspect-ratio');
   comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
   comparisonWrapper.style.setProperty('min-height', `${height}px`, 'important');
   comparisonWrapper.style.setProperty('max-height', `${height}px`, 'important');
 }
-
 function applyCurrentFormat() {
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
