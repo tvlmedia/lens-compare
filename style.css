@@ -248,33 +248,31 @@ select:hover,
   line-height: 1.5;
 }
 
-/* ========== Mobile Fix voor beforeImage (rechter beeld) ========== */
+/* ========== Mobile mode ========== */
 .mobile-mode #comparisonWrapper {
-  width: 100vw; /* laat JS de hoogte bepalen */
-}
-  overflow: hidden;
-  position: relative;
+  width: 100vw; /* laat JS (applyCurrentFormat) de hoogte bepalen */
 }
 
-.mobile-mode #beforeImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 1;
-  pointer-events: none;
+.mobile-mode #afterWrapper #afterImage,
+.mobile-mode #afterWrapper #afterImage img {
+  width: 100% !important;
+  height: 100% !important;
 }
 
-.mobile-mode #beforeImage img {
+.mobile-mode #infoContainer {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  position: absolute;
-  top: 0;
-  left: 0;
+  padding: 0 16px;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 13px;
+  text-align: center;
+  gap: 8px;
+}
+
+.mobile-mode #leftLabel,
+.mobile-mode #rightLabel {
+  width: 50%;
+  margin: 0;
 }
 @media (max-width: 767px) {
   #fullscreenButton {
@@ -493,12 +491,7 @@ body.dragging * {
   object-position:center;
 }
 
-/* Als sensor-mode actief is → beide kanten contain + black bars */
-.sensor-mode #beforeImage img,
-.sensor-mode #afterImage img {
-  object-fit: contain;
-  background: black; /* voor transparante PNG's */
-}
+
 
 /* Hard fix tegen theme-regels zoals img{height:auto} */
 #comparisonWrapper #beforeImage img,
