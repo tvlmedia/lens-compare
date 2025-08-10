@@ -65,6 +65,16 @@ cameraSelect.addEventListener("change", () => {
 
 comparisonWrapper.style.removeProperty("--sensor-scale");
 
+function setWrapperSizeByAR(w, h) {
+  // breedte van de wrapper zoals hij nu op de pagina staat
+  const width = comparisonWrapper.clientWidth || comparisonWrapper.offsetWidth;
+  // reken hoogte uit: H = W * (h/w)
+  const height = width * (h / w);
+  // zet expliciet de hoogte in px, en wis evt. oude inline aspectRatio
+  comparisonWrapper.style.height = `${height}px`;
+  comparisonWrapper.style.removeProperty('aspectRatio');
+}
+
 sensorFormatSelect.addEventListener("change", () => {
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
@@ -76,17 +86,20 @@ sensorFormatSelect.addEventListener("change", () => {
  // 1) Aspect — SPECIAL CASE voor Venice 6K-modi (breedte ≈ gelijk aan basis)
 // Hierdoor blijft de wrapper 3:2 zodat de zoom zichtbaar wordt.
 const { w, h } = cameras[cam][fmt];
-const sameWidthAsBase = Math.abs(w - BASE_SENSOR.w) < 0.2;
-const isVenice6K = cam === "Sony Venice" && fmt.startsWith("6K");
 
-// Special case: 6K 17:9 en 6K 1.85:1 blijven op basis 3:2 ratio voor duidelijke zoom
-if (isVenice6K && (fmt.includes("17:9") || fmt.includes("1.85:1"))) {
-  comparisonWrapper.style.aspectRatio = `${BASE_SENSOR.w} / ${BASE_SENSOR.h}`;
+// 1) Wil je bij Venice 6K 17:9 en 6K 1.85:1 de viewer op 3:2 laten
+//    om puur de *zoom* te zien? Laat de container dan 3:2,
+//    maar laat we de *beelden* zélf zoomen (dat doe je al met transform: scale).
+const isVenice6K = (cam === "Sony Venice") && fmt.startsWith("6K");
+const keepBaseAR = isVenice6K && (fmt.includes("17:9") || fmt.includes("1.85:1"));
+
+if (keepBaseAR) {
+  // Container: 3:2 hoogte
+  setWrapperSizeByAR(BASE_SENSOR.w, BASE_SENSOR.h);
 } else {
-  // Alle andere modi (inclusief 6K 2.39:1) krijgen hun echte verhouding
-  comparisonWrapper.style.aspectRatio = `${w} / ${h}`;
+  // Container: echte verhouding van het gekozen formaat (bv. 2.39:1 wordt echt platter)
+  setWrapperSizeByAR(w, h);
 }
-
   // 2) Sensor-mode = contain + letterbox in CSS
   document.body.classList.add("sensor-mode");
 
@@ -105,11 +118,29 @@ comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
 // Init (optioneel: standaard op Venice 6K 3:2)
 cameraSelect.value = "Sony Venice";
 cameraSelect.dispatchEvent(new Event("change"));
+
 window.addEventListener("resize", () => {
   if (window.innerWidth < 768) {
     document.body.classList.add("mobile-mode");
   } else {
     document.body.classList.remove("mobile-mode");
+  }
+
+  // opnieuw toepassen voor huidige keuze
+  const cam = cameraSelect.value;
+  const fmt = sensorFormatSelect.value;
+  if (!cam || !fmt) return;
+
+  const { w, h } = cameras[cam][fmt];
+  const keepBaseAR =
+    (cam === "Sony Venice") &&
+    fmt.startsWith("6K") &&
+    (fmt.includes("17:9") || fmt.includes("1.85:1"));
+
+  if (keepBaseAR) {
+    setWrapperSizeByAR(BASE_SENSOR.w, BASE_SENSOR.h);
+  } else {
+    setWrapperSizeByAR(w, h);
   }
 });
 
