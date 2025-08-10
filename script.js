@@ -696,7 +696,11 @@ function drawBottomBarPage1() {
   const yLogo        = pageHeight - targetHeight - 12;
   pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
 }
- const splitCanvas = await html2canvas(comparison, { scale: 4, useCORS: true });
+const splitCanvas = await html2canvas(comparison, {
+  scale: Math.min(3, (window.devicePixelRatio || 1) * 1.5),
+  useCORS: true,
+  backgroundColor: null
+});
 // Gebruik gewoon de natuurlijke canvas-afmeting (geen vervorming)
 const splitData = splitCanvas.toDataURL("image/jpeg", 0.95);
 
