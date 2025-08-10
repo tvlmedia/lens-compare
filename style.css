@@ -48,7 +48,7 @@ select:hover,
   max-width: 960px;
   position: relative;
   background: black;
-  overflow: hidden;
+  overflow: visible;
 }
 
 
