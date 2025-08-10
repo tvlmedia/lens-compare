@@ -584,32 +584,40 @@ async function getImageDimsFromDataURL(dataUrl) {
       fit.h
     );
   }
-  function drawTopBar(text) {
-    const barHeight = 40;
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, barHeight, "F");
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(16);
-    pdf.text(text, pageWidth / 2, 20, { align: "center" });
-  }
+  const pageWidth = pdf.internal.pageSize.getWidth();
+const barHeight = TOP_BAR;
+pdf.setFillColor(0, 0, 0);
+pdf.rect(0, 0, pageWidth, barHeight, "F");
+pdf.setTextColor(255, 255, 255);
+pdf.setFontSize(16);
+pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, { align: "center", baseline: "middle" });
 
-  function drawBottomBar(text = "", link = "") {
-    const barHeight = 80;
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+const pageHeight = pdf.internal.pageSize.getHeight();
+const barHeight = BOTTOM_BAR;
 
-    pdf.setFontSize(12);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
+pdf.setFillColor(0, 0, 0);
+pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-    if (link) {
-      const displayText = "Klik hier voor alle info over deze lens";
-      const x = 20;
-      const y = pageHeight - barHeight + 55;
-      pdf.setFontSize(10);
-      pdf.setTextColor(0, 102, 255);
-      pdf.textWithLink(displayText, x, y, { url: link });
-    }
+pdf.setFontSize(12);
+pdf.setTextColor(255, 255, 255);
+pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
+
+if (link) {
+  const displayText = "Klik hier voor alle info over deze lens";
+  const x = 20;
+  const y = pageHeight - barHeight + 55;
+  pdf.setFontSize(10);
+  pdf.setTextColor(0, 102, 255);
+  pdf.textWithLink(displayText, x, y, { url: link });
+}
+
+const targetHeight = 50;
+const ratio = logo.width / logo.height;
+const targetWidth = targetHeight * ratio;
+const xLogo = pageWidth - targetWidth - 12;
+const yLogo = pageHeight - targetHeight - 12;
+pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
 
     const targetHeight = 50;
     const ratio = logo.width / logo.height;
@@ -619,25 +627,35 @@ async function getImageDimsFromDataURL(dataUrl) {
     pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   }
 
-  function drawBottomBarPage1(barHeight) {
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  function drawBottomBarPage1() {
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const barHeight = BOTTOM_BAR;
 
-    const text = "Benieuwd naar alle lenzen? Klik hier";
-    const fontSize = 22;
-    const textY = pageHeight - barHeight / 2 + fontSize / 2 - 10;
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-    pdf.setFontSize(fontSize);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(text, pageWidth / 2, textY, { align: "center" });
+  const text = "Benieuwd naar alle lenzen? Klik hier";
+  const fontSize = 22;
+  const textY = pageHeight - Math.round(barHeight / 2);
 
-    const textWidth = pdf.getTextWidth(text);
-    const linkX = (pageWidth - textWidth) / 2;
-    const linkY = textY - fontSize + 5 - 10;
-    const linkHeight = fontSize + 6;
-    pdf.link(linkX, linkY, textWidth, linkHeight, {
-      url: "https://tvlrental.nl/lenses/"
-    });
+  pdf.setFontSize(fontSize);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(text, pageWidth / 2, textY, { align: "center", baseline: "middle" });
+
+  const textWidth = pdf.getTextWidth(text);
+  const linkX = (pageWidth - textWidth) / 2;
+  const linkY = textY - Math.round(fontSize / 2) - 4;
+  const linkHeight = fontSize + 8;
+  pdf.link(linkX, linkY, textWidth, linkHeight, { url: "https://tvlrental.nl/lenses/" });
+
+  const targetHeight = 50;
+  const ratio = logo.width / logo.height;
+  const targetWidth = targetHeight * ratio;
+  const xLogo = pageWidth - targetWidth - 12;
+  const yLogo = pageHeight - targetHeight - 12;
+  pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+}
 
     const targetHeight = 50;
     const ratio = logo.width / logo.height;
