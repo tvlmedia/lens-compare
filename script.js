@@ -80,44 +80,31 @@ function getCurrentWH() {
 
 
 
- function applyCurrentFormat() {
+function applyCurrentFormat() {
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
   if (!cam || !fmt) return;
 
   const { w, h } = cameras[cam][fmt];
 
- updateFullscreenBars();
+  // reset schaal var
+  comparisonWrapper.style.removeProperty("--sensor-scale");
 
+  // Altijd exact naar gekozen formaat schalen
+  setWrapperSizeByAR(w, h);
+  requestAnimationFrame(() => setWrapperSizeByAR(w, h));
 
+  document.body.classList.add("sensor-mode");
 
-// (laat je bestaande updateFullscreenBars() calls staan;
-//   in fullscreen wint de fs-* CSS en is padding toch 0)
-  
- // reset schaal var
-comparisonWrapper.style.removeProperty("--sensor-scale");
-
-// Altijd exact naar gekozen formaat schalen
-setWrapperSizeByAR(w, h);
-// vangnet: nog een keer in de volgende frame
-requestAnimationFrame(() => setWrapperSizeByAR(w, h));
-
- // sensor-mode aan
-document.body.classList.add("sensor-mode");
-
-// Schaal puur op horizontale breedte t.o.v. Venice 6K 3:2
-// - smallere sensor => scale > 1 (inzoomen, bv. S16)
-// - bredere sensor  => scale < 1 (uitzoomen, bv. Alexa 2K Ana)
-let scale = BASE_SENSOR.w / w;
-
-  // mini-verschillen rond Venice afronden naar 1 om micro-zoom te voorkomen
+  // Schaal t.o.v. Venice
+  let scale = BASE_SENSOR.w / w;
   if (Math.abs(BASE_SENSOR.w - w) < 0.1) scale = 1;
+  comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
 
-    comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
-
+  // Bars/slider opnieuw positioneren
   updateFullscreenBars();
-  resetSplitToMiddle();     // <<< nieuw
-} // einde applyCurrentFormat
+  resetSplitToMiddle();
+}
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
   cameraSelect.add(new Option(cam, cam));
@@ -733,6 +720,19 @@ document.addEventListener("keydown", (e) => {
 });
 // VERVANGT updateFullscreenBars()
 function updateFullscreenBars() {
+  // ✅ Alleen letter/pillarbox berekenen in fullscreen
+  if (!isWrapperFullscreen()) {
+    comparisonWrapper.style.setProperty('--lb-top', '0px');
+    comparisonWrapper.style.setProperty('--lb-bottom', '0px');
+    comparisonWrapper.style.setProperty('--lb-left', '0px');
+    comparisonWrapper.style.setProperty('--lb-right', '0px');
+    // Zorg dat interne helpers niet met oude waarden werken:
+    comparisonWrapper._lbLeft  = 0;
+    comparisonWrapper._lbRight = 0;
+    comparisonWrapper._usableW = comparisonWrapper.getBoundingClientRect().width;
+    return;
+  }
+
   const rect  = comparisonWrapper.getBoundingClientRect();
   const hostW = Math.max(1, Math.round(rect.width));
   const hostH = Math.max(1, Math.round(rect.height));
@@ -745,26 +745,22 @@ function updateFullscreenBars() {
   let lbLeft = 0, lbRight = 0, lbTop = 0, lbBottom = 0;
 
   if (hostAR > targetAR) {
-    // Pillarbox links/rechts
     usedH = hostH;
     usedW = Math.round(usedH * targetAR);
     const side = Math.floor((hostW - usedW) / 2);
     lbLeft = lbRight = side;
   } else {
-    // Letterbox boven/onder
     usedW = hostW;
     usedH = Math.round(usedW / targetAR);
     const bar = Math.floor((hostH - usedH) / 2);
     lbTop = lbBottom = bar;
   }
 
-  // Zet CSS variabelen voor fullscreen black bars
   comparisonWrapper.style.setProperty('--lb-top',    lbTop + 'px');
   comparisonWrapper.style.setProperty('--lb-bottom', lbBottom + 'px');
   comparisonWrapper.style.setProperty('--lb-left',   lbLeft + 'px');
   comparisonWrapper.style.setProperty('--lb-right',  lbRight + 'px');
 
-  // Bewaar waarden voor slider/clip-path
   comparisonWrapper._lbLeft  = lbLeft;
   comparisonWrapper._lbRight = lbRight;
   comparisonWrapper._usableW = usedW;
