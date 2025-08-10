@@ -472,6 +472,8 @@ requestAnimationFrame(() => {
   resetSplitToMiddle();
 });
 
+}); // ← sluit de fullscreenButton click handler af
+
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   const { jsPDF } = window.jspdf;
