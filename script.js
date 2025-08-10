@@ -772,7 +772,7 @@ const rightData = await renderImage(rightImg);
 
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
- await drawImageCover(pdf, splitData); // pagina 1 (contain, geen crop)
+ await drawImageContain(pdf, splitData);
   drawBottomBarPage1();
 
  pdf.addPage("a4", "landscape");
