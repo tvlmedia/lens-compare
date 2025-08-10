@@ -101,6 +101,29 @@ function applyCurrentFormat() {
 
  updateFullscreenBars();
 
+function setFullscreenARClass(fmtLabel) {
+  document.body.classList.remove(
+    "fs-3-2","fs-185","fs-17-9","fs-239","fs-16-9","fs-6-5","fs-4-3","fs-155"
+  );
+  const f = (fmtLabel || "").toLowerCase();
+
+  if (f.includes("open gate"))   return document.body.classList.add("fs-155"); // ~1.55:1
+  if (f.includes("3:2"))         return document.body.classList.add("fs-3-2");
+  if (f.includes("1.85:1"))      return document.body.classList.add("fs-185");
+  if (f.includes("17:9"))        return document.body.classList.add("fs-17-9");
+  if (f.includes("2.39:1"))      return document.body.classList.add("fs-239");
+  if (f.includes("16:9"))        return document.body.classList.add("fs-16-9");
+  if (f.includes("6:5"))         return document.body.classList.add("fs-6-5");
+  if (f.includes("4:3"))         return document.body.classList.add("fs-4-3");
+}
+
+// ... in applyCurrentFormat():
+const fmtLabel = cameras[cam][fmt].label || fmt;  // jouw labels bevatten bv. "6K 2.39:1"
+setFullscreenARClass(fmtLabel);
+
+// (laat je bestaande updateFullscreenBars() calls staan;
+//   in fullscreen wint de fs-* CSS en is padding toch 0)
+  
  // reset schaal var
 comparisonWrapper.style.removeProperty("--sensor-scale");
 
