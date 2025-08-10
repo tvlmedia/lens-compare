@@ -525,27 +525,3 @@ body.fs-155  #comparisonWrapper:-webkit-full-screen {
   object-fit: cover;
 }
 
-/* ==== Fullscreen: aspect-ratio per gekozen sensorformaat ==== */
-body.fs-3-2  #comparisonWrapper:fullscreen,
-body.fs-3-2  #comparisonWrapper:-webkit-full-screen { aspect-ratio: 3 / 2 !important; }
-
-body.fs-185  #comparisonWrapper:fullscreen,
-body.fs-185  #comparisonWrapper:-webkit-full-screen { aspect-ratio: 185 / 100 !important; } /* 1.85:1 */
-
-body.fs-17-9 #comparisonWrapper:fullscreen,
-body.fs-17-9 #comparisonWrapper:-webkit-full-screen { aspect-ratio: 17 / 9 !important; }
-
-body.fs-239  #comparisonWrapper:fullscreen,
-body.fs-239  #comparisonWrapper:-webkit-full-screen { aspect-ratio: 239 / 100 !important; } /* 2.39:1 */
-
-body.fs-16-9 #comparisonWrapper:fullscreen,
-body.fs-16-9 #comparisonWrapper:-webkit-full-screen { aspect-ratio: 16 / 9 !important; }
-
-body.fs-6-5  #comparisonWrapper:fullscreen,
-body.fs-6-5  #comparisonWrapper:-webkit-full-screen { aspect-ratio: 6 / 5 !important; }
-
-body.fs-4-3  #comparisonWrapper:fullscreen,
-body.fs-4-3  #comparisonWrapper:-webkit-full-screen { aspect-ratio: 4 / 3 !important; }
-
-body.fs-155  #comparisonWrapper:fullscreen,
-body.fs-155  #comparisonWrapper:-webkit-full-screen { aspect-ratio: 155 / 100 !important; } /* ~1.55:1 */
