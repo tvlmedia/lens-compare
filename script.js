@@ -845,3 +845,18 @@ function pulseFsBars({ duration = 1400 } = {}) {
     if (now - start < duration) requestAnimationFrame(tick);
   })(start);
 }
+// === Keyboard shortcuts ===
+document.addEventListener("keydown", (e) => {
+  // Niet triggeren als je in een input/select/textarea zit
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) return;
+
+  if (e.key.toLowerCase() === "f") {
+    // Fullscreen toggle
+    document.getElementById("fullscreenButton")?.click();
+  }
+
+  if (e.key.toLowerCase() === "d") {
+    // Detail view toggle
+    document.getElementById("detailViewToggle")?.click();
+  }
+});
