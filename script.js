@@ -514,7 +514,7 @@ async function getImageDimsFromDataURL(dataUrl) {
   await new Promise(resolve => (img.onload = resolve));
 
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/jpeg", 0.98); // iets hogere kwaliteit
+  return canvas.toDataURL("image/jpeg", 1.0);
 }
 
   
@@ -590,7 +590,7 @@ async function drawImageCover(pdf, imgData) {
   const fit = fitCover(img.width, img.height, box.w, box.h);
 
   // 2) Render op hogere resolutie om blur te voorkomen
-  const dpr = Math.min(2, window.devicePixelRatio || 1);   // 2x is meestal genoeg; 3x kan, maar maakt PDF zwaarder
+  const dpr = 3; // of Math.min(3, window.devicePixelRatio || 3)
   const cvs = document.createElement("canvas");
   cvs.width  = Math.round(box.w * dpr);
   cvs.height = Math.round(box.h * dpr);
@@ -764,9 +764,7 @@ const splitData = splitCvs.toDataURL("image/jpeg", 0.98);
 const leftData  = await renderImage(leftImg);
 const rightData = await renderImage(rightImg);
 
-// DataURL’s voor pagina 2/3 (zoals je al deed)
-const leftData  = await renderImage(leftImg);
-const rightData = await renderImage(rightImg);
+
 
   
 
