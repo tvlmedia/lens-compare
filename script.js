@@ -556,28 +556,7 @@ const leftDetailImg = leftDetail.querySelector("img");
 const rightDetailImg = rightDetail.querySelector("img");
 const detailToggleButton = document.getElementById("detailViewToggle");
 
-function syncDetailOverlayBox() {
-  const r = comparisonWrapper.getBoundingClientRect();
-  detailOverlay.style.left   = `${r.left}px`;
-  detailOverlay.style.top    = `${r.top}px`;
-  detailOverlay.style.width  = `${r.width}px`;
-  detailOverlay.style.height = `${r.height}px`;
-}
 
-let detailActive = false;
-
-detailToggleButton.addEventListener("click", () => {
-  detailActive = !detailActive;
-  detailOverlay.classList.toggle("active", detailActive);
-  detailToggleButton.classList.toggle("active", detailActive);
-
-  if (detailActive) {
-    syncDetailOverlayBox();
-  } else {
-    leftDetail.style.display = "none";
-    rightDetail.style.display = "none";
-  }
-});
 document.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
