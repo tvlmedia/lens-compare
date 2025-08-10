@@ -356,10 +356,10 @@ select:hover,
   touch-action: none;
 }
 #detailOverlay {
-  position: fixed;     /* full-screen overlay */
-  inset: 0;            /* top/right/bottom/left = 0 */
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  inset: 0;              /* ← toevoegen */
+  width: 100vw;          /* ← toevoegen */
+  height: 100vh;         /* ← toevoegen */
   pointer-events: none;
   z-index: 9999;
   overflow: visible;
