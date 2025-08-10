@@ -150,43 +150,46 @@ cameraSelect.addEventListener("change", () => {
 
 
 sensorFormatSelect.addEventListener("change", applyCurrentFormat);
-function onFsChange
-// Luister naar fullscreen wissels
+function onFsChange() {
+  if (isWrapperFullscreen()) {
+    // In fullscreen: nooit inline heights
+    clearInlineHeights();
+  } else {
+    // UIT fullscreen: direct de juiste hoogte terugzetten
+    const { w, h } = getCurrentWH();
+    comparisonWrapper.style.setProperty('aspect-ratio', 'auto'); // vangnet
+    setWrapperSizeByAR(w, h);
+    requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+
+    // FS-balk variabelen resetten
+    comparisonWrapper.style.setProperty('--lb-top', '0px');
+    comparisonWrapper.style.setProperty('--lb-bottom', '0px');
+    comparisonWrapper.style.setProperty('--lb-left', '0px');
+    comparisonWrapper.style.setProperty('--lb-right', '0px');
+  }
+
+  // Balken + slider opnieuw
+  updateFullscreenBars();
+  requestAnimationFrame(() => {
+    updateFullscreenBars();
+    resetSplitToMiddle();
+  });
+
+  // Extra vangnet tegen 'mini' state
+  requestAnimationFrame(() => {
+    if (!isWrapperFullscreen()) {
+      const { w, h } = getCurrentWH();
+      setWrapperSizeByAR(w, h);
+    }
+  });
+}
+
+// Luister naar fullscreen wissels (buiten de functie!)
 document.addEventListener('fullscreenchange', onFsChange);
 document.addEventListener('webkitfullscreenchange', onFsChange); // Safari
 
-// Direct bij pageload al één keer checken
+// Direct bij pageload 1x runnen
 onFsChange();
-window.addEventListener("resize", () => {
-  // mobile-mode togglen
-  if (window.innerWidth < 768) {
-    document.body.classList.add("mobile-mode");
-  } else {
-    document.body.classList.remove("mobile-mode");
-  }
-
-  // opnieuw toepassen voor huidige keuze
-  const cam = cameraSelect.value;
-  const fmt = sensorFormatSelect.value;
-  if (!cam || !fmt) return;
-
-  const { w, h } = cameras[cam][fmt];
-
-  if (isWrapperFullscreen()) {
-    clearInlineHeights();
-    updateFullscreenBars();
-    requestAnimationFrame(() => {
-      updateFullscreenBars();
-      resetSplitToMiddle();                // <<< nieuw
-    });
-  } else {
-    setWrapperSizeByAR(w, h);
-    requestAnimationFrame(() => {
-      setWrapperSizeByAR(w, h);
-      resetSplitToMiddle();                // <<< nieuw
-    });
-  }
-});
 
 const lenses = [
   "IronGlass Red P",
