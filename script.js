@@ -151,18 +151,26 @@ cameraSelect.addEventListener("change", () => {
 
 sensorFormatSelect.addEventListener("change", applyCurrentFormat);
 function onFsChange() {
-  if (isWrapperFullscreen()) {
-    clearInlineHeights();                     // nooit inline heights in fullscreen
+  const fs = isWrapperFullscreen();
+  const { w, h } = getCurrentWH();
+
+  if (fs) {
+    // In fullscreen: nooit inline heights
+    clearInlineHeights();
+  } else {
+    // Uit fullscreen: direct weer een vaste hoogte op basis van sensor AR
+    setWrapperSizeByAR(w, h);
+    // vangnet in de volgende frame (na layout)
+    requestAnimationFrame(() => setWrapperSizeByAR(w, h));
   }
-  updateFullscreenBars();                     // 1e pass
+
+  // Bars/slider altijd even opnieuw laten rekenen
+  updateFullscreenBars();
   requestAnimationFrame(() => {
-    updateFullscreenBars();                   // 2e pass na layout
-    resetSplitToMiddle();                     // <<< nieuw
+    updateFullscreenBars();
+    resetSplitToMiddle();
   });
 }
-document.addEventListener('fullscreenchange', onFsChange);
-document.addEventListener('webkitfullscreenchange', onFsChange);
-
 
 window.addEventListener("resize", () => {
   // mobile-mode togglen
