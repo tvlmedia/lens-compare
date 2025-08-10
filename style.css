@@ -505,24 +505,7 @@ body.dragging * {
   background: black;
 }
 
-/* In fullscreen: plaats content binnen de letter/pillarbox randen */
-#comparisonWrapper:fullscreen #beforeImage,
-#comparisonWrapper:-webkit-full-screen #beforeImage,
-#comparisonWrapper:fullscreen #afterWrapper,
-#comparisonWrapper:-webkit-full-screen #afterWrapper {
-  position: absolute;
-  top:    var(--lb-top, 0);
-  right:  var(--lb-right, 0);
-  bottom: var(--lb-bottom, 0);
-  left:   var(--lb-left, 0);
-}
 
-/* Slider alleen over het bruikbare vlak laten lopen */
-#comparisonWrapper:fullscreen #slider,
-#comparisonWrapper:-webkit-full-screen #slider {
-  top:    var(--lb-top, 0);
-  bottom: var(--lb-bottom, 0);
-}
 #comparisonWrapper:fullscreen,
 #comparisonWrapper:-webkit-full-screen {
   overflow: hidden; /* geen lekken buiten bruikbare vlak */
