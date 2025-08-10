@@ -698,19 +698,19 @@ const ori3 = decideOrientationByAR(rw, rh); // right
 
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
-  await drawImagePreserveAR(pdf, splitData); // pagina 1
+ await drawImageCover(pdf, splitData); // pagina 1 (gevuld, gecropt)
   drawBottomBarPage1();
 
  pdf.addPage("a4", ori2);
 fillBlack();
 drawTopBar(leftText);
-await drawImagePreserveAR(pdf, leftData);
+await drawImageCover(pdf, leftData);  // pagina 2 (gevuld, gecropt)
 drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
 
 pdf.addPage("a4", ori3);
 fillBlack();
 drawTopBar(rightText);
-await drawImagePreserveAR(pdf, rightData);
+await drawImageCover(pdf, rightData); // pagina 3 (gevuld, gecropt)
 drawBottomBar(lensDescriptions[right]?.text || "", lensDescriptions[right]?.url);
 
   const safeLeft = left.replace(/\s+/g, "");
