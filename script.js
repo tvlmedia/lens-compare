@@ -699,7 +699,7 @@ function drawBottomBarPage1() {
   const yLogo        = pageHeight - targetHeight - 12;
   pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
 }
-// === BUILD SPLIT IMAGE OFF-DOM (zelfde scaling als p2/p3) ===
+// === BUILD SPLIT IMAGE OFF-DOM (native resolutie, geen upscaling) ===
 const leftImgEl  = leftImg;   // afterImgTag
 const rightImgEl = rightImg;  // beforeImgTag
 
@@ -707,12 +707,21 @@ const rightImgEl = rightImg;  // beforeImgTag
 const { w: sensW, h: sensH } = getCurrentWH();
 const targetAR = sensW / sensH;
 
-// Renderresolutie voor pagina 1 (ruim voldoende voor A4)
-const outW = 2000;
+// Bronafbeeldingen op natuurlijke grootte inladen
+const li = new Image(); li.crossOrigin = "anonymous"; li.src = leftImgEl.src;
+await new Promise(r => (li.onload = r));
+
+const ri = new Image(); ri.crossOrigin = "anonymous"; ri.src = rightImgEl.src;
+await new Promise(r => (ri.onload = r));
+
+// Outputbreedte kiezen zonder upscaling (neem de kleinste bronbreedte)
+const leftNatW  = li.naturalWidth  || li.width;
+const rightNatW = ri.naturalWidth || ri.width;
+const outW = Math.min(leftNatW, rightNatW);
 const outH = Math.round(outW / targetAR);
 
 const splitCvs = document.createElement("canvas");
-splitCvs.width = outW;
+splitCvs.width  = outW;
 splitCvs.height = outH;
 
 const sctx = splitCvs.getContext("2d", { alpha: false });
@@ -731,19 +740,11 @@ function coverFit(srcW, srcH, boxW, boxH) {
   }
 }
 
-// LEFT (volledig) tekenen met cover‑fit
-const li = new Image();
-li.crossOrigin = "anonymous";
-li.src = leftImgEl.src;
-await new Promise(r => (li.onload = r));
+// LEFT volledig tekenen met cover‑fit
 let fit = coverFit(li.naturalWidth || li.width, li.naturalHeight || li.height, outW, outH);
 sctx.drawImage(li, fit.x, fit.y, fit.w, fit.h);
 
 // RIGHT tekenen met clip op rechter helft (split)
-const ri = new Image();
-ri.crossOrigin = "anonymous";
-ri.src = rightImgEl.src;
-await new Promise(r => (ri.onload = r));
 fit = coverFit(ri.naturalWidth || ri.width, ri.naturalHeight || ri.height, outW, outH);
 sctx.save();
 sctx.beginPath();
@@ -756,8 +757,12 @@ sctx.restore();
 sctx.fillStyle = "#FFFFFF";
 sctx.fillRect(Math.round(outW / 2) - 1, 0, 2, outH);
 
-// DataURL voor de PDF (pagina 1)
-const splitData = splitCvs.toDataURL("image/jpeg", 0.95);
+// DataURL voor de PDF (pagina 1) op hoge kwaliteit
+const splitData = splitCvs.toDataURL("image/jpeg", 0.98);
+
+// DataURL’s voor pagina 2/3 op native resolutie
+const leftData  = await renderImage(leftImg);
+const rightData = await renderImage(rightImg);
 
 // DataURL’s voor pagina 2/3 (zoals je al deed)
 const leftData  = await renderImage(leftImg);
