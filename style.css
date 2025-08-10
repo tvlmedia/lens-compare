@@ -489,8 +489,7 @@ body.dragging * {
   top:    var(--lb-top, 0);
   bottom: var(--lb-bottom, 0);
 }
-/* voeg toe */
 #comparisonWrapper:fullscreen,
 #comparisonWrapper:-webkit-full-screen {
-  overflow: hidden; /* voorkomt dat content buiten het bruikbare vlak zichtbaar is */
+  overflow: hidden; /* geen lekken buiten bruikbare vlak */
 }
