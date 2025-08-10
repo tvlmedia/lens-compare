@@ -522,7 +522,7 @@ async function renderToSensorAR(imgOrURL, targetAR, outH, scale = 1) {
   }
 
   ctx.drawImage(img, Math.round(offX), Math.round(offY), Math.round(drawW), Math.round(drawH));
-  return { dataURL: cvs.toDataURL("image/jpeg", 0.98), W, H };
+  return { dataURL: cvs.toDataURL("image/jpeg", 1.0), W, H };
 }
 
 // Plaats een (W,H) image contain in PDF-box
@@ -557,7 +557,7 @@ async function buildSplitFromSensor(leftURL, rightURL, W, H) {
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(Math.round(W/2)-1, 0, 2, H);
 
-  return cvs.toDataURL("image/jpeg", 0.98);
+  return cvs.toDataURL("image/jpeg", 1.0);
 }
 
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
