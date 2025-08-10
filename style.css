@@ -36,7 +36,7 @@ select, #toggleButton, #fullscreenButton, #downloadPdfButton {
 
 select:hover,
 #toggleButton:hover,
-#Button:hover,
+#fullscreenButton:hover,
 #downloadPdfButton:hover {
   background: #666;
   border-color: #666;
@@ -169,7 +169,7 @@ select:hover,
   margin: 0;
 }
 @media (max-width: 767px) {
-  #Button {
+  #fullscreenButton {
     display: none !important;
   }
 }
