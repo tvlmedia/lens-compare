@@ -1,5 +1,6 @@
 /* ===========================================
    LENS COMPARISON TOOL — COMPLETE SCRIPT.JS
+   (fullscreen houdt gekozen sensor AR; buiten FS wordt hoogte geforceerd)
    =========================================== */
 
 // -- 0) BASIS: mobile-mode class
@@ -26,7 +27,7 @@ const cameras = {
     "4:3 2.8K":        { w: 23.760, h: 17.820, label: "4:3 2.8K" },
     "HD":              { w: 23.760, h: 13.365, label: "HD (16:9)" },
     "2K":              { w: 23.661, h: 13.299, label: "2K (16:9)" },
-    "2.39:1 2K Ana":   { w: 42.240, h: 17.696, label: "2.39:1 2K Ana" }, // anamorf tab
+    "2.39:1 2K Ana":   { w: 42.240, h: 17.696, label: "2.39:1 2K Ana" },
     "HD Ana":          { w: 31.680, h: 17.820, label: "HD Ana (16:9)" },
     "S16 HD":          { w: 13.200, h: 7.425,  label: "S16 HD (16:9)" },
   },
@@ -36,6 +37,7 @@ const cameras = {
 const cameraSelect         = document.getElementById("cameraSelect");
 const sensorFormatSelect   = document.getElementById("sensorFormatSelect");
 const comparisonWrapper    = document.getElementById("comparisonWrapper");
+
 const beforeImgTag         = document.getElementById("beforeImgTag");
 const afterImgTag          = document.getElementById("afterImgTag");
 const afterWrapper         = document.getElementById("afterWrapper");
@@ -66,24 +68,27 @@ const detailToggleButton   = document.getElementById("detailViewToggle");
 const BASE_SENSOR = cameras["Sony Venice"]["6K 3:2"];
 
 // ===== 4) HULPFUNCTIES (SENSOR / FULLSCREEN) =====
-function clearInlineHeights() {
-  comparisonWrapper.style.removeProperty('height');
-  comparisonWrapper.style.removeProperty('min-height');
-  comparisonWrapper.style.removeProperty('max-height');
-}
-
 function setWrapperSizeByAR(w, h) {
-  // In fullscreen geen inline heights forceren — AR + letterbox via CSS/JS
+  // (1) In fullscreen nooit inline heights forceren; CSS + letterbox doen dat
   if (document.fullscreenElement === comparisonWrapper) return;
 
   const width  = comparisonWrapper.getBoundingClientRect().width;
-  const height = Math.round(width * (h / w));
+  const height = Math.round(width * (h / w)); // puur AR
+
   comparisonWrapper.style.removeProperty('aspect-ratio');
   comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
   comparisonWrapper.style.setProperty('min-height', `${height}px`, 'important');
   comparisonWrapper.style.setProperty('max-height', `${height}px`, 'important');
 }
 
+// (2) Helper: inline heights opruimen
+function clearInlineHeights() {
+  comparisonWrapper.style.removeProperty('height');
+  comparisonWrapper.style.removeProperty('min-height');
+  comparisonWrapper.style.removeProperty('max-height');
+}
+
+// Bepaal huidig formaat
 function getCurrentWH() {
   const cam = cameraSelect?.value;
   const fmt = sensorFormatSelect?.value;
@@ -91,23 +96,24 @@ function getCurrentWH() {
   return cameras[cam][fmt];
 }
 
+// CSS class voor fullscreen AR
 function setFullscreenARClass(fmtLabel) {
   document.body.classList.remove(
     "fs-3-2","fs-185","fs-17-9","fs-239","fs-16-9","fs-6-5","fs-4-3","fs-155"
   );
   const f = (fmtLabel || "").toLowerCase();
-  if (f.includes("open gate"))   return document.body.classList.add("fs-155");  // ~1.55:1
-  if (f.includes("3:2"))         return document.body.classList.add("fs-3-2");
-  if (f.includes("1.85:1"))      return document.body.classList.add("fs-185");
-  if (f.includes("17:9"))        return document.body.classList.add("fs-17-9");
-  if (f.includes("2.39:1"))      return document.body.classList.add("fs-239");
-  if (f.includes("16:9"))        return document.body.classList.add("fs-16-9");
-  if (f.includes("6:5"))         return document.body.classList.add("fs-6-5");
-  if (f.includes("4:3"))         return document.body.classList.add("fs-4-3");
+  if (f.includes("open gate")) return document.body.classList.add("fs-155");
+  if (f.includes("3:2"))       return document.body.classList.add("fs-3-2");
+  if (f.includes("1.85:1"))    return document.body.classList.add("fs-185");
+  if (f.includes("17:9"))      return document.body.classList.add("fs-17-9");
+  if (f.includes("2.39:1"))    return document.body.classList.add("fs-239");
+  if (f.includes("16:9"))      return document.body.classList.add("fs-16-9");
+  if (f.includes("6:5"))       return document.body.classList.add("fs-6-5");
+  if (f.includes("4:3"))       return document.body.classList.add("fs-4-3");
 }
 
+// Letter/pillarbox berekenen in fullscreen
 function updateFullscreenBars() {
-  // reset als niet FS of een ander element FS is
   if (document.fullscreenElement !== comparisonWrapper) {
     comparisonWrapper.style.setProperty('--lb-top', '0px');
     comparisonWrapper.style.setProperty('--lb-bottom', '0px');
@@ -125,12 +131,10 @@ function updateFullscreenBars() {
   let top = 0, bottom = 0, left = 0, right = 0;
 
   if (viewAR > targetAR) {
-    // Pillarbox links/rechts
     const usedW = Math.round(viewH * targetAR);
     const side  = Math.max(0, Math.floor((viewW - usedW) / 2));
     left = right = side;
   } else {
-    // Letterbox boven/onder
     const usedH = Math.round(viewW / targetAR);
     const bar   = Math.max(0, Math.floor((viewH - usedH) / 2));
     top = bottom = bar;
@@ -149,7 +153,6 @@ function applyCurrentFormat() {
 
   const { w, h } = cameras[cam][fmt];
 
-  // Klasse voor AR in fullscreen
   const fmtLabel = cameras[cam][fmt].label || fmt;
   setFullscreenARClass(fmtLabel);
 
@@ -160,12 +163,12 @@ function applyCurrentFormat() {
   // Sensor-mode aan
   document.body.classList.add("sensor-mode");
 
-  // Schaalfactor: horizontale vergelijking tegen Venice 6K 3:2
+  // Schaal t.o.v. Venice 6K 3:2, kleine diffs dempen
   let scale = BASE_SENSOR.w / w;
-  if (Math.abs(BASE_SENSOR.w - w) < 0.1) scale = 1; // micro‑verschillen dempen
+  if (Math.abs(BASE_SENSOR.w - w) < 0.1) scale = 1;
   comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
 
-  // Letter-/pillarbox in fullscreen
+  // Fullscreen letter/pillarbox updaten
   updateFullscreenBars();
 }
 
@@ -290,17 +293,12 @@ function updateImages() {
   const imgLeft  = `images/${lensImageMap[leftKey]  || leftKey  + ".jpg"}`;
   const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
 
-  // rechts (before) en links (after) zoals jij het gebruikt
-  beforeImgTag.src = imgRight;
-  afterImgTag.src  = imgLeft;
-
-  const tStopFormatted = `T${tStopSelect.value}`;
-  const leftUrl  = lensDescriptions[leftSelect.value]?.url  || "#";
-  const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
+  beforeImgTag.src = imgRight; // rechts
+  afterImgTag.src  = imgLeft;  // links
 
   // Beginstand slider 50/50
-  afterWrapper.style.clipPath      = 'inset(0 50% 0 0)';
-  afterWrapper.style.webkitClipPath= 'inset(0 50% 0 0)';
+  afterWrapper.style.clipPath        = 'inset(0 50% 0 0)';
+  afterWrapper.style.webkitClipPath  = 'inset(0 50% 0 0)';
   slider.style.left = '50%';
 
   // RAW buttons
@@ -308,8 +306,13 @@ function updateImages() {
   setDownloadButton(downloadRightRawBtn, rightKey);
 
   // Labels + link
-  leftLabel.innerHTML  = `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">${leftSelect.value} ${notes[leftBaseKey] || focal} ${tStopFormatted}</a>`;
-  rightLabel.innerHTML = `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">${rightSelect.value} ${notes[rightBaseKey] || focal} ${tStopFormatted}</a>`;
+  const tStopFormatted = `T${tStopSelect.value}`;
+  const leftUrl  = lensDescriptions[leftSelect.value]?.url  || "#";
+  const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
+  leftLabel.innerHTML  =
+    `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">${leftSelect.value} ${notes[leftBaseKey] || focal} ${tStopFormatted}</a>`;
+  rightLabel.innerHTML =
+    `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">${rightSelect.value} ${notes[rightBaseKey] || focal} ${tStopFormatted}</a>`;
 }
 
 // ===== 7) SLIDER (clip-path) =====
@@ -320,7 +323,6 @@ function updateSliderPosition(clientX) {
   const offset = Math.max(0, Math.min(clientX - rect.left, rect.width));
   const percent = (offset / rect.width) * 100;
   const rightInset = 100 - percent; // deel dat we rechts "dicht" houden
-
   afterWrapper.style.clipPath       = `inset(0 ${rightInset}% 0 0)`;
   afterWrapper.style.webkitClipPath = `inset(0 ${rightInset}% 0 0)`;
   slider.style.left = `${percent}%`;
@@ -354,21 +356,23 @@ window.addEventListener("touchmove", (e) => {
 
 // ===== 8) KNOPPEN =====
 toggleButton?.addEventListener("click", () => {
-  const left  = leftSelect.value;
-  const right = rightSelect.value;
-  leftSelect.value  = right;
-  rightSelect.value = left;
+  const l = leftSelect.value;
+  const r = rightSelect.value;
+  leftSelect.value  = r;
+  rightSelect.value = l;
   updateLensInfo();
   updateImages();
 });
 
+// (3) Fullscreen-button handler vervangen
 fullscreenButton?.addEventListener("click", async () => {
   if (document.fullscreenElement === comparisonWrapper) {
     await document.exitFullscreen();
   } else {
-    clearInlineHeights(); // laat fullscreen AR/balken hun werk doen
+    clearInlineHeights(); // vóór fullscreen: inline heights weg
     await comparisonWrapper.requestFullscreen();
   }
+  // na toggle
   requestAnimationFrame(() => {
     clearInlineHeights();
     updateFullscreenBars();
@@ -593,8 +597,8 @@ document.addEventListener("mousemove", (e) => {
     }
   };
 
-  updateZoomViewer(leftDetail,  leftDetailImg,  afterImgTag);
-  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag);
+  updateZoomViewer(leftDetail,  leftDetailImg,  afterImgTag);   // left = after
+  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag);  // right = before
 });
 
 comparisonWrapper.addEventListener("mouseleave", () => {
@@ -639,15 +643,31 @@ cameraSelect?.addEventListener("change", () => {
 
 sensorFormatSelect?.addEventListener("change", applyCurrentFormat);
 
-// Fullscreen wissel
+// (4) fullscreenchange-listener vervangen
 document.addEventListener('fullscreenchange', () => {
   if (document.fullscreenElement === comparisonWrapper) {
-    clearInlineHeights();
+    clearInlineHeights(); // kill inline heights zodra we fullscreen zijn
   }
   updateFullscreenBars();
 });
 
-// Window resize
+// ===== 13) INIT & RESIZE =====
+if (leftSelect && rightSelect && tStopSelect && focalLengthSelect) {
+  leftSelect.value = "IronGlass Red P";
+  rightSelect.value = "IronGlass Zeiss Jena";
+  tStopSelect.value = "2.8";
+  focalLengthSelect.value = "35mm";
+}
+
+updateLensInfo?.();
+updateImages?.();
+
+cameraSelect.value = "Sony Venice";
+cameraSelect.dispatchEvent(new Event("change"));
+updateFullscreenBars();
+clearInlineHeights(); // (6) netjes opruimen direct na init
+
+// (5) Resize-handler met FS-check
 window.addEventListener("resize", () => {
   if (window.innerWidth < 768) {
     document.body.classList.add("mobile-mode");
@@ -670,23 +690,6 @@ window.addEventListener("resize", () => {
     requestAnimationFrame(() => setWrapperSizeByAR(w, h));
   }
 });
-
-// ===== 13) INIT =====
-if (leftSelect && rightSelect && tStopSelect && focalLengthSelect) {
-  leftSelect.value = "IronGlass Red P";
-  rightSelect.value = "IronGlass Zeiss Jena";
-  tStopSelect.value = "2.8";
-  focalLengthSelect.value = "35mm";
-}
-
-updateLensInfo?.();
-updateImages?.();
-
-cameraSelect.value = "Sony Venice";
-cameraSelect.dispatchEvent(new Event("change"));
-
-updateFullscreenBars();
-clearInlineHeights();
 
 // Force update (init race conditions)
 setTimeout(() => {
