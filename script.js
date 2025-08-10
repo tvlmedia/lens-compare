@@ -657,7 +657,7 @@ const { w: sW, h: sH } = getCurrentWH();
 const targetAR = sW / sH;
 
 // Export-resolutie (scherpte).  ~300 DPI benadering op A4 landscape content-box
-const exportScale = 3; // 2.5–3 is meestal top; 3 geeft veel detail
+const exportScale = 8; // 2.5–3 is meestal top; 3 geeft veel detail
 const exportH = Math.round(box.h * exportScale);
 
   // Zoom/crop factor tov Venice breedte: nooit “uitzoomen”, alleen extra crop als kleiner is
