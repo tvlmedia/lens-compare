@@ -469,11 +469,7 @@ document.getElementById("downloadPdfButton")?.addEventListener("click", async ()
   const { jsPDF } = window.jspdf;
 
   // --- Oriëntatie op basis van aspect ratio ---
-function decideOrientationByAR(w, h) {
-  const ar = w / h;
-  // < 1.35 is portrait: 4:3, 6:5, square
-  return ar < 1.35 ? "portrait" : "landscape";
-}
+
 
 // Afmetingen ophalen uit dataURL
 async function getImageDimsFromDataURL(dataUrl) {
@@ -707,28 +703,22 @@ const splitData = splitCanvas.toDataURL("image/jpeg", 0.95);
   const leftData = await renderImage(leftImg);
   const rightData = await renderImage(rightImg);
 
-  const { w: sw, h: sh } = await getImageDimsFromDataURL(splitData);
-const { w: lw, h: lh } = await getImageDimsFromDataURL(leftData);
-const { w: rw, h: rh } = await getImageDimsFromDataURL(rightData);
+  
 
-const ori1 = decideOrientationByAR(sw, sh); // split
-const ori2 = decideOrientationByAR(lw, lh); // left
-const ori3 = decideOrientationByAR(rw, rh); // right
-
-  const pdf = new jsPDF({ orientation: ori1, unit: "px", format: "a4" });
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
 
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
  await drawImageContain(pdf, splitData); // pagina 1 (contain, geen crop)
   drawBottomBarPage1();
 
- pdf.addPage("a4", ori2);
+ pdf.addPage("a4", "landscape");
 fillBlack();
 drawTopBar(leftText);
 await drawImageCover(pdf, leftData);  // pagina 2 (gevuld, gecropt)
 drawBottomBar(lensDescriptions[left]?.text || "", lensDescriptions[left]?.url);
 
-pdf.addPage("a4", ori3);
+pdf.addPage("a4", "landscape");
 fillBlack();
 drawTopBar(rightText);
 await drawImageCover(pdf, rightData); // pagina 3 (gevuld, gecropt)
