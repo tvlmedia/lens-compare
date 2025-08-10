@@ -497,7 +497,7 @@ async function getImageDimsFromDataURL(dataUrl) {
   const right = rightSelect.value;
   const focal = focalLengthSelect.value;
   const t = tStopSelect.value;
-  const barHeight = 80;
+ 
 
   
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
@@ -576,40 +576,7 @@ async function getImageDimsFromDataURL(dataUrl) {
   });
 }
 
-  const pageWidth = pdf.internal.pageSize.getWidth();
-const pageHeight = pdf.internal.pageSize.getHeight();
-const barHeight = BOTTOM_BAR;
-
-pdf.setFillColor(0, 0, 0);
-pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
-
-pdf.setFontSize(12);
-pdf.setTextColor(255, 255, 255);
-pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
-
-if (link) {
-  const displayText = "Klik hier voor alle info over deze lens";
-  const x = 20;
-  const y = pageHeight - barHeight + 55;
-  pdf.setFontSize(10);
-  pdf.setTextColor(0, 102, 255);
-  pdf.textWithLink(displayText, x, y, { url: link });
-}
-
-const targetHeight = 50;
-const ratio = logo.width / logo.height;
-const targetWidth = targetHeight * ratio;
-const xLogo = pageWidth - targetWidth - 12;
-const yLogo = pageHeight - targetHeight - 12;
-pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
-
-    const targetHeight = 50;
-    const ratio = logo.width / logo.height;
-    const targetWidth = targetHeight * ratio;
-    const xLogo = pageWidth - targetWidth - 12;
-    const yLogo = pageHeight - targetHeight - 12;
-    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
-  }
+  
 
   function drawBottomBar(text = "", link = "") {
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -649,7 +616,39 @@ pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   pdf.setFillColor(0, 0, 0);
   pdf.rect(0, 0, pw, ph, "F");
 }
+function drawBottomBarPage1() {
+  const pageWidth  = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const barHeight  = BOTTOM_BAR;
 
+  // Zwarte onderbalk
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+  // CTA-tekst gecentreerd
+  const text     = "Benieuwd naar alle lenzen? Klik hier";
+  const fontSize = 22;
+  const textY    = pageHeight - Math.round(barHeight / 2);
+
+  pdf.setFontSize(fontSize);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(text, pageWidth / 2, textY, { align: "center", baseline: "middle" });
+
+  // Klikbare link over de tekst
+  const textWidth  = pdf.getTextWidth(text);
+  const linkX      = (pageWidth - textWidth) / 2;
+  const linkY      = textY - Math.round(fontSize / 2) - 4;
+  const linkHeight = fontSize + 8;
+  pdf.link(linkX, linkY, textWidth, linkHeight, { url: "https://tvlrental.nl/lenses/" });
+
+  // Logo rechts
+  const targetHeight = 50;
+  const ratio        = logo.width / logo.height;
+  const targetWidth  = targetHeight * ratio;
+  const xLogo        = pageWidth - targetWidth - 12;
+  const yLogo        = pageHeight - targetHeight - 12;
+  pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+}
  const splitCanvas = await html2canvas(comparison, { scale: 2, useCORS: true });
 // Gebruik gewoon de natuurlijke canvas-afmeting (geen vervorming)
 const splitData = splitCanvas.toDataURL("image/jpeg", 0.95);
