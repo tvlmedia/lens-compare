@@ -73,9 +73,18 @@ sensorFormatSelect.addEventListener("change", () => {
   // 0) Reset eventuele oude waarde
   comparisonWrapper.style.removeProperty("--sensor-scale");
 
-  // 1) Aspect van de viewer instellen (mm → verhouding)
-  const { w, h } = cameras[cam][fmt];
+ // 1) Aspect — SPECIAL CASE voor Venice 6K-modi (breedte ≈ gelijk aan basis)
+// Hierdoor blijft de wrapper 3:2 zodat de zoom zichtbaar wordt.
+const { w, h } = cameras[cam][fmt];
+const sameWidthAsBase = Math.abs(w - BASE_SENSOR.w) < 0.2;
+const isVenice6K = cam === "Sony Venice" && fmt.startsWith("6K");
+
+// Venice 6K varianten → wrapper op basis 3:2 laten
+if (isVenice6K && sameWidthAsBase) {
+  comparisonWrapper.style.aspectRatio = `${BASE_SENSOR.w} / ${BASE_SENSOR.h}`;
+} else {
   comparisonWrapper.style.aspectRatio = `${w} / ${h}`;
+}
 
   // 2) Sensor-mode = contain + letterbox in CSS
   document.body.classList.add("sensor-mode");
