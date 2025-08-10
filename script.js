@@ -157,35 +157,36 @@ cameraSelect.addEventListener("change", () => {
 
 
 sensorFormatSelect.addEventListener("change", applyCurrentFormat);
-// → Reageer op fullscreen wisselen en op venstergrootte
+// → Reageer op fullscreen wisselen en op venstergrootte (1x, buiten andere handlers)
 document.addEventListener('fullscreenchange', updateFullscreenBars);
-window.addEventListener('resize', updateFullscreenBars); 
+window.addEventListener('resize', updateFullscreenBars);
 
 // Init (optioneel: standaard op Venice 6K 3:2)
 cameraSelect.value = "Sony Venice";
 cameraSelect.dispatchEvent(new Event("change"));
-// zorg dat de fullscreen‑balken direct kloppen (ook als je al fullscreen zit)
+// fullscreen-balken direct goedzetten (ook als je al fullscreen zit)
 updateFullscreenBars();
 
+// Eigen resize-handler (GEEN extra listeners hier binnen toevoegen)
 window.addEventListener("resize", () => {
   if (window.innerWidth < 768) {
     document.body.classList.add("mobile-mode");
   } else {
     document.body.classList.remove("mobile-mode");
   }
-document.addEventListener('fullscreenchange', updateFullscreenBars);
-window.addEventListener('resize', updateFullscreenBars);
+
   // opnieuw toepassen voor huidige keuze
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
   if (!cam || !fmt) return;
-const { w, h } = cameras[cam][fmt];
-setWrapperSizeByAR(w, h);
-requestAnimationFrame(() => setWrapperSizeByAR(w, h));
-    // update de letterbox/pillarbox waardes na resize
+
+  const { w, h } = cameras[cam][fmt];
+  setWrapperSizeByAR(w, h);
+  requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+
+  // letterbox/pillarbox waardes na resize bijwerken
   updateFullscreenBars();
   requestAnimationFrame(updateFullscreenBars);
-});
 });
 
 const lenses = [
