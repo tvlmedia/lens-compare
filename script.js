@@ -726,13 +726,13 @@ drawBottomBarPage1(logo);
   pdf.addPage("a4", "landscape");
   fillBlack();
   drawTopBar(leftText);
-  await drawImageCover(pdf, leftData);
+  await drawImageCoverInBox(pdf, leftData,  fullBox);
   drawBottomBar(lensDescriptions[leftName]?.text || "", lensDescriptions[leftName]?.url);
 
   pdf.addPage("a4", "landscape");
   fillBlack();
   drawTopBar(rightText);
-  await drawImageCover(pdf, rightData);
+  await drawImageCoverInBox(pdf, rightData, fullBox);
   drawBottomBar(lensDescriptions[rightName]?.text || "", lensDescriptions[rightName]?.url);
 
   const safeLeft  = leftName.replace(/\s+/g, "");
