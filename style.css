@@ -70,14 +70,7 @@ select:hover,
   will-change: clip-path;
 }
 
-/* Dit mag blijven; zorg dat binnenkant 100% van de wrapper is */
-#afterWrapper #afterImage,
-#afterWrapper #afterImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;       /* of 'contain' als je sensor-mode gebruikt */
-  object-position: center;
-}
+
 
 
 /* ========== Slider lijn ========== */
@@ -179,7 +172,7 @@ select:hover,
 }
 
 /* ========== Mobile mode ========== */
-.mobile-mode #comparisonWrapper {
+
   width: 100vw;
   aspect-ratio: 3 / 2;
 }
@@ -257,8 +250,8 @@ select:hover,
 
 /* ========== Mobile Fix voor beforeImage (rechter beeld) ========== */
 .mobile-mode #comparisonWrapper {
-  width: 100vw;
-  aspect-ratio: 3 / 2;
+  width: 100vw; /* laat JS de hoogte bepalen */
+}
   overflow: hidden;
   position: relative;
 }
@@ -360,11 +353,7 @@ select:hover,
     align-items: center;
   }
 }
-@media (max-width: 767px) {
-  #fullscreenButton {
-    display: none !important;
-  }
-}
+
 #slider {
   touch-action: none;
 }
@@ -552,4 +541,4 @@ body.dragging * {
   object-fit: contain !important;
   background: black;
 }
-.mobile-mode #comparisonWrapper { aspect-ratio: auto !important; }
+
