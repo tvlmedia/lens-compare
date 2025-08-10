@@ -713,7 +713,7 @@ const splitData = splitCanvas.toDataURL("image/jpeg", 0.95);
 
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
- await drawImageContain(pdf, splitData); // pagina 1 (contain, geen crop)
+ await drawImageCover(pdf, splitData); // pagina 1 (contain, geen crop)
   drawBottomBarPage1();
 
  pdf.addPage("a4", "landscape");
