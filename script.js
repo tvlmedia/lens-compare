@@ -1,4 +1,4 @@
-// ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF LOGO) ======
+  // ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF LOGO) ======
 if (window.innerWidth < 768) {
   document.body.classList.add("mobile-mode");
 }
@@ -51,20 +51,11 @@ function applyCurrentFormat() {
 
   const { w, h } = cameras[cam][fmt];
 
-  // reset schaal var
-  comparisonWrapper.style.removeProperty("--sensor-scale");
+ // reset schaal var
+comparisonWrapper.style.removeProperty("--sensor-scale");
 
-  // Venice 6K 17:9 en 1.85:1 → container 3:2 houden
-  const keepBaseAR =
-    cam === "Sony Venice" &&
-    fmt.startsWith("6K") &&
-    (fmt.includes("17:9") || fmt.includes("1.85:1"));
-
-  if (keepBaseAR) {
-    setWrapperSizeByAR(BASE_SENSOR.w, BASE_SENSOR.h);
-  } else {
-    setWrapperSizeByAR(w, h);
-  }
+// Altijd exact naar gekozen formaat schalen
+setWrapperSizeByAR(w, h);
 
   // sensor-mode aan
   document.body.classList.add("sensor-mode");
