@@ -518,13 +518,15 @@ document.getElementById("fullscreenButton")?.addEventListener("click", async () 
   if (isWrapperFullscreen()) {
     await exitAnyFullscreen();
   } else {
-    clearInlineHeights();          // vóór je fullscreen gaat
+    clearInlineHeights();
     await enterWrapperFullscreen();
   }
+  // 1e pass direct
   updateFullscreenBars();
+  // 2e pass nà layout + slider centreren
   requestAnimationFrame(() => {
     updateFullscreenBars();
-    resetSplitToMiddle();          // <<< nieuw
+    resetSplitToMiddle();
   });
 });
 
