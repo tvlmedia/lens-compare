@@ -154,6 +154,10 @@ function onFsChange() {
   if (isWrapperFullscreen()) {
     // In fullscreen: nooit inline heights
     clearInlineHeights();
+
+    // extra pulses als de fullscreen‑UI nog schuift
+    pulseFsBars(12);
+    pulseFsBars(12, 250);
   } else {
     // UIT fullscreen: direct de juiste hoogte terugzetten
     const { w, h } = getCurrentWH();
@@ -187,6 +191,13 @@ function onFsChange() {
 // Luister naar fullscreen wissels (buiten de functie!)
 document.addEventListener('fullscreenchange', onFsChange);
 document.addEventListener('webkitfullscreenchange', onFsChange); // Safari
+
+window.addEventListener('resize', () => {
+  if (isWrapperFullscreen()) {
+    updateFullscreenBars();
+    resetSplitToMiddle();
+  }
+});
 
 // Direct bij pageload 1x runnen
 onFsChange();
@@ -446,16 +457,19 @@ document.getElementById("fullscreenButton")?.addEventListener("click", async () 
     comparisonWrapper.style.setProperty('--lb-bottom', '0px');
     comparisonWrapper.style.setProperty('--lb-left', '0px');
     comparisonWrapper.style.setProperty('--lb-right', '0px');
-  } else {
-    clearInlineHeights();
-    await enterWrapperFullscreen();
-  }
+ } else {
+  clearInlineHeights();
+  await enterWrapperFullscreen();
 
+  // herbereken meerdere frames terwijl de browser‑UI verdwijnt
+  pulseFsBars(12);
+  pulseFsBars(12, 250);
+}
+
+updateFullscreenBars();
+requestAnimationFrame(() => {
   updateFullscreenBars();
-  requestAnimationFrame(() => {
-    updateFullscreenBars();
-    resetSplitToMiddle();
-  });
+  resetSplitToMiddle();
 });
 
 
@@ -780,4 +794,15 @@ function updateSliderPosition(clientX) {
   afterWrapper.style.clipPath = `inset(0 ${rightInsetPx}px 0 0)`;
   afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
   slider.style.left = (lbLeft + clamped) + 'px';
+}
+function pulseFsBars(times = 12, delayMs = 0) {
+  let i = 0;
+  const tick = () => {
+    if (!isWrapperFullscreen()) return;
+    updateFullscreenBars();
+    resetSplitToMiddle();
+    if (++i < times) requestAnimationFrame(tick);
+  };
+  if (delayMs) setTimeout(() => requestAnimationFrame(tick), delayMs);
+  else requestAnimationFrame(tick);
 }
