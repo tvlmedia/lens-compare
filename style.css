@@ -450,14 +450,12 @@ body.dragging * {
 
 
 
-/* Fullscreen letter/pillarbox via JS-variabelen */
+/* GENERIC fullscreen basis (zonder vaste height) */
 #comparisonWrapper:fullscreen,
 #comparisonWrapper:-webkit-full-screen {
   box-sizing: content-box;
   width: 100vw;
-  height: 100vh;
-  max-width: 100vw;
-  max-height: 100vh;
+  height: auto; /* ← hoogte wordt bepaald door aspect-ratio */
   margin: 0;
   background: #000;
   padding-top:    var(--lb-top, 0px);
@@ -480,52 +478,28 @@ body.dragging * {
   object-fit: cover;
 }
 
-/* ===== Fullscreen: aspect-ratio lock per gekozen sensorformaat ===== */
-/* Zet JS een body-class? Dan wint die hier, en padding (JS-balken) gaat uit. */
-
-body.fs-3-2  #comparisonWrapper:fullscreen,
-body.fs-3-2  #comparisonWrapper:-webkit-full-screen {
-  aspect-ratio: 3 / 2;
-  padding: 0 !important;
-}
-
-body.fs-185  #comparisonWrapper:fullscreen,
-body.fs-185  #comparisonWrapper:-webkit-full-screen {
-  aspect-ratio: 185 / 100;     /* 1.85:1 */
-  padding: 0 !important;
-}
-
-body.fs-17-9 #comparisonWrapper:fullscreen,
-body.fs-17-9 #comparisonWrapper:-webkit-full-screen {
-  aspect-ratio: 17 / 9;
-  padding: 0 !important;
-}
-
-body.fs-239  #comparisonWrapper:fullscreen,
-body.fs-239  #comparisonWrapper:-webkit-full-screen {
-  aspect-ratio: 239 / 100;     /* 2.39:1 */
-  padding: 0 !important;
-}
-
+/* Helemaal onderaan laten staan */
 body.fs-16-9 #comparisonWrapper:fullscreen,
-body.fs-16-9 #comparisonWrapper:-webkit-full-screen {
-  aspect-ratio: 16 / 9;
-  padding: 0 !important;
-}
-
-body.fs-6-5  #comparisonWrapper:fullscreen,
-body.fs-6-5  #comparisonWrapper:-webkit-full-screen {
-  aspect-ratio: 6 / 5;
-  padding: 0 !important;
-}
-
+body.fs-16-9 #comparisonWrapper:-webkit-full-screen,
+body.fs-239  #comparisonWrapper:fullscreen,
+body.fs-239  #comparisonWrapper:-webkit-full-screen,
+body.fs-17-9 #comparisonWrapper:fullscreen,
+body.fs-17-9 #comparisonWrapper:-webkit-full-screen,
+body.fs-185  #comparisonWrapper:fullscreen,
+body.fs-185  #comparisonWrapper:-webkit-full-screen,
+body.fs-3-2  #comparisonWrapper:fullscreen,
+body.fs-3-2  #comparisonWrapper:-webkit-full-screen,
 body.fs-4-3  #comparisonWrapper:fullscreen,
-body.fs-4-3  #comparisonWrapper:-webkit-full-screen {
-  aspect-ratio: 4 / 3;
-  padding: 0 !important;
-}
-body.fs-155 #comparisonWrapper:fullscreen,
-body.fs-155 #comparisonWrapper:-webkit-full-screen {
-  aspect-ratio: 155 / 100;
-  padding: 0 !important;
+body.fs-4-3  #comparisonWrapper:-webkit-full-screen,
+body.fs-6-5  #comparisonWrapper:fullscreen,
+body.fs-6-5  #comparisonWrapper:-webkit-full-screen,
+body.fs-155  #comparisonWrapper:fullscreen,
+body.fs-155  #comparisonWrapper:-webkit-full-screen {
+  /* aspect ratio lock per class (heb je al per blok) */
+  /* bv. body.fs-16-9 ... { aspect-ratio: 16/9; } */
+
+  padding: 0 !important;       /* wint van JS padding fallback */
+  height: auto !important;     /* killt 100vh én inline heights */
+  min-height: 0 !important;
+  max-height: none !important;
 }
