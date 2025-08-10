@@ -719,7 +719,7 @@ const ori3 = decideOrientationByAR(rw, rh); // right
 
   fillBlack();
   drawTopBar(`${leftText} vs ${rightText}`);
- await drawImageCover(pdf, splitData); // pagina 1 (gevuld, gecropt)
+ await drawImageContain(pdf, splitData); // pagina 1 (contain, geen crop)
   drawBottomBarPage1();
 
  pdf.addPage("a4", ori2);
