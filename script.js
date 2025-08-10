@@ -499,19 +499,22 @@ async function getImageDimsFromDataURL(dataUrl) {
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
   const logo = await loadImage(logoUrl);
 
-  async function renderImage(imgEl) {
+ async function renderImage(imgEl) {
   const canvas = document.createElement("canvas");
-  canvas.width  = imgEl.naturalWidth || 1920;
-  canvas.height = imgEl.naturalHeight || 1080;
+  canvas.width  = imgEl.naturalWidth  || imgEl.width;
+  canvas.height = imgEl.naturalHeight || imgEl.height;
+
   const ctx = canvas.getContext("2d", { alpha: false });
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
+
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.src = imgEl.src;
-  await new Promise(resolve => img.onload = resolve);
+  await new Promise(resolve => (img.onload = resolve));
+
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/jpeg", 0.95); // 0.95 is prima balans
+  return canvas.toDataURL("image/jpeg", 0.98); // iets hogere kwaliteit
 }
 
   
