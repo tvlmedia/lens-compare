@@ -72,69 +72,12 @@ function getCurrentWH() {
   return cameras[cam][fmt];
 }
 
-// Zet CSS-variabelen met de benodigde letter-/pillarbox in px
-function updateFullscreenBars() {
-  // Niet fullscreen? Geen balken.
-  if (!isWrapperFullscreen()) {
-    comparisonWrapper.style.setProperty('--lb-top', '0px');
-    comparisonWrapper.style.setProperty('--lb-bottom', '0px');
-    comparisonWrapper.style.setProperty('--lb-left', '0px');
-    comparisonWrapper.style.setProperty('--lb-right', '0px');
-    return;
-  }
 
-  // 1) Neem ALTIJD het echte rect van de wrapper
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const viewW = Math.max(1, Math.round(rect.width));
-  const viewH = Math.max(1, Math.round(rect.height));
 
-  // 2) Doelformaat (mm) → aspect ratio
-  const { w, h } = getCurrentWH();
-  const targetAR = w / h;
-  const viewAR   = viewW / viewH;
+  
 
-  let top = 0, bottom = 0, left = 0, right = 0;
 
-  if (viewAR > targetAR) {
-    // breder scherm → pillarbox links/rechts
-    const usedW = Math.round(viewH * targetAR);
-    const side  = Math.max(0, Math.floor((viewW - usedW) / 2));
-    left = right = side;
-  } else {
-    // hoger scherm → letterbox boven/onder
-    const usedH = Math.round(viewW / targetAR);
-    const bar   = Math.max(0, Math.floor((viewH - usedH) / 2));
-    top = bottom = bar;
-  }
 
-  // 3) Zet CSS-variabelen (integers om subpixel-clip artefacts te vermijden)
-  comparisonWrapper.style.setProperty('--lb-top',    `${top}px`);
-  comparisonWrapper.style.setProperty('--lb-bottom', `${bottom}px`);
-  comparisonWrapper.style.setProperty('--lb-left',   `${left}px`);
-  comparisonWrapper.style.setProperty('--lb-right',  `${right}px`);
-}
-// --- helpers voor fullscreen-balken + reset midden ---
-function getLbOffsets() {
-  const cs = getComputedStyle(comparisonWrapper);
-  const n = v => parseInt(v || '0', 10) || 0;
-  return {
-    left:   n(cs.getPropertyValue('--lb-left')),
-    right:  n(cs.getPropertyValue('--lb-right')),
-    top:    n(cs.getPropertyValue('--lb-top')),
-    bottom: n(cs.getPropertyValue('--lb-bottom')),
-  };
-}
-
-function resetSplitToMiddle() {
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const { left: lbLeft, right: lbRight } = getLbOffsets();
-  const usableWidth = Math.max(1, rect.width - lbLeft - lbRight);
-
-  // 50/50 split in het bruikbare vlak
-  afterWrapper.style.clipPath = 'inset(0 50% 0 0)';
-  afterWrapper.style.webkitClipPath = 'inset(0 50% 0 0)';
-  slider.style.left = (lbLeft + usableWidth / 2) + 'px';
-}
 
 
  function applyCurrentFormat() {
@@ -445,42 +388,9 @@ setTimeout(() => updateImages(), 50);
 
 let isDragging = false;
 
-function updateSliderPosition(clientX) {
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const { left: lbLeft, right: lbRight } = getLbOffsets();
 
-  // bruikbare breedte (zonder pillarbox)
-  const usableWidth = Math.max(1, Math.round(rect.width - lbLeft - lbRight));
 
-  // muispositie t.o.v. bruikbaar vlak
-  const xInUsable = clientX - rect.left - lbLeft;
 
-  // clamp + afronden naar hele px
-  const clampedPx = Math.max(0, Math.min(Math.round(xInUsable), usableWidth));
-
-  // rechter inset in PX (niet in %)
-  const rightInsetPx = usableWidth - clampedPx;
-
-  afterWrapper.style.clipPath       = `inset(0 ${rightInsetPx}px 0 0)`;
-  afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
-
-  // slider exact boven bruikbare vlak
-  slider.style.left = (lbLeft + clampedPx) + 'px';
-}
-
-function resetSplitToMiddle() {
-  const rect = comparisonWrapper.getBoundingClientRect();
-  const { left: lbLeft, right: lbRight } = getLbOffsets();
-  const usableWidth = Math.max(1, Math.round(rect.width - lbLeft - lbRight));
-
-  const midPx = Math.round(usableWidth / 2);
-  const rightInsetPx = usableWidth - midPx;
-
-  afterWrapper.style.clipPath       = `inset(0 ${rightInsetPx}px 0 0)`;
-  afterWrapper.style.webkitClipPath = `inset(0 ${rightInsetPx}px 0 0)`;
-
-  slider.style.left = (lbLeft + midPx) + 'px';
-}
 
 // Mouse events
 // Mouse events
