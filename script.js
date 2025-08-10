@@ -132,8 +132,7 @@ function resetSplitToMiddle() {
 }
 
 
-  // ...
-function applyCurrentFormat() {
+ function applyCurrentFormat() {
   const cam = cameraSelect.value;
   const fmt = sensorFormatSelect.value;
   if (!cam || !fmt) return;
@@ -166,10 +165,10 @@ let scale = BASE_SENSOR.w / w;
   // mini-verschillen rond Venice afronden naar 1 om micro-zoom te voorkomen
   if (Math.abs(BASE_SENSOR.w - w) < 0.1) scale = 1;
 
-  comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
+    comparisonWrapper.style.setProperty("--sensor-scale", scale.toFixed(4));
 
-  // >>> voeg deze als allerlaatste regel toe <<<
   updateFullscreenBars();
+  resetSplitToMiddle();     // <<< nieuw
 } // einde applyCurrentFormat
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
@@ -216,13 +215,6 @@ function onFsChange() {
 document.addEventListener('fullscreenchange', onFsChange);
 document.addEventListener('webkitfullscreenchange', onFsChange);
 
-// Init (optioneel: standaard op Venice 6K 3:2)
-cameraSelect.value = "Sony Venice";
-cameraSelect.dispatchEvent(new Event("change"));
-// fullscreen-balken direct goedzetten (ook als je al fullscreen zit)
-updateFullscreenBars();
-clearInlineHeights();
-resetSplitToMiddle();                 // <<< nieuw
 
 window.addEventListener("resize", () => {
   // mobile-mode togglen
@@ -432,6 +424,15 @@ tStopSelect.value = "2.8";
 focalLengthSelect.value = "35mm";
 updateLensInfo();
 updateImages();
+
+// Init (optioneel: standaard op Venice 6K 3:2)
+cameraSelect.value = "Sony Venice";
+cameraSelect.dispatchEvent(new Event("change"));
+// fullscreen-balken direct goedzetten (ook als je al fullscreen zit)
+updateFullscreenBars();
+clearInlineHeights();
+resetSplitToMiddle();                 // <<< nieuw
+
 
 
 // Force update to fix initial load issue
