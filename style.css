@@ -36,7 +36,7 @@ select, #toggleButton, #fullscreenButton, #downloadPdfButton {
 
 select:hover,
 #toggleButton:hover,
-#fullscreenButton:hover,
+#Button:hover,
 #downloadPdfButton:hover {
   background: #666;
   border-color: #666;
@@ -169,7 +169,7 @@ select:hover,
   margin: 0;
 }
 @media (max-width: 767px) {
-  #fullscreenButton {
+  #Button {
     display: none !important;
   }
 }
@@ -449,18 +449,30 @@ body.dragging * {
 
 
 
-/* FULLSCREEN: element vult scherm */
+/* FULLSCREEN: wrapper vult scherm en krijgt padding = letter/pillarbox */
 #comparisonWrapper:fullscreen,
 #comparisonWrapper:-webkit-full-screen {
   width: 100vw;
   height: 100vh;
   margin: 0;
   background: #000;
-  box-sizing: border-box; /* mag blijven staan */
+  box-sizing: border-box;
+  padding-top:    var(--lb-top, 0);
+  padding-right:  var(--lb-right, 0);
+  padding-bottom: var(--lb-bottom, 0);
+  padding-left:   var(--lb-left, 0);
+  overflow: hidden;
 }
 
-
-
+/* Binnen fullscreen: beeldlagen vullen de "bruikbare" space exact */
+#comparisonWrapper:fullscreen #beforeImage,
+#comparisonWrapper:-webkit-full-screen #beforeImage,
+#comparisonWrapper:fullscreen #afterWrapper,
+#comparisonWrapper:-webkit-full-screen #afterWrapper {
+  position: absolute;
+  /* binnen de paddingbox → gewoon 0..0 */
+  top: 0; right: 0; bottom: 0; left: 0;
+}
 
 #comparisonWrapper:fullscreen #beforeImage img,
 #comparisonWrapper:-webkit-full-screen #beforeImage img,
@@ -469,8 +481,23 @@ body.dragging * {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center; /* 👈 dit zorgt dat crop in hoogte gecentreerd is */
+  object-position: center center;
 }
+
+/* Slider alleen over bruikbare hoogte laten lopen: 0..0 in paddingbox */
+#comparisonWrapper:fullscreen #slider,
+#comparisonWrapper:-webkit-full-screen #slider {
+  top: 0;
+  bottom: 0;
+}
+
+/* Zwarte balken mogen blijven; ze volgen dezelfde var(--lb-*) */
+#fsBars { position:absolute; inset:0; pointer-events:none; z-index:9; }
+#fsBars .bar { position:absolute; background:#000; }
+#fsBars .top    { top:0;    left:var(--lb-left,0); right:var(--lb-right,0); height:var(--lb-top,0); }
+#fsBars .bottom { bottom:0; left:var(--lb-left,0); right:var(--lb-right,0); height:var(--lb-bottom,0); }
+#fsBars .left   { top:var(--lb-top,0); bottom:var(--lb-bottom,0); left:0;  width:var(--lb-left,0); }
+#fsBars .right  { top:var(--lb-top,0); bottom:var(--lb-bottom,0); right:0; width:var(--lb-right,0); }
 .sensor-mode #comparisonWrapper #beforeImage img,
 .sensor-mode #comparisonWrapper #afterWrapper #afterImage img {
   object-fit: cover !important;
