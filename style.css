@@ -422,7 +422,7 @@ body.dragging * {
   background: black;
 }
 
-#comparisonWrapper { aspect-ratio: auto; }
+#comparisonWrapper { aspect-ratio: auto !important; }
 
 
 /* SENSOR-MODE: hou cover, geen contain */
