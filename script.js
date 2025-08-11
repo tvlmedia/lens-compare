@@ -920,12 +920,8 @@ const pageHeight = pdf.internal.pageSize.getHeight();
 drawTopBar("Meer lenzen testen?");
 const toolURL = "https://tvlrental.nl/lens-comparison/";
 
-// Viewer-only screenshot
-let shotData = await captureViewerOnly();
-if (!shotData) {
-  // fallback naar oude methode
-  shotData = await screenshotTool();
-}
+// Screenshot mét UI/labels
+const shotData = await screenshotTool();
 
 // Plaats zonder squeeze (cover)
 const shotBox = {
