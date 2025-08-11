@@ -531,7 +531,27 @@ async function placeContain(pdf, dataURL, box) {
   const fit = fitContain(im.naturalWidth || im.width, im.naturalHeight || im.height, box.w, box.h);
   pdf.addImage(dataURL, "JPEG", box.x + fit.x, box.y + fit.y, fit.w, fit.h);
 }
+// Maak een nette CTA-"knop" met klikbare link
+function drawCtaButton({ pdf, x, y, w, h, label, url }) {
+  // achtergrond
+  pdf.setDrawColor(255, 255, 255);
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(x, y, w, h, 6, 6, "F");
+  // tekst
+  pdf.setTextColor(0, 0, 0);
+  pdf.setFontSize(14);
+  pdf.text(label, x + w / 2, y + h / 2 + 4, { align: "center", baseline: "middle" });
+  // klikbare link over de "knop"
+  pdf.link(x, y, w, h, { url });
+}
 
+// Screenshot van de huidige tool (comparisonWrapper + labels)
+async function screenshotTool() {
+  // Neem alleen het hoofd-beeld (comparisonWrapper); dat is het duidelijkst
+  const target = document.getElementById("comparisonWrapper");
+  const canvas = await html2canvas(target, { scale: 2, useCORS: true, backgroundColor: "#000" });
+  return canvas.toDataURL("image/jpeg", 1.0);
+}
 function getCurrentSplitFraction() {
   const wrapperRect = comparisonWrapper.getBoundingClientRect();
   const lbLeft  = comparisonWrapper._lbLeft  || 0;
@@ -771,6 +791,49 @@ await placeContain(pdf, rightData, fullBox);
 drawBottomBar(
   lensDescriptions[rightName]?.text || "",
   lensDescriptions[rightName]?.url,
+  logo
+);
+
+  // --- Pagina 4: CTA + screenshot van de tool ---
+pdf.addPage();
+fillBlack();
+
+// Titel
+const pageWidth  = pdf.internal.pageSize.getWidth();
+const pageHeight = pdf.internal.pageSize.getHeight();
+drawTopBar("Meer lenzen testen?");
+
+// Content-box die we al gebruikten
+const fullBox4 = { x: 0, y: TOP_BAR, w: pageWidth, h: pageHeight - TOP_BAR - BOTTOM_BAR };
+
+// 4a) Screenshot van de tool (het viewer-beeld)
+const toolShot = await screenshotTool();
+await placeContain(pdf, toolShot, {
+  x: PAGE_MARGIN,
+  y: TOP_BAR + PAGE_MARGIN,
+  w: pageWidth - PAGE_MARGIN * 2,
+  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2 - 70 // ruimte voor knop
+});
+
+// 4b) Grote CTA-knop onder het screenshot
+const btnW = Math.min(420, pageWidth - PAGE_MARGIN * 2);
+const btnH = 42;
+const btnX = (pageWidth - btnW) / 2;
+const btnY = pageHeight - BOTTOM_BAR - btnH - 18;
+drawCtaButton({
+  pdf,
+  x: btnX,
+  y: btnY,
+  w: btnW,
+  h: btnH,
+  label: "Open de interactieve Lens Comparison Tool",
+  url: "https://tvlrental.nl/lens-comparison/"
+});
+
+// 4c) Zwarte bottombar + logo (consistent met de rest)
+drawBottomBar(
+  "Bezoek de interactieve tool voor meer combinaties en updates.",
+  "https://tvlrental.nl/lens-comparison/",
   logo
 );
 
