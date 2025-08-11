@@ -747,18 +747,20 @@ drawBottomBarPage1(logo);
   
   pdf.addPage();
   fillBlack();
-  drawTopBar(`${leftText} – ${sensorText}`);
-  await placeContain(pdf, leftData,  fullBox);
-  drawBottomBar(lensDescriptions[leftName]?.text || "", lensDescriptions[leftName]?.url);
-  logo // ← meegeven
+ drawBottomBar(
+  lensDescriptions[leftName]?.text || "",
+  lensDescriptions[leftName]?.url,
+  logo
+);
   
 
   pdf.addPage();
   fillBlack();
-  drawTopBar(`${rightText} – ${sensorText}`);
-  await placeContain(pdf, rightData, fullBox);
-  drawBottomBar(lensDescriptions[rightName]?.text || "", lensDescriptions[rightName]?.url);
-   logo // ← meegeven
+ drawBottomBar(
+  lensDescriptions[rightName]?.text || "",
+  lensDescriptions[rightName]?.url,
+  logo
+);
 
   const safeLeft  = leftName.replace(/\s+/g, "");
   const safeRight = rightName.replace(/\s+/g, "");
