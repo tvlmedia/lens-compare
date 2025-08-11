@@ -53,6 +53,9 @@ const cameras = {
     "9K 16:9":              { w: 25.195, h: 14.198, label: "9K 16:9" },
     "9K 6:5":               { w: 22.272, h: 18.583, label: "9K 6:5" },
   }
+  "65mm": {
+    "65mm":               { w: 49.105, h: 36.829, label: "65mm" },
+    }
 };
 
 // Pak de elementen
