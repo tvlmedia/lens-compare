@@ -815,8 +815,7 @@ updateFullscreenBars();
     pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 3, { align: "center", baseline: "middle" });
 
     pdf.link(btnX, btnY, btnW, btnH, { url: ctaUrl });
-  }
-    }
+}
 
   function drawBottomBarPage1(logo, sensorText) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
@@ -971,7 +970,7 @@ pdf.text(cta, 20, pageHeight - 20);
 pdf.link(20, pageHeight - 32, pdf.getTextWidth(cta), 16, { url: toolURL });
 
 // Onderbalk met logo
-drawBottomBar("", "", logo);
+drawBottomBar({ text: "", link: "", logo });
 
 const safeLeft  = leftName.replace(/\s+/g, "");
 const safeRight = rightName.replace(/\s+/g, "");
