@@ -1062,13 +1062,13 @@ fillBlack();
 
 const toolURL_P4 = "https://tvlrental.nl/lens-comparison/";
 
-// Maak een shot van alléén de viewer (geen extra page-margins)
-let viewerShot = await captureViewerOnly();
+// Screenshot alleen het actieve viewer-beeld, zonder letterbox/pillarbox
+let viewerShot = await screenshotActiveImage();
 
-// Fallback: als er iets misgaat met het shot, toon dan de split zonder UI
+// Fallback naar splitData als er iets misgaat
 if (!viewerShot) viewerShot = splitData;
 
-// Plaats in dezelfde content-box als p1 → visuele schaal matcht p1
+// Zelfde box als pagina 1 → zelfde visuele schaal
 const placedP4 = await placeContainWithBox(pdf, viewerShot, fullBox);
 
 // Maak de geplaatste afbeelding klikbaar
