@@ -606,7 +606,7 @@ function drawCtaButton({ pdf, x, y, w, h, label, url }) {
   pdf.setFontSize(12);
   pdf.text(label, x + w / 2, y + Math.round(h / 2) + 4, { align: "center", baseline: "middle" });
   // klikbare zone
-  pdf.linkRect(x, y, w, h, { url });
+  pdfLinkRect(pdf, x, y, w, h, url);
 }
 
 async function screenshotTool() {
@@ -869,8 +869,7 @@ updateFullscreenBars();
   const linkX = (pageWidth - textWidth) / 2;
   const linkY = yCta - 10;             // kleine marge
   const linkH = 20;
-  pdf.linkRect(linkX, linkY, textWidth, linkH, { url: "https://tvlrental.nl/lenses/" });
-
+  pdfLinkRect(pdf, linkX, linkY, textWidth, linkH, "https://tvlrental.nl/lenses/");
   // logo rechts
   if (logo) {
     const targetHeight = 50;
@@ -985,7 +984,8 @@ const shotBox = {
 };
 
 // Nog steeds geen vervorming: contain i.p.v. cover
-await placeContainWithBox(pdf, shotData, shotBox);
+const placed = await placeContainWithBox(pdf, shotData, shotBox);
+  pdfLinkRect(pdf, placed.x, placed.y, placed.w, placed.h, toolURL);
 // CTA-knop in zwarte bottombar
 drawBottomBar({
   text: "",
@@ -1233,3 +1233,20 @@ function onGlobalKeydown(e) {
   }
 }
 window.addEventListener("keydown", onGlobalKeydown, { capture: true });
+(function enforceBlankTargets(){
+  const setBlank = (a) => {
+    if (!a.target) a.target = "_blank";
+    const rel = (a.getAttribute("rel") || "").split(/\s+/);
+    if (!rel.includes("noopener")) rel.push("noopener");
+    if (!rel.includes("noreferrer")) rel.push("noreferrer");
+    a.setAttribute("rel", rel.join(" ").trim());
+  };
+  document.querySelectorAll("a[href]").forEach(setBlank);
+  new MutationObserver(muts => muts.forEach(m => {
+    m.addedNodes.forEach(n => {
+      if (n.nodeType !== 1) return;
+      if (n.matches?.("a[href]")) setBlank(n);
+      n.querySelectorAll?.("a[href]").forEach(setBlank);
+    });
+  })).observe(document.documentElement, { childList: true, subtree: true });
+})();
