@@ -942,29 +942,28 @@ drawBottomBar({
   logo
 });
 
-  // --- Pagina 4: CTA + viewer-only screenshot ---
+ // --- Pagina 4: CTA + viewer-only screenshot ---
 pdf.addPage();
 fillBlack();
 
 const pageWidth  = pdf.internal.pageSize.getWidth();
 const pageHeight = pdf.internal.pageSize.getHeight();
-
 const toolURL = "https://tvlrental.nl/lens-comparison/";
 
-// Met UI/labels
+// Hele viewer (UI + labels)
 const shotData = await screenshotTool();
-// Plaats zonder squeeze (cover)
+
 const shotBox = {
   x: PAGE_MARGIN,
-  y: PAGE_MARGIN,
+  y: PAGE_MARGIN, // geen topbar hier, dus gewoon PAGE_MARGIN
   w: pageWidth  - PAGE_MARGIN * 2,
   h: pageHeight - BOTTOM_BAR - PAGE_MARGIN * 2
 };
 
-// Nog steeds geen vervorming: contain i.p.v. cover
-const shotData = await screenshotTool(); // Hele viewer
-const placed   = await placeContainWithBox(pdf, shotData, shotBox);
-// CTA-knop in zwarte bottombar
+const placed = await placeContainWithBox(pdf, shotData, shotBox);
+// Maak de screenshot klikbaar:
+pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
+
 drawBottomBar({
   text: "",
   link: "",
