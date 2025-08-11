@@ -606,7 +606,7 @@ function drawCtaButton({ pdf, x, y, w, h, label, url }) {
   pdf.setFontSize(12);
   pdf.text(label, x + w / 2, y + Math.round(h / 2) + 4, { align: "center", baseline: "middle" });
   // klikbare zone
-  pdf.link(x, y, w, h, { url });
+  pdf.linkRect(x, y, w, h, { url });
 }
 
 async function screenshotTool() {
@@ -747,7 +747,7 @@ function ensureAbsoluteUrl(url) {
 }
 function pdfLinkRect(pdf, x, y, w, h, url) {
   const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.link(x, y, w, h, { url: abs });
+  if (abs) pdf.linkRect(x, y, w, h, { url: abs });
 }
 function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   const abs = ensureAbsoluteUrl(url);
@@ -809,7 +809,7 @@ updateFullscreenBars();
     const displayText = "Klik hier voor alle info over deze lens";
     pdf.setFontSize(10);
     pdf.setTextColor(0, 102, 255);
-    pdf.textWithLink(displayText, 20, pageHeight - barHeight + 55, { url: link });
+   pdfTextWithLink(pdf, displayText, 20, pageHeight - barHeight + 55, link);
   }
 
   // logo rechts
@@ -837,7 +837,7 @@ updateFullscreenBars();
     pdf.setFontSize(12);
     pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 3, { align: "center", baseline: "middle" });
 
-    pdf.link(btnX, btnY, btnW, btnH, { url: ctaUrl });
+  pdfLinkRect(pdf, btnX, btnY, btnW, btnH, ctaUrl);
   }
 }
   function drawBottomBarPage1(logo, sensorText) {
@@ -869,7 +869,7 @@ updateFullscreenBars();
   const linkX = (pageWidth - textWidth) / 2;
   const linkY = yCta - 10;             // kleine marge
   const linkH = 20;
-  pdf.link(linkX, linkY, textWidth, linkH, { url: "https://tvlrental.nl/lenses/" });
+  pdf.linkRect(linkX, linkY, textWidth, linkH, { url: "https://tvlrental.nl/lenses/" });
 
   // logo rechts
   if (logo) {
