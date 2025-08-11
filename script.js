@@ -745,18 +745,23 @@ pdf.text(`Camera/Sensor mode: ${sensorText}`,
          { align: "center" });
 drawBottomBarPage1(logo);
   
-  pdf.addPage();
-  fillBlack();
- drawBottomBar(
+  // --- Pagina 2: LINKER beeld ---
+pdf.addPage();
+fillBlack();
+drawTopBar(`${leftText} – ${sensorText}`);
+await placeContain(pdf, leftData, fullBox);
+drawBottomBar(
   lensDescriptions[leftName]?.text || "",
   lensDescriptions[leftName]?.url,
   logo
 );
-  
 
-  pdf.addPage();
-  fillBlack();
- drawBottomBar(
+// --- Pagina 3: RECHTER beeld ---
+pdf.addPage();
+fillBlack();
+drawTopBar(`${rightText} – ${sensorText}`);
+await placeContain(pdf, rightData, fullBox);
+drawBottomBar(
   lensDescriptions[rightName]?.text || "",
   lensDescriptions[rightName]?.url,
   logo
