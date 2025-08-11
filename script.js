@@ -649,36 +649,47 @@ updateFullscreenBars();
     pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   }
 }
-  function drawBottomBarPage1(logo) {
-    const pageWidth  = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const barHeight  = BOTTOM_BAR;
+  function drawBottomBarPage1(logo, sensorText) {
+  const pageWidth  = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const barHeight  = BOTTOM_BAR;
 
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  // zwarte balk
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-    const text = "Benieuwd naar alle lenzen? Klik hier";
-    const fontSize = 16;
-    const textY = pageHeight - Math.round(barHeight / 3);
-    pdf.setFontSize(fontSize);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(text, pageWidth / 2, textY, { align: "center", baseline: "middle" });
+  // regel 1: sensor mode (bovenin de balk)
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(14);                 // pas evt. aan (14–18)
+  const ySensor = pageHeight - barHeight + 20; // afstand vanaf bovenzijde balk
+  pdf.text(`Camera/Sensor mode: ${sensorText}`, pageWidth / 2, ySensor, {
+    align: "center",
+    baseline: "middle"
+  });
 
-    const textWidth = pdf.getTextWidth(text);
-    const linkX = (pageWidth - textWidth) / 2;
-    const linkY = textY - Math.round(fontSize / 2) - 4;
-    const linkHeight = fontSize + 8;
-    pdf.link(linkX, linkY, textWidth, linkHeight, { url: "https://tvlrental.nl/lenses/" });
+  // regel 2: CTA (onderin de balk)
+  const cta = "Benieuwd naar alle lenzen? Klik hier";
+  pdf.setFontSize(16);
+  const yCta = pageHeight - 18;        // afstand boven onderrand
+  pdf.text(cta, pageWidth / 2, yCta, { align: "center", baseline: "middle" });
 
-    if (logo) {
-      const targetHeight = 50;
-      const ratio = logo.width / logo.height;
-      const targetWidth = targetHeight * ratio;
-      const xLogo = pageWidth - targetWidth - 12;
-      const yLogo = pageHeight - targetHeight - 12;
-      pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
-    }
+  // klikbare link over de CTA-tekst
+  const textWidth = pdf.getTextWidth(cta);
+  const linkX = (pageWidth - textWidth) / 2;
+  const linkY = yCta - 10;             // kleine marge
+  const linkH = 20;
+  pdf.link(linkX, linkY, textWidth, linkH, { url: "https://tvlrental.nl/lenses/" });
+
+  // logo rechts
+  if (logo) {
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   }
+}
   function fillBlack() {
     const pw = pdf.internal.pageSize.getWidth();
     const ph = pdf.internal.pageSize.getHeight();
@@ -738,14 +749,6 @@ drawTopBar(`${leftText} vs ${rightText}`);
   const fullBox = { x: 0, y: TOP_BAR, w: pageW, h: pageH - TOP_BAR - BOTTOM_BAR };
 await placeContain(pdf, splitData, fullBox);
 // Sensor‑tekst net boven de bottombar
-const sensorY = pageH - BOTTOM_BAR - 10; // marge boven de bar (pas aan naar smaak)
-
-pdf.setFontSize(22);                      // groter/kleiner kan hier
-pdf.setTextColor(220, 220, 220);
-pdf.text(`Camera/Sensor mode: ${sensorText}`,
-         pageW / 2,
-         sensorY,
-         { align: "center", baseline: "bottom" });
 
 drawBottomBarPage1(logo); // daarna pas de bar tekenen
   
