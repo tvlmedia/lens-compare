@@ -1293,3 +1293,45 @@ function onGlobalKeydown(e) {
   }
 }
 window.addEventListener("keydown", onGlobalKeydown, { capture: true });
+// --- Enforcer: alle <a> openen in nieuw tabblad ---
+(function enforceBlankTargets(){
+  const setBlank = (a) => {
+    if (!a.target) a.target = "_blank";
+    // voeg noopener/noreferrer toe als het (nog) niet staat
+    const rel = (a.getAttribute("rel") || "").split(/\s+/);
+    if (!rel.includes("noopener")) rel.push("noopener");
+    if (!rel.includes("noreferrer")) rel.push("noreferrer");
+    a.setAttribute("rel", rel.join(" ").trim());
+  };
+
+  // 1) Bestaande anchors
+  document.querySelectorAll("a[href]").forEach(setBlank);
+
+  // 2) Toekomstige/dynamische anchors
+  const mo = new MutationObserver((muts) => {
+    muts.forEach(m => {
+      // nieuw toegevoegde nodes
+      m.addedNodes.forEach(node => {
+        if (node.nodeType !== 1) return;
+        if (node.matches?.("a[href]")) setBlank(node);
+        node.querySelectorAll?.("a[href]").forEach(setBlank);
+      });
+      // attribute-wijzigingen
+      if (m.type === "attributes" && m.target.matches?.("a[href]")) {
+        setBlank(m.target);
+      }
+    });
+  });
+  mo.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["href", "target", "rel"]
+  });
+
+  // 3) Safety: ook op click (bijv. very-late injected)
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest?.("a[href]");
+    if (a) setBlank(a);
+  }, { capture: true });
+})();
