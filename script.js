@@ -750,7 +750,7 @@ drawTopBar(`${leftText} vs ${rightText}`);
 await placeContain(pdf, splitData, fullBox);
 // Sensor‑tekst net boven de bottombar
 
-drawBottomBarPage1(logo); // daarna pas de bar tekenen
+drawBottomBarPage1(logo, sensorText);
   
   // --- Pagina 2: LINKER beeld ---
 pdf.addPage();
