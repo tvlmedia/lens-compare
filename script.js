@@ -737,11 +737,11 @@ const rightData = rightSensor.dataURL;
 drawTopBar(`${leftText} vs ${rightText}`);
   const fullBox = { x: 0, y: TOP_BAR, w: pageW, h: pageH - TOP_BAR - BOTTOM_BAR };
 await placeContain(pdf, splitData, fullBox);
-  pdf.setFontSize(12);
+pdf.setFontSize(22);
 pdf.setTextColor(220, 220, 220);
 pdf.text(`Camera/Sensor mode: ${sensorText}`,
          pageW / 2,
-         pageH - BOTTOM_BAR - 5,
+         pageH - BOTTOM_BAR - 10, // bijna tegen de zwarte balk
          { align: "center" });
 drawBottomBarPage1(logo);
   
