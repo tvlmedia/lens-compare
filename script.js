@@ -1054,34 +1054,7 @@ drawBottomBar({
   logo
 });
 
-  // --- Pagina 4 ---
-pdf.addPage();
-fillBlack();
-
-const toolURL = "https://tvlrental.nl/lens-comparison/";
-
-const cardData = await buildViewerCard(
-  splitData,          // uit buildSplitFromSensor
-  leftText,           // bestaande label-strings
-  rightText
-);
-
-const shotBox = {
-  x: PAGE_MARGIN,
-  y: PAGE_MARGIN,
-  w: pageWidth  - PAGE_MARGIN * 2,
-  h: pageHeight - BOTTOM_BAR - PAGE_MARGIN * 2
-};
-const placed = await placeContainWithBox(pdf, cardData, shotBox); // nooit squeeze
-pdfLinkRect(pdf, placed.x, placed.y, placed.w, placed.h, toolURL); // klikbaar naar tool
-
-drawBottomBar({
-  text: "",
-  link: "",
-  logo, // evt. logo behouden
-  ctaLabel: "Open de interactieve Lens Comparison Tool",
-  ctaUrl: toolURL
-});
+ 
 
  // --- Pagina 4: viewer-shot met UI, AR-correct geplaatst ---
 pdf.addPage();
