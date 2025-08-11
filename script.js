@@ -619,26 +619,36 @@ updateFullscreenBars();
       baseline: "middle"
     });
   }
-  function drawBottomBar(text = "", link = "") {
-    const pageWidth  = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const barHeight  = BOTTOM_BAR;
+  function drawBottomBar(text = "", link = "", logo) {
+  const pageWidth  = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const barHeight  = BOTTOM_BAR;
 
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-    pdf.setFontSize(12);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
+  pdf.setFontSize(12);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
 
-    if (link) {
-      const displayText = "Klik hier voor alle info over deze lens";
-      const x = 20, y = pageHeight - barHeight + 55;
-      pdf.setFontSize(10);
-      pdf.setTextColor(0, 102, 255);
-      pdf.textWithLink(displayText, x, y, { url: link });
-    }
+  if (link) {
+    const displayText = "Klik hier voor alle info over deze lens";
+    const x = 20, y = pageHeight - barHeight + 55;
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 102, 255);
+    pdf.textWithLink(displayText, x, y, { url: link });
   }
+
+  // ← logo toevoegen (net als op pagina 1)
+  if (logo) {
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
+}
   function drawBottomBarPage1(logo) {
     const pageWidth  = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
@@ -740,12 +750,15 @@ drawBottomBarPage1(logo);
   drawTopBar(`${leftText} – ${sensorText}`);
   await placeContain(pdf, leftData,  fullBox);
   drawBottomBar(lensDescriptions[leftName]?.text || "", lensDescriptions[leftName]?.url);
+  logo // ← meegeven
+  
 
   pdf.addPage();
   fillBlack();
   drawTopBar(`${rightText} – ${sensorText}`);
   await placeContain(pdf, rightData, fullBox);
   drawBottomBar(lensDescriptions[rightName]?.text || "", lensDescriptions[rightName]?.url);
+   logo // ← meegeven
 
   const safeLeft  = leftName.replace(/\s+/g, "");
   const safeRight = rightName.replace(/\s+/g, "");
