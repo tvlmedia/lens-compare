@@ -738,20 +738,29 @@ async function captureViewerOnly() {
   }
 }
 
-// --- PDF link helpers: maak URL absoluut en linkbaar ---
+// --- PDF link helpers: maak URL absoluut en stuur via redirector ---
 function ensureAbsoluteUrl(url) {
   if (!url) return "";
   if (/^https?:\/\//i.test(url)) return url;
   try { return new URL(url, "https://tvlrental.nl/").href; }
   catch { return "https://tvlrental.nl/"; }
 }
+
+// Stuur alle PDF-klikbare links via /out.html?to=<doel>
+function toRedirect(absUrl) {
+  const u = new URL("/out.html", "https://tvlrental.nl/");
+  u.searchParams.set("to", absUrl);
+  return u.href;
+}
+
 function pdfLinkRect(pdf, x, y, w, h, url) {
   const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.link(x, y, w, h, { url: abs }); // <-- i.p.v. linkRect
+  if (abs) pdf.link(x, y, w, h, { url: toRedirect(abs) });
 }
+
 function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
+  if (abs) pdf.textWithLink(text, x, y, { url: toRedirect(abs), ...opts });
   else pdf.text(text, x, y, opts);
 }
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
