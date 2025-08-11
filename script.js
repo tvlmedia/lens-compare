@@ -1056,25 +1056,21 @@ drawBottomBar({
 
  
 
- // --- Pagina 4: viewer-shot met UI, AR-correct geplaatst ---
+ // --- Pagina 4: viewer-shot met UI ---
 pdf.addPage();
 fillBlack();
 
 const toolURL = "https://tvlrental.nl/lens-comparison/";
-const cardData = await buildViewerCard(
-  splitData,   // uit buildSplitFromSensor
-  leftText,    // lens links
-  rightText    // lens rechts
-);
+const viewerShot = await captureViewerWithUI(); // gebruikt je (enige) captureViewerWithUI()
 
 const shotBox = {
   x: PAGE_MARGIN,
   y: PAGE_MARGIN,
-  w: pageWidth  - PAGE_MARGIN * 2,
-  h: pageHeight - BOTTOM_BAR - PAGE_MARGIN * 2
+  w: pageW - PAGE_MARGIN * 2,
+  h: pageH - BOTTOM_BAR - PAGE_MARGIN * 2
 };
 
-const placed = await placeContainWithBox(pdf, cardData, shotBox);
+const placed = await placeContainWithBox(pdf, viewerShot, shotBox);
 pdfLinkRect(pdf, placed.x, placed.y, placed.w, placed.h, toolURL);
 
 drawBottomBar({
