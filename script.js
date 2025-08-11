@@ -573,8 +573,14 @@ async function screenshotTool() {
   const top    = Math.min(...rects.map(r => r.top));
   const bottom = Math.max(...rects.map(r => r.bottom));
 
-  return cropFromCanvas(big, left, top, right - left, bottom - top);
-}
+  const PAD = 12;
+return cropFromCanvas(
+  big,
+  Math.max(0, left - PAD),
+  Math.max(0, top - PAD),
+  (right - left) + PAD * 2,
+  (bottom - top) + PAD * 2
+);
 
 // helper: crop uit html2canvas resultaat (rekening houdend met scale:2)
 function cropFromCanvas(sourceCanvas, sx, sy, sw, sh) {
@@ -716,7 +722,7 @@ updateFullscreenBars();
   // regel 1: sensor mode (bovenin de balk)
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);                 // pas evt. aan (14–18)
-  const ySensor = pageHeight - barHeight + 44; // afstand vanaf bovenzijde balk
+  const ySensor = pageHeight - barHeight + 48;
   pdf.text(`Camera/Sensor mode: ${sensorText}`, pageWidth / 2, ySensor, {
     align: "center",
     baseline: "middle"
@@ -838,8 +844,7 @@ const pageWidth  = pdf.internal.pageSize.getWidth();
 const pageHeight = pdf.internal.pageSize.getHeight();
 drawTopBar("Meer lenzen testen?");
 
-// Content-box die we al gebruikten
-const fullBox4 = { x: 0, y: TOP_BAR, w: pageWidth, h: pageHeight - TOP_BAR - BOTTOM_BAR };
+
 
 // 4a) Screenshot van de tool (met knoppen) + klikbare overlay
 const toolURL = "https://tvlrental.nl/lens-comparison/";
