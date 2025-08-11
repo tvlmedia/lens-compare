@@ -910,18 +910,24 @@ drawBottomBar(
   logo
 );
 
-  // --- Pagina 4: CTA + screenshot van de tool ---
+  // --- Pagina 4: CTA + viewer-only screenshot ---
 pdf.addPage();
 fillBlack();
 
 const pageWidth  = pdf.internal.pageSize.getWidth();
 const pageHeight = pdf.internal.pageSize.getHeight();
+
 drawTopBar("Meer lenzen testen?");
+const toolURL = "https://tvlrental.nl/lens-comparison/";
 
-const toolURL  = "https://tvlrental.nl/lens-comparison/";
-const shotData = await screenshotTool(); // <-- screenshot mét knoppen/labels
+// Viewer-only screenshot
+let shotData = await captureViewerOnly();
+if (!shotData) {
+  // fallback naar oude methode
+  shotData = await screenshotTool();
+}
 
-// Plaats screenshot ZONDER squeeze: cover (cropt indien nodig)
+// Plaats zonder squeeze (cover)
 const shotBox = {
   x: PAGE_MARGIN,
   y: TOP_BAR + PAGE_MARGIN,
@@ -929,23 +935,23 @@ const shotBox = {
   h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2
 };
 const placed = await placeCoverWithBox(pdf, shotData, shotBox);
-
-// Hele screenshot klikbaar
 pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
 
 // CTA-knop
 const btnW = Math.min(300, pageWidth - PAGE_MARGIN * 2);
 const btnH = 32;
 const btnX = (pageWidth - btnW) / 2;
-const btnY = pageHeight - BOTTOM_BAR - btnH - 14;
+const btnY = pageHeight - BOTTOM_BAR - btnH - 24;
 pdf.setDrawColor(0,0,0);
 pdf.setFillColor(0,0,0);
 pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
 pdf.setTextColor(255,255,255);
 pdf.setFontSize(12);
-pdf.text("Open de interactieve Lens Comparison Tool",
-         btnX + btnW/2, btnY + btnH/2 + 3,
-         { align: "center", baseline: "middle" });
+pdf.text(
+  "Open de interactieve Lens Comparison Tool",
+  btnX + btnW/2, btnY + btnH/2 + 3,
+  { align: "center", baseline: "middle" }
+);
 pdf.link(btnX, btnY, btnW, btnH, { url: toolURL });
 
 drawBottomBar("", "", logo);
