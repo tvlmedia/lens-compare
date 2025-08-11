@@ -595,8 +595,7 @@ async function screenshotActiveImage() {
 
   return out.toDataURL("image/jpeg", 1.0);
 }
-// Maak een nette CTA-"knop" met klikbare link
-function drawCtaButton({ pdf, x, y, w, h, label, url }) {
+
   // zwarte achtergrond
   pdf.setDrawColor(0, 0, 0);
   pdf.setFillColor(0, 0, 0);
@@ -950,8 +949,7 @@ const zoom = Math.max(1, BASE_SENSOR.w / sW);
   const focal     = focalLengthSelect.value;
   const t         = tStopSelect.value;
 
-  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
-const logo = await loadHTMLImage(logoUrl);
+ 
 const sensorText = getSensorText(); // bv. "Sony Venice – 6K 3:2"
   
 
