@@ -980,9 +980,11 @@ const shotBox = {
   h: pageHeight - BOTTOM_BAR - PAGE_MARGIN * 2
 };
 
-// Nog steeds geen vervorming: contain i.p.v. cover
+  // << HIER plak je het nieuwe stukje >>
 const placed = await placeContainWithBox(pdf, shotData, shotBox);
-  pdfLinkRect(pdf, placed.x, placed.y, placed.w, placed.h, toolURL);
+pdfLinkRect(pdf, placed.x, placed.y, placed.w, placed.h, toolURL);
+
+
 // CTA-knop in zwarte bottombar
 drawBottomBar({
   text: "",
