@@ -949,7 +949,6 @@ fillBlack();
 const pageWidth  = pdf.internal.pageSize.getWidth();
 const pageHeight = pdf.internal.pageSize.getHeight();
 
-drawTopBar("Meer lenzen testen?");
 const toolURL = "https://tvlrental.nl/lens-comparison/";
 
 // Screenshot mét UI/labels
@@ -958,37 +957,26 @@ const shotData = await screenshotTool();
 // Plaats zonder squeeze (cover)
 const shotBox = {
   x: PAGE_MARGIN,
-  y: TOP_BAR + PAGE_MARGIN,
+  y: PAGE_MARGIN,
   w: pageWidth  - PAGE_MARGIN * 2,
-  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2
+  h: pageHeight - BOTTOM_BAR - PAGE_MARGIN * 2
 };
-const placed = await placeCoverWithBox(pdf, shotData, shotBox);
-pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
 
-// CTA-knop
-const btnW = Math.min(300, pageWidth - PAGE_MARGIN * 2);
-const btnH = 32;
-const btnX = (pageWidth - btnW) / 2;
-const btnY = placed.y + placed.h + 20; // 20px eronder
-pdf.setDrawColor(0,0,0);
-pdf.setFillColor(0,0,0);
-pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
-pdf.setTextColor(255,255,255);
-pdf.setFontSize(12);
-pdf.text(
-  "Open de interactieve Lens Comparison Tool",
-  btnX + btnW/2, btnY + btnH/2 + 3,
-  { align: "center", baseline: "middle" }
-);
-pdf.link(btnX, btnY, btnW, btnH, { url: toolURL });
+placeCoverWithBox(shotData, shotBox);
 
-drawBottomBar("", "", logo);
-  
-  const safeLeft  = leftName.replace(/\s+/g, "");
-  const safeRight = rightName.replace(/\s+/g, "");
-  const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
-  pdf.save(filename);
+// CTA-knop in zwarte bottombar
+drawBottomBar({
+  text: "",
+  link: "",
+  logo,
+  ctaLabel: "Open de interactieve Lens Comparison Tool",
+  ctaUrl: toolURL
 });
+
+const safeLeft  = leftName.replace(/\s+/g, "");
+const safeRight = rightName.replace(/\s+/g, "");
+const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
+pdf.save(filename);
 
  
 
