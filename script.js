@@ -962,7 +962,7 @@ const shotBox = {
   h: pageHeight - BOTTOM_BAR - PAGE_MARGIN * 2
 };
 
-placeCoverWithBox(shotData, shotBox);
+await placeCoverWithBox(pdf, shotData, shotBox);
 
 // CTA-knop in zwarte bottombar
 drawBottomBar({
