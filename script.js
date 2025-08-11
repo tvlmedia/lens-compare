@@ -717,18 +717,21 @@ function waitForImage(imgEl) {
 
 // Capture van viewer + UI met dezelfde targetAR/zoom als pagina 1
 // Capture van viewer + UI, ZONDER extra Venice-zoom (pagina 4 moet 1:1 zijn)
-// Capture van viewer + UI, ZONDER extra Venice-zoom (pagina 4 moet 1:1 zijn)
 async function captureViewerWithUI() {
   const viewerEl = document.getElementById("comparisonWrapper");
   if (!viewerEl) return null;
 
+  // behoud dezelfde target aspect ratio als de huidige sensor
   const { w: sW, h: sH } = getCurrentWH();
   const targetAR = sW / sH;
-  const zoom = 1; // <-- belangrijk: geen Venice-zoom
+
+  // ⚠️ Belangrijk: geen extra crop/zoom hier
+  const zoom = 1;
 
   const origLeftSrc  = afterImgTag.src;
   const origRightSrc = beforeImgTag.src;
 
+  // render links/rechts eerst naar exact sensor-AR (geen squeeze, geen extra crop)
   const DPR = window.devicePixelRatio || 1;
   const H   = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
   const L   = await loadHTMLImage(origLeftSrc);
@@ -737,6 +740,7 @@ async function captureViewerWithUI() {
   const leftC  = await renderToSensorAR(L, targetAR, H, zoom);
   const rightC = await renderToSensorAR(R, targetAR, H, zoom);
 
+  // tijdelijk tonen zodat html2canvas exact dit ziet
   afterImgTag.src  = leftC.dataURL;
   beforeImgTag.src = rightC.dataURL;
   await new Promise(r => requestAnimationFrame(r));
@@ -746,8 +750,9 @@ async function captureViewerWithUI() {
   if (sliderEl) sliderEl.style.visibility = "hidden";
 
   try {
-    return await screenshotTool();
+    return await screenshotTool(); // capture controls + viewer + labels 1:1
   } finally {
+    // herstel
     afterImgTag.src  = origLeftSrc;
     beforeImgTag.src = origRightSrc;
     if (sliderEl) sliderEl.style.visibility = prevVis || "";
@@ -794,8 +799,44 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
   else pdf.text(text, x, y, opts);
 }
+async function captureViewerWithUI() {
+  const viewerEl = document.getElementById("comparisonWrapper");
+  if (!viewerEl) return null;
 
+  // zelfde AR/zoom als de PDF
+  const { w: sW, h: sH } = getCurrentWH();
+  const targetAR = sW / sH;
+  const zoom = 1
 
+  const origLeftSrc  = afterImgTag.src;
+  const origRightSrc = beforeImgTag.src;
+
+  // render links/rechts eerst naar exact sensor-AR (geen squeeze)
+  const DPR = window.devicePixelRatio || 1;
+  const H = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+  const L = await loadHTMLImage(origLeftSrc);
+  const R = await loadHTMLImage(origRightSrc);
+  const leftC  = await renderToSensorAR(L, targetAR, H, zoom);
+  const rightC = await renderToSensorAR(R, targetAR, H, zoom);
+
+  // tijdelijk tonen zodat html2canvas exact dit ziet
+  afterImgTag.src  = leftC.dataURL;
+  beforeImgTag.src = rightC.dataURL;
+  await new Promise(r => requestAnimationFrame(r));
+
+  const sliderEl = document.getElementById("slider");
+  const prevVis = sliderEl?.style.visibility;
+  if (sliderEl) sliderEl.style.visibility = "hidden";
+
+  try {
+    return await screenshotTool(); // maakt een uitsnede van controls + viewer + labels
+  } finally {
+    // herstel
+    afterImgTag.src  = origLeftSrc;
+    beforeImgTag.src = origRightSrc;
+    if (sliderEl) sliderEl.style.visibility = prevVis || "";
+  }
+}
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
   const { jsPDF } = window.jspdf; // ← belangrijk
@@ -1293,6 +1334,3 @@ window.addEventListener("keydown", onGlobalKeydown, { capture: true });
     });
   })).observe(document.documentElement, { childList: true, subtree: true });
 })();
-
-
-
