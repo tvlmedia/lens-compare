@@ -541,15 +541,15 @@ async function placeContainWithBox(pdf, dataURL, box) {
 }
 // Maak een nette CTA-"knop" met klikbare link
 function drawCtaButton({ pdf, x, y, w, h, label, url }) {
-  // achtergrond
-  pdf.setDrawColor(255, 255, 255);
-  pdf.setFillColor(255, 255, 255);
+  // zwarte achtergrond
+  pdf.setDrawColor(0, 0, 0);
+  pdf.setFillColor(0, 0, 0);
   pdf.roundedRect(x, y, w, h, 6, 6, "F");
-  // tekst
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(14);
-  pdf.text(label, x + w / 2, y + h / 2 + 4, { align: "center", baseline: "middle" });
-  // klikbare link over de "knop"
+  // witte tekst
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(12);
+  pdf.text(label, x + w / 2, y + Math.round(h / 2) + 4, { align: "center", baseline: "middle" });
+  // klikbare zone
   pdf.link(x, y, w, h, { url });
 }
 
