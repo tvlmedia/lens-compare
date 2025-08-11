@@ -741,7 +741,7 @@ await placeContain(pdf, splitData, fullBox);
 pdf.setTextColor(220, 220, 220);
 pdf.text(`Camera/Sensor mode: ${sensorText}`,
          pageW / 2,
-         pageH - BOTTOM_BAR - 50,
+         pageH - BOTTOM_BAR - 5,
          { align: "center" });
 drawBottomBarPage1(logo);
   
