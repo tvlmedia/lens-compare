@@ -925,22 +925,22 @@ pdf.addPage();
 fillBlack();
 drawTopBar(`${leftText} – ${sensorText}`);
 await placeContain(pdf, leftData, fullBox);
-drawBottomBar(
-  lensDescriptions[leftName]?.text || "",
-  lensDescriptions[leftName]?.url,
+drawBottomBar({
+  text: lensDescriptions[leftName]?.text || "",
+  link: lensDescriptions[leftName]?.url || "",
   logo
-);
+});
 
 // --- Pagina 3: RECHTER beeld ---
 pdf.addPage();
 fillBlack();
 drawTopBar(`${rightText} – ${sensorText}`);
 await placeContain(pdf, rightData, fullBox);
-drawBottomBar(
-  lensDescriptions[rightName]?.text || "",
-  lensDescriptions[rightName]?.url,
+drawBottomBar({
+  text: lensDescriptions[rightName]?.text || "",
+  link: lensDescriptions[rightName]?.url || "",
   logo
-);
+});
 
   // --- Pagina 4: CTA + viewer-only screenshot ---
 pdf.addPage();
