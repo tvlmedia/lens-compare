@@ -998,11 +998,13 @@ pdf.addPage();
 fillBlack();
 drawTopBar(`${leftText} – ${sensorText}`);
 await placeContain(pdf, leftData, fullBox);
-drawBottomBar({
-  text: lensDescriptions[leftName]?.text || "",
-  link: lensDescriptions[leftName]?.url || "",
-  logo
-});
+drawBottomBar(
+  pdf,
+  lensDescriptions[leftName]?.text || "",
+  lensDescriptions[leftName]?.url || "",
+  "https://tvlrental.nl/lenses/",
+  "Alle lenzen bekijken"
+);
 
 // --- Pagina 3: RECHTER beeld ---
 pdf.addPage();
