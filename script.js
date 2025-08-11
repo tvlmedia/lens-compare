@@ -258,8 +258,7 @@ const rightLabel = document.getElementById("rightLabel");
 const downloadLeftRawButton  = document.getElementById("downloadLeftRawButton");
 const downloadRightRawButton = document.getElementById("downloadRightRawButton");
 
-// Direct bij pageload 1x runnen
-onFsChange();
+
 
 function updateLensInfo() {
   const left = leftSelect.value;
@@ -387,7 +386,10 @@ updateFullscreenBars();
 resetSplitToMiddle();   
 if (isWrapperFullscreen()) clearInlineHeights();// <<< nieuw
 
-
+function onFsChange() {
+  if (typeof slider === "undefined" || !slider) return;
+  // ... rest van je functie
+}
 
 // Force update to fix initial load issue
 setTimeout(() => updateImages(), 50);
