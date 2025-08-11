@@ -737,13 +737,17 @@ const rightData = rightSensor.dataURL;
 drawTopBar(`${leftText} vs ${rightText}`);
   const fullBox = { x: 0, y: TOP_BAR, w: pageW, h: pageH - TOP_BAR - BOTTOM_BAR };
 await placeContain(pdf, splitData, fullBox);
-pdf.setFontSize(22);
+// Sensor‑tekst net boven de bottombar
+const sensorY = pageH - BOTTOM_BAR - 10; // marge boven de bar (pas aan naar smaak)
+
+pdf.setFontSize(22);                      // groter/kleiner kan hier
 pdf.setTextColor(220, 220, 220);
 pdf.text(`Camera/Sensor mode: ${sensorText}`,
          pageW / 2,
-         pageH - (BOTTOM_BAR / 2),
-         { align: "center", baseline: "middle" });
-drawBottomBarPage1(logo);
+         sensorY,
+         { align: "center", baseline: "bottom" });
+
+drawBottomBarPage1(logo); // daarna pas de bar tekenen
   
   // --- Pagina 2: LINKER beeld ---
 pdf.addPage();
