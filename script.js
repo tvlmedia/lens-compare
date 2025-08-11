@@ -741,7 +741,7 @@ pdf.setFontSize(22);
 pdf.setTextColor(220, 220, 220);
 pdf.text(`Camera/Sensor mode: ${sensorText}`,
          pageW / 2,
-         pageH - BOTTOM_BAR - 10, // bijna tegen de zwarte balk
+         pageH - (BOTTOM_BAR / 2)
          { align: "center" });
 drawBottomBarPage1(logo);
   
