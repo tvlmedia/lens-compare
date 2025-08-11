@@ -941,7 +941,7 @@ pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
 const btnW = Math.min(300, pageWidth - PAGE_MARGIN * 2);
 const btnH = 32;
 const btnX = (pageWidth - btnW) / 2;
-const btnY = pageHeight - BOTTOM_BAR - btnH - 24;
+const btnY = placed.y + placed.h + 20; // 20px eronder
 pdf.setDrawColor(0,0,0);
 pdf.setFillColor(0,0,0);
 pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
