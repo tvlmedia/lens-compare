@@ -891,43 +891,40 @@ drawBottomBar(
 pdf.addPage();
 fillBlack();
 
-// Titel
 const pageWidth  = pdf.internal.pageSize.getWidth();
 const pageHeight = pdf.internal.pageSize.getHeight();
 drawTopBar("Meer lenzen testen?");
 
+const toolURL  = "https://tvlrental.nl/lens-comparison/";
+const shotData = await screenshotTool(); // <-- screenshot mét knoppen/labels
 
-
-// Screenshot van tool met knoppen
-const shotData = await screenshotTool();
-const toolURL = "https://tvlrental.nl/lens-comparison/";
-const placed = await placeCoverWithBox(pdf, shotData, {
+// Plaats screenshot ZONDER squeeze: cover (cropt indien nodig)
+const shotBox = {
   x: PAGE_MARGIN,
   y: TOP_BAR + PAGE_MARGIN,
-  w: pageWidth - PAGE_MARGIN * 2,
+  w: pageWidth  - PAGE_MARGIN * 2,
   h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2
-});
+};
+const placed = await placeCoverWithBox(pdf, shotData, shotBox);
+
+// Hele screenshot klikbaar
 pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
-// Screenshot zelf klikbaar maken
-pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
-  
-// 4b) Grote CTA-knop onder het screenshot
-const btnW = Math.min(300, pageWidth - PAGE_MARGIN * 2); // smaller
-const btnH = 32; // lager
+
+// CTA-knop
+const btnW = Math.min(300, pageWidth - PAGE_MARGIN * 2);
+const btnH = 32;
 const btnX = (pageWidth - btnW) / 2;
 const btnY = pageHeight - BOTTOM_BAR - btnH - 14;
-pdf.setDrawColor(0, 0, 0);
-pdf.setFillColor(0, 0, 0);
+pdf.setDrawColor(0,0,0);
+pdf.setFillColor(0,0,0);
 pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
-pdf.setTextColor(255, 255, 255);
+pdf.setTextColor(255,255,255);
 pdf.setFontSize(12);
-pdf.text("Open de interactieve Lens Comparison Tool", btnX + btnW / 2, btnY + btnH / 2 + 3, {
-  align: "center",
-  baseline: "middle"
-});
-pdf.link(btnX, btnY, btnW, btnH, { url: "https://tvlrental.nl/lens-comparison/" });
+pdf.text("Open de interactieve Lens Comparison Tool",
+         btnX + btnW/2, btnY + btnH/2 + 3,
+         { align: "center", baseline: "middle" });
+pdf.link(btnX, btnY, btnW, btnH, { url: toolURL });
 
-// 4c) Zwarte bottombar + logo (consistent met de rest)
 drawBottomBar("", "", logo);
   
   const safeLeft  = leftName.replace(/\s+/g, "");
