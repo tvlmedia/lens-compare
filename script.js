@@ -708,26 +708,54 @@ function getSensorText() {
   const label = cameras[cam]?.[fmt]?.label || "";
   return `${cam} – ${label}`;
 }
+// helper: wacht tot een <img> echt geladen is
+function waitForImage(imgEl) {
+  return new Promise((resolve, reject) => {
+    if (imgEl.complete && imgEl.naturalWidth > 0) return resolve();
+    imgEl.onload = () => resolve();
+    imgEl.onerror = reject;
+  });
+}
+
 async function captureViewerOnly() {
   const viewerEl = document.getElementById("comparisonWrapper");
-  if (!viewerEl) {
-    console.error("Viewer element niet gevonden!");
-    return null;
-  }
+  if (!viewerEl) return null;
+
+  const { w: sW, h: sH } = getCurrentWH();
+  const targetAR = sW / sH;
+  const zoom = Math.max(1, BASE_SENSOR.w / sW);
+
+  const origLeftSrc  = afterImgTag.src;
+  const origRightSrc = beforeImgTag.src;
+
+  const DPR = window.devicePixelRatio || 1;
+  const imgBoxH = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+
+  const leftSrcImg  = await loadHTMLImage(origLeftSrc);
+  const rightSrcImg = await loadHTMLImage(origRightSrc);
+
+  const leftCropped  = await renderToSensorAR(leftSrcImg,  targetAR, imgBoxH, zoom);
+  const rightCropped = await renderToSensorAR(rightSrcImg, targetAR, imgBoxH, zoom);
+
+  afterImgTag.src  = leftCropped.dataURL;
+  beforeImgTag.src = rightCropped.dataURL;
+  await Promise.all([waitForImage(afterImgTag), waitForImage(beforeImgTag)]);
+  await new Promise(r => requestAnimationFrame(r));
 
   const sliderEl = document.getElementById("slider");
   const prevVis = sliderEl?.style.visibility;
+  if (sliderEl) sliderEl.style.visibility = "hidden";
 
   try {
-    if (sliderEl) sliderEl.style.visibility = "hidden";
-
     const canvas = await html2canvas(viewerEl, {
       scale: 2,
+      useCORS: true,
       backgroundColor: "#000"
     });
-
     return canvas.toDataURL("image/jpeg", 0.95);
   } finally {
+    afterImgTag.src  = origLeftSrc;
+    beforeImgTag.src = origRightSrc;
     if (sliderEl) sliderEl.style.visibility = prevVis || "";
   }
 }
