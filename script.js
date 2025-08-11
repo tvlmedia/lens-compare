@@ -603,21 +603,26 @@ function drawCtaButton({ pdf, x, y, w, h, label, url }) {
   pdf.link(x, y, w, h, { url });
 }
 
-// Screenshot met knoppen + viewer + labels/RAW (klikbaar)
 async function screenshotTool() {
-  const big = await html2canvas(document.body, { scale: 2, useCORS: true, backgroundColor: "#000" });
+  const DPR   = window.devicePixelRatio || 1;
+  const SCALE = DPR; // hou canvas en crop 1:1 met device pixels
+
+  const big = await html2canvas(document.body, {
+    scale: SCALE,
+    useCORS: true,
+    backgroundColor: "#000"
+  });
 
   const parts = [".controls", "#comparisonWrapper", "#infoContainer"]
     .map(s => document.querySelector(s))
     .filter(Boolean);
 
-  // fallback: alleen viewer
   if (!parts.length) {
     const r = document.getElementById("comparisonWrapper").getBoundingClientRect();
-    return cropFromCanvas(big, r.left, r.top, r.width, r.height);
+    return cropFromCanvas(big, r.left + window.scrollX, r.top + window.scrollY, r.width, r.height, SCALE);
   }
 
-  const rects = parts.map(el => el.getBoundingClientRect());
+  const rects  = parts.map(el => el.getBoundingClientRect());
   const left   = Math.min(...rects.map(r => r.left));
   const right  = Math.max(...rects.map(r => r.right));
   const top    = Math.min(...rects.map(r => r.top));
@@ -626,23 +631,28 @@ async function screenshotTool() {
   const PAD = 12;
   return cropFromCanvas(
     big,
-    Math.max(0, left - PAD),
-    Math.max(0, top - PAD),
+    Math.max(0, left   - PAD) + window.scrollX,
+    Math.max(0, top    - PAD) + window.scrollY,
     (right - left) + PAD * 2,
-    (bottom - top) + PAD * 2
+    (bottom - top) + PAD * 2,
+    SCALE
   );
-} // ← deze sluit screenshotTool() netjes af
-// helper: crop uit html2canvas resultaat …
+}
 
 // helper: crop uit html2canvas resultaat (rekening houdend met scale:2)
-function cropFromCanvas(sourceCanvas, sx, sy, sw, sh) {
+function cropFromCanvas(sourceCanvas, sx, sy, sw, sh, SCALE = window.devicePixelRatio || 1) {
   const out = document.createElement("canvas");
-  out.width  = Math.max(1, Math.round(sw * 2));
-  out.height = Math.max(1, Math.round(sh * 2));
-  const ctx = out.getContext("2d", { alpha:false });
+  out.width  = Math.max(1, Math.round(sw * SCALE));
+  out.height = Math.max(1, Math.round(sh * SCALE));
+  const ctx = out.getContext("2d", { alpha: false });
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(sourceCanvas, sx * 2, sy * 2, sw * 2, sh * 2, 0, 0, out.width, out.height);
+  ctx.drawImage(
+    sourceCanvas,
+    Math.round(sx * SCALE), Math.round(sy * SCALE),
+    Math.round(sw * SCALE), Math.round(sh * SCALE),
+    0, 0, out.width, out.height
+  );
   return out.toDataURL("image/jpeg", 1.0);
 }
 function getCurrentSplitFraction() {
