@@ -556,29 +556,36 @@ async function placeCoverWithBox(pdf, dataURL, box) {
   return { x, y, w, h };
 }
 
-// --- NIEUW: screenshot van ALLEEN het actieve beeld, zónder letter/pillarbox ---
 async function screenshotActiveImage() {
-  // zorg dat lb-waarden actueel zijn
   updateFullscreenBars();
   const el = document.getElementById("comparisonWrapper");
   const scale = 2;
+
+  // html2canvas doet de capture
   const big = await html2canvas(el, { scale, useCORS: true, backgroundColor: "#000" });
 
-  const lbL = el._lbLeft  || 0;
+  // Gebruik je berekende letterbox/pillarbox waarden
+  const lbL = el._lbLeft || 0;
   const lbR = el._lbRight || 0;
-  const lbT = el._lbTop   || 0;
-  const lbB = el._lbBottom|| 0;
+  const lbT = el._lbTop || 0;
+  const lbB = el._lbBottom || 0;
 
-  const r  = el.getBoundingClientRect();
+  // Crop exact het bruikbare beeld zonder squeeze
+  const usableW = el._usableW || (el.getBoundingClientRect().width - lbL - lbR);
+  const usableH = el.getBoundingClientRect().height - lbT - lbB;
+
   const sx = Math.round(lbL * scale);
   const sy = Math.round(lbT * scale);
-  const sw = Math.round((r.width  - lbL - lbR) * scale);
-  const sh = Math.round((r.height - lbT - lbB) * scale);
+  const sw = Math.round(usableW * scale);
+  const sh = Math.round(usableH * scale);
 
   const out = document.createElement("canvas");
-  out.width = sw; out.height = sh;
-  out.getContext("2d", { alpha:false, willReadFrequently:false })
-     .drawImage(big, sx, sy, sw, sh, 0, 0, sw, sh);
+  out.width = sw;
+  out.height = sh;
+  const ctx = out.getContext("2d", { alpha: false });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(big, sx, sy, sw, sh, 0, 0, sw, sh);
 
   return out.toDataURL("image/jpeg", 1.0);
 }
