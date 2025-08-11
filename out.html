@@ -3,23 +3,51 @@
 <meta charset="utf-8">
 <title>↗</title>
 <meta name="referrer" content="no-referrer">
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#fff;font-family:system-ui,Segoe UI,Arial,sans-serif}
+  .wrap{display:flex;align-items:center;justify-content:center;height:100%;text-align:center;gap:16px;flex-direction:column}
+  .btn{background:#fff;color:#000;border:0;border-radius:6px;padding:10px 16px;font-weight:600;cursor:pointer}
+  .hint{opacity:.6;font-size:14px}
+</style>
+<div class="wrap" id="ui" hidden>
+  <div>Kon geen nieuw tabblad openen vanwege een popup‑blocker.</div>
+  <button class="btn" id="open">Open in nieuw tabblad</button>
+  <div class="hint">(deze knop werkt altijd; dit venster sluit daarna)</div>
+</div>
 <script>
 (function () {
-  const to = new URLSearchParams(location.search).get('to');
-  if (!to) return;
+  const raw = new URLSearchParams(location.search).get('to');
+  if (!raw) return;
+  let url;
+  try { url = new URL(raw, 'https://tvlrental.nl/').href; } catch { return; }
 
-  try {
-    const abs = new URL(to, "https://tvlrental.nl/").href;
-    // Altijd nieuw tabblad
-    window.open(abs, '_blank', 'noopener,noreferrer');
-    // Sluit dit tabblad vrijwel direct
+  // 1) Probeer nieuw tabblad
+  let win = null;
+  try { win = window.open(url, '_blank', 'noopener,noreferrer'); } catch {}
+
+  // 2) Als gelukt: probeer dit tabblad netjes te sluiten
+  if (win) {
+    setTimeout(() => { window.close(); location.replace('about:blank'); }, 50);
+    return;
+  }
+
+  // 3) Fallback: toon knop (echte user click) → opent gegarandeerd nieuw tabblad
+  const ui = document.getElementById('ui');
+  ui.hidden = false;
+  const btn = document.getElementById('open');
+  btn.onclick = () => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    // sluit/ga terug zodat dit tabblad verdwijnt
     setTimeout(() => {
-      window.close();
-      location.replace('about:blank'); // fallback als sluiten niet mag
+      if (history.length > 1) history.back();
+      else { window.close(); location.replace('about:blank'); }
     }, 50);
-  } catch (e) {
-    console.error("Ongeldige URL:", e);
+  };
+
+  // 4) Extra: als we een history hebben, meteen proberen terug te gaan
+  // (scheelt het "lelijke" scherm als de browser toch al in hetzelfde tabblad opende)
+  if (history.length > 1) {
+    setTimeout(() => { history.back(); }, 250);
   }
 })();
 </script>
-</html>
