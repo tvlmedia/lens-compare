@@ -627,7 +627,7 @@ updateFullscreenBars();
   pdf.setFillColor(0, 0, 0);
   pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  pdf.setFontSize(12);
+  pdf.setFontSize(18);
   pdf.setTextColor(255, 255, 255);
   pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
 
