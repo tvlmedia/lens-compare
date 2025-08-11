@@ -658,8 +658,8 @@ updateFullscreenBars();
     pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
     const text = "Benieuwd naar alle lenzen? Klik hier";
-    const fontSize = 22;
-    const textY = pageHeight - Math.round(barHeight / 2);
+    const fontSize = 16;
+    const textY = pageHeight - Math.round(barHeight / 3);
     pdf.setFontSize(fontSize);
     pdf.setTextColor(255, 255, 255);
     pdf.text(text, pageWidth / 2, textY, { align: "center", baseline: "middle" });
@@ -741,7 +741,7 @@ await placeContain(pdf, splitData, fullBox);
 pdf.setTextColor(220, 220, 220);
 pdf.text(`Camera/Sensor mode: ${sensorText}`,
          pageW / 2,
-         pageH - BOTTOM_BAR - 12,
+         pageH - BOTTOM_BAR - 50,
          { align: "center" });
 drawBottomBarPage1(logo);
   
