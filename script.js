@@ -898,16 +898,15 @@ drawTopBar("Meer lenzen testen?");
 
 
 
-// 4a) Screenshot van de tool (met knoppen) + klikbare overlay
+// 4a) Zelfde split als pagina 1 → gegarandeerd juiste AR/zoom
 const toolURL = "https://tvlrental.nl/lens-comparison/";
-const shotData = await screenshotActiveImage(); // alleen bruikbaar beeld
-const placed = await placeCoverWithBox(pdf, shotData, {
+const placed = await placeContainWithBox(pdf, splitData, {
   x: PAGE_MARGIN,
   y: TOP_BAR + PAGE_MARGIN,
   w: pageWidth - PAGE_MARGIN * 2,
-  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2 // geen extra -40
+  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2
 });
-pdf.link(placed.x, placed.y, placed.w, placed.h, { url: "https://tvlrental.nl/lens-comparison/" });
+pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
 // Screenshot zelf klikbaar maken
 pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
   
