@@ -808,6 +808,22 @@ async function captureViewerWithUI() {
     if (sliderEl) sliderEl.style.visibility = prevVis || "";
   }
 }
+// --- PDF helpers: maak elke link absoluut en extern ---
+function ensureAbsoluteUrl(url) {
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url)) return url;
+  try { return new URL(url, "https://tvlrental.nl/").href; } 
+  catch { return "https://tvlrental.nl/"; }
+}
+function pdfLinkRect(pdf, x, y, w, h, url) {
+  const abs = ensureAbsoluteUrl(url);
+  if (abs) pdf.link(x, y, w, h, { url: abs });
+}
+function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
+  const abs = ensureAbsoluteUrl(url);
+  if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
+  else pdf.text(text, x, y, opts);
+}
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
   const { jsPDF } = window.jspdf; // ← belangrijk
@@ -863,7 +879,7 @@ updateFullscreenBars();
     const displayText = "Klik hier voor alle info over deze lens";
     pdf.setFontSize(10);
     pdf.setTextColor(0, 102, 255);
-    pdf.textWithLink(displayText, 20, pageHeight - barHeight + 55, { url: link });
+    pdfTextWithLink(pdf, displayText, 20, pageHeight - barHeight + 55, link);
   }
 
   // logo rechts
@@ -894,7 +910,7 @@ updateFullscreenBars();
       baseline: "middle"
     });
 
-    pdf.link(btnX, btnY, btnW, btnH, { url: ctaUrl });
+    pdfLinkRect(pdf, btnX, btnY, btnW, btnH, ctaUrl);
   }
 }
   function drawBottomBarPage1(logo, sensorText) {
@@ -926,7 +942,7 @@ updateFullscreenBars();
   const linkX = (pageWidth - textWidth) / 2;
   const linkY = yCta - 10;             // kleine marge
   const linkH = 20;
-  pdf.link(linkX, linkY, textWidth, linkH, { url: "https://tvlrental.nl/lenses/" });
+  pdfLinkRect(pdf, linkX, linkY, textWidth, linkH, "https://tvlrental.nl/lenses/");
 
   // logo rechts
   if (logo) {
@@ -1044,7 +1060,7 @@ const shotBox = {
 // Nog steeds geen vervorming: contain i.p.v. cover
 // Plaats de afbeelding en maak 'm klikbaar
 const placed = await placeContainWithBox(pdf, shotData, shotBox);
-pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
+pdfLinkRect(pdf, placed.x, placed.y, placed.w, placed.h, toolURL);
 
 // Grotere CTA-tekst in de balk
 drawBottomBar({
