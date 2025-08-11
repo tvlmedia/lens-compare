@@ -386,10 +386,7 @@ updateFullscreenBars();
 resetSplitToMiddle();   
 if (isWrapperFullscreen()) clearInlineHeights();// <<< nieuw
 
-function onFsChange() {
-  if (typeof slider === "undefined" || !slider) return;
-  // ... rest van je functie
-}
+
 
 // Force update to fix initial load issue
 setTimeout(() => updateImages(), 50);
