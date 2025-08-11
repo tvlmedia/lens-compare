@@ -539,6 +539,49 @@ async function placeContainWithBox(pdf, dataURL, box) {
   pdf.addImage(dataURL, "JPEG", x, y, w, h);
   return { x, y, w, h };
 }
+// --- helper: cover-fit (laat staan als je 'm al hebt) ---
+function fitCover(srcW, srcH, boxW, boxH) {
+  const srcAR = srcW / srcH, boxAR = boxW / boxH;
+  let w,h;
+  if (srcAR < boxAR) { h = boxH; w = Math.round(h * srcAR); }
+  else               { w = boxW; h = Math.round(w / srcAR); }
+  const x = Math.round((boxW - w)/2), y = Math.round((boxH - h)/2);
+  return { w,h,x,y };
+}
+async function placeCoverWithBox(pdf, dataURL, box) {
+  const im  = await loadHTMLImage(dataURL);
+  const fit = fitCover(im.naturalWidth || im.width, im.naturalHeight || im.height, box.w, box.h);
+  const x = box.x + fit.x, y = box.y + fit.y, w = fit.w, h = fit.h;
+  pdf.addImage(dataURL, "JPEG", x, y, w, h);
+  return { x, y, w, h };
+}
+
+// --- NIEUW: screenshot van ALLEEN het actieve beeld, zónder letter/pillarbox ---
+async function screenshotActiveImage() {
+  // zorg dat lb-waarden actueel zijn
+  updateFullscreenBars();
+  const el = document.getElementById("comparisonWrapper");
+  const scale = 2;
+  const big = await html2canvas(el, { scale, useCORS: true, backgroundColor: "#000" });
+
+  const lbL = el._lbLeft  || 0;
+  const lbR = el._lbRight || 0;
+  const lbT = el._lbTop   || 0;
+  const lbB = el._lbBottom|| 0;
+
+  const r  = el.getBoundingClientRect();
+  const sx = Math.round(lbL * scale);
+  const sy = Math.round(lbT * scale);
+  const sw = Math.round((r.width  - lbL - lbR) * scale);
+  const sh = Math.round((r.height - lbT - lbB) * scale);
+
+  const out = document.createElement("canvas");
+  out.width = sw; out.height = sh;
+  out.getContext("2d", { alpha:false, willReadFrequently:false })
+     .drawImage(big, sx, sy, sw, sh, 0, 0, sw, sh);
+
+  return out.toDataURL("image/jpeg", 1.0);
+}
 // Maak een nette CTA-"knop" met klikbare link
 function drawCtaButton({ pdf, x, y, w, h, label, url }) {
   // zwarte achtergrond
@@ -850,13 +893,14 @@ drawTopBar("Meer lenzen testen?");
 
 // 4a) Screenshot van de tool (met knoppen) + klikbare overlay
 const toolURL = "https://tvlrental.nl/lens-comparison/";
-const shotData = await screenshotTool();
-const placed = await placeContainWithBox(pdf, shotData, {
+const shotData = await screenshotActiveImage(); // alleen bruikbaar beeld
+const placed = await placeCoverWithBox(pdf, shotData, {
   x: PAGE_MARGIN,
   y: TOP_BAR + PAGE_MARGIN,
   w: pageWidth - PAGE_MARGIN * 2,
-  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2 - 40 // minder marge onder → groter beeld
+  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2 // geen extra -40
 });
+pdf.link(placed.x, placed.y, placed.w, placed.h, { url: "https://tvlrental.nl/lens-comparison/" });
 // Screenshot zelf klikbaar maken
 pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
   
