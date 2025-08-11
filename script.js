@@ -759,6 +759,49 @@ async function captureViewerOnly() {
     if (sliderEl) sliderEl.style.visibility = prevVis || "";
   }
 }
+
+async function captureViewerWithUI() {
+  const viewerEl = document.getElementById("comparisonWrapper");
+  if (!viewerEl) return null;
+
+  // zelfde AR/zoom-setup als captureViewerOnly()
+  const { w: sW, h: sH } = getCurrentWH();
+  const targetAR = sW / sH;
+  const zoom = Math.max(1, BASE_SENSOR.w / sW);
+
+  const origLeftSrc  = afterImgTag.src;
+  const origRightSrc = beforeImgTag.src;
+
+  const DPR = window.devicePixelRatio || 1;
+  const imgBoxH = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+
+  const leftSrcImg  = await loadHTMLImage(origLeftSrc);
+  const rightSrcImg = await loadHTMLImage(origRightSrc);
+
+  const leftCropped  = await renderToSensorAR(leftSrcImg,  targetAR, imgBoxH, zoom);
+  const rightCropped = await renderToSensorAR(rightSrcImg, targetAR, imgBoxH, zoom);
+
+  // tijdelijk de gecropte versies tonen, zodat html2canvas exact de juiste AR ziet
+  afterImgTag.src  = leftCropped.dataURL;
+  beforeImgTag.src = rightCropped.dataURL;
+  await Promise.all([waitForImage(afterImgTag), waitForImage(beforeImgTag)]);
+  await new Promise(r => requestAnimationFrame(r));
+
+  // slider verbergen
+  const sliderEl = document.getElementById("slider");
+  const prevVis = sliderEl?.style.visibility;
+  if (sliderEl) sliderEl.style.visibility = "hidden";
+
+  try {
+    // ↙️ dit capture’t de gecombineerde bbox van .controls, #comparisonWrapper en #infoContainer
+    return await screenshotTool();  // geeft dataURL terug
+  } finally {
+    // herstel beelden + slider
+    afterImgTag.src  = origLeftSrc;
+    beforeImgTag.src = origRightSrc;
+    if (sliderEl) sliderEl.style.visibility = prevVis || "";
+  }
+}
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
   const { jsPDF } = window.jspdf; // ← belangrijk
@@ -980,7 +1023,7 @@ const pageHeight = pdf.internal.pageSize.getHeight();
 const toolURL = "https://tvlrental.nl/lens-comparison/";
 
 // Met UI/labels
-const shotData = await captureViewerOnly();   // alleen de viewer
+const shotData = await captureViewerWithUI(); // viewer + UI (controls + labels)
 // Plaats zonder squeeze (cover)
 const shotBox = {
   x: PAGE_MARGIN,
