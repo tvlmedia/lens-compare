@@ -942,7 +942,7 @@ drawBottomBar({
   logo
 });
 
- // --- Pagina 4: CTA + viewer-only screenshot ---
+// --- Pagina 4: CTA + viewer-only screenshot ---
 pdf.addPage();
 fillBlack();
 
@@ -950,33 +950,33 @@ const pageWidth  = pdf.internal.pageSize.getWidth();
 const pageHeight = pdf.internal.pageSize.getHeight();
 const toolURL = "https://tvlrental.nl/lens-comparison/";
 
-// Hele viewer (UI + labels)
+// Screenshot van de hele viewer (UI + labels)
 const shotData = await screenshotTool();
 
 const shotBox = {
   x: PAGE_MARGIN,
-  y: PAGE_MARGIN, // geen topbar hier, dus gewoon PAGE_MARGIN
+  y: PAGE_MARGIN, // geen topbar, dus gewoon PAGE_MARGIN
   w: pageWidth  - PAGE_MARGIN * 2,
   h: pageHeight - BOTTOM_BAR - PAGE_MARGIN * 2
 };
 
-const placed = await placeContainWithBox(pdf, shotData, shotBox);
-// Maak de screenshot klikbaar:
-pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
+await placeContainWithBox(pdf, shotData, shotBox);
 
-drawBottomBar({
-  text: "",
-  link: "",
-  logo,
-  ctaLabel: "Open de interactieve Lens Comparison Tool",
-  ctaUrl: toolURL
-});
+// CTA-tekst onderin
+const cta = "Meer lenzen testen? Klik hier";
+pdf.setFontSize(12);
+pdf.setTextColor(255, 255, 255);
+pdf.text(cta, 20, pageHeight - 20);
+pdf.link(20, pageHeight - 32, pdf.getTextWidth(cta), 16, { url: toolURL });
+
+// Onderbalk met logo
+drawBottomBar("", "", logo);
 
 const safeLeft  = leftName.replace(/\s+/g, "");
 const safeRight = rightName.replace(/\s+/g, "");
 const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
 pdf.save(filename);
-}); // ← sluit de addEventListener("click", async () => { ... })
+});
  
 
 
