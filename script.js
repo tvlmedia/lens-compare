@@ -970,8 +970,8 @@ const pageHeight = pdf.internal.pageSize.getHeight();
 
 const toolURL = "https://tvlrental.nl/lens-comparison/";
 
-// Met UI/labels
-const shotData = await screenshotTool();
+// Met UI/labels, maar eerst sensor-AR correct “gebakken”
+const shotData = await captureViewerWithUI();
 // Plaats zonder squeeze (cover)
 const shotBox = {
   x: PAGE_MARGIN,
