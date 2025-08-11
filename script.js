@@ -1,5 +1,3 @@
-Luister Chefke! Deze code was bijna perfect. 
-
 // ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF LOGO) ======
 if (window.innerWidth < 768) {
   document.body.classList.add("mobile-mode");
@@ -801,7 +799,44 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
   else pdf.text(text, x, y, opts);
 }
+async function captureViewerWithUI() {
+  const viewerEl = document.getElementById("comparisonWrapper");
+  if (!viewerEl) return null;
 
+  // zelfde AR/zoom als de PDF
+  const { w: sW, h: sH } = getCurrentWH();
+  const targetAR = sW / sH;
+  const zoom = Math.max(1, BASE_SENSOR.w / sW);
+
+  const origLeftSrc  = afterImgTag.src;
+  const origRightSrc = beforeImgTag.src;
+
+  // render links/rechts eerst naar exact sensor-AR (geen squeeze)
+  const DPR = window.devicePixelRatio || 1;
+  const H = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+  const L = await loadHTMLImage(origLeftSrc);
+  const R = await loadHTMLImage(origRightSrc);
+  const leftC  = await renderToSensorAR(L, targetAR, H, zoom);
+  const rightC = await renderToSensorAR(R, targetAR, H, zoom);
+
+  // tijdelijk tonen zodat html2canvas exact dit ziet
+  afterImgTag.src  = leftC.dataURL;
+  beforeImgTag.src = rightC.dataURL;
+  await new Promise(r => requestAnimationFrame(r));
+
+  const sliderEl = document.getElementById("slider");
+  const prevVis = sliderEl?.style.visibility;
+  if (sliderEl) sliderEl.style.visibility = "hidden";
+
+  try {
+    return await screenshotTool(); // maakt een uitsnede van controls + viewer + labels
+  } finally {
+    // herstel
+    afterImgTag.src  = origLeftSrc;
+    beforeImgTag.src = origRightSrc;
+    if (sliderEl) sliderEl.style.visibility = prevVis || "";
+  }
+}
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
   const { jsPDF } = window.jspdf; // ← belangrijk
