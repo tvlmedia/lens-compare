@@ -9,26 +9,17 @@
   if (!to) return;
 
   try {
-    const abs = new URL(to, location.origin).href;
-    const w = window.open(abs, '_blank', 'noopener');
-
-    if (w) {
-      try { w.opener = null; } catch(e) {}
-      // Sluit dit tabblad vrijwel direct
-      setTimeout(() => {
-        window.close();
-        location.replace('about:blank'); // fallback
-      }, 50);
-    } else {
-      // Popup geblokkeerd → stuur direct door in zelfde tabblad
-      location.replace(abs);
-    }
+    const abs = new URL(to, "https://tvlrental.nl/").href;
+    // Altijd nieuw tabblad
+    window.open(abs, '_blank', 'noopener,noreferrer');
+    // Sluit dit tabblad vrijwel direct
+    setTimeout(() => {
+      window.close();
+      location.replace('about:blank'); // fallback als sluiten niet mag
+    }, 50);
   } catch (e) {
-    console.error(e);
+    console.error("Ongeldige URL:", e);
   }
 })();
 </script>
-<body style="background:#000;color:#fff;display:flex;align-items:center;justify-content:center;">
-<p>Link wordt geopend…</p>
-</body>
 </html>
