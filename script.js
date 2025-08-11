@@ -826,7 +826,9 @@ updateFullscreenBars();
     pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
 
     pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(12);
+  pdf.setFontSize(18); // was 12, nu 1.5x zo groot en opvallender
+pdf.setFont("helvetica", "bold"); // maakt het vetgedrukt
+pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 5, { align: "center", baseline: "middle" });
     pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 3, { align: "center", baseline: "middle" });
 
   pdfLinkRect(pdf, btnX, btnY, btnW, btnH, ctaUrl);
@@ -983,7 +985,7 @@ drawBottomBar({
   text: "",
   link: "",
   logo,
-  ctaLabel: "Open de interactieve Lens Comparison Tool",
+  ctaLabel: "KLIK HIER OM MEER LENZEN TE TESTEN",
   ctaUrl: toolURL
 });
 
