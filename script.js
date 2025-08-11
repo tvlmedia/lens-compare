@@ -706,6 +706,25 @@ function getSensorText() {
   const label = cameras[cam]?.[fmt]?.label || "";
   return `${cam} – ${label}`;
 }
+
+async function captureViewerWithUI() {
+  const wrapper = document.getElementById("comparisonWrapper");
+  const sliderWasVisible = slider.style.visibility;
+  slider.style.visibility = "hidden"; // slider tijdelijk verbergen
+
+  try {
+    const DPR = window.devicePixelRatio || 1;
+    const canvas = await html2canvas(wrapper, {
+      scale: DPR,
+      useCORS: true,
+      backgroundColor: "#000"
+    });
+    return canvas.toDataURL("image/jpeg", 1.0);
+  } finally {
+    slider.style.visibility = sliderWasVisible || "";
+  }
+}
+
 async function captureViewerOnly() {
   const viewerEl = document.getElementById("comparisonWrapper");
   if (!viewerEl) {
