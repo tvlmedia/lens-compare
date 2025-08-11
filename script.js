@@ -746,6 +746,48 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
   else pdf.text(text, x, y, opts);
 }
+async function captureViewerWithUI() {
+  const viewerEl = document.getElementById("comparisonWrapper");
+  if (!viewerEl) return null;
+
+  const { w: sW, h: sH } = getCurrentWH();
+  const targetAR = sW / sH;
+  const zoom = Math.max(1, BASE_SENSOR.w / sW);
+
+  const origLeftSrc  = afterImgTag.src;
+  const origRightSrc = beforeImgTag.src;
+
+  const DPR = window.devicePixelRatio || 1;
+  const imgBoxH = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+
+  const leftSrcImg  = await loadHTMLImage(origLeftSrc);
+  const rightSrcImg = await loadHTMLImage(origRightSrc);
+
+  const leftCropped  = await renderToSensorAR(leftSrcImg,  targetAR, imgBoxH, zoom);
+  const rightCropped = await renderToSensorAR(rightSrcImg, targetAR, imgBoxH, zoom);
+
+  // tijdelijk de gecropte versies tonen
+  afterImgTag.src  = leftCropped.dataURL;
+  beforeImgTag.src = rightCropped.dataURL;
+  await Promise.all([
+    new Promise(r => { if (afterImgTag.complete) r(); else afterImgTag.onload = r; }),
+    new Promise(r => { if (beforeImgTag.complete) r(); else beforeImgTag.onload = r; })
+  ]);
+  await new Promise(r => requestAnimationFrame(r));
+
+  const sliderEl = document.getElementById("slider");
+  const prevVis = sliderEl?.style.visibility;
+  if (sliderEl) sliderEl.style.visibility = "hidden";
+
+  try {
+    return await screenshotTool();  // dataURL met UI
+  } finally {
+    // herstel
+    afterImgTag.src  = origLeftSrc;
+    beforeImgTag.src = origRightSrc;
+    if (sliderEl) sliderEl.style.visibility = prevVis || "";
+  }
+}
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
   const { jsPDF } = window.jspdf; // ← belangrijk
