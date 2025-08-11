@@ -816,7 +816,7 @@ updateFullscreenBars();
 
     pdf.link(btnX, btnY, btnW, btnH, { url: ctaUrl });
   }
-}
+
   function drawBottomBarPage1(logo, sensorText) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
