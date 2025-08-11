@@ -698,29 +698,7 @@ function getSensorText() {
   const label = cameras[cam]?.[fmt]?.label || "";
   return `${cam} – ${label}`;
 }
-async function captureViewerOnly() {
-  const viewerEl = document.getElementById("comparisonWrapper");
-  if (!viewerEl) {
-    console.error("Viewer element niet gevonden!");
-    return null;
-  }
-
-  // slider tijdelijk verbergen zodat hij niet in de PDF staat
-  const sliderEl = document.getElementById("slider");
-  const prevVis  = sliderEl?.style.visibility;
-  if (sliderEl) sliderEl.style.visibility = "hidden";
-
-  const canvas = await html2canvas(viewerEl, {
-    scale: 2,
-    backgroundColor: "#000" // zwarte achtergrond, geen transparant grijs
-  });
-
-  if (sliderEl) sliderEl.style.visibility = prevVis || "";
-
-  return canvas.toDataURL("image/jpeg", 0.95);
-}
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
-  
   
   const { jsPDF } = window.jspdf; // ← belangrijk
   // Zorg dat de cache (pillar/letterbox + slider) up-to-date is
@@ -909,7 +887,16 @@ drawBottomBar(
   logo
 );
 
-  const shotData = await captureViewerOnly();
+  // --- Pagina 4: CTA + screenshot van de tool ---
+pdf.addPage();
+fillBlack();
+
+const pageWidth  = pdf.internal.pageSize.getWidth();
+const pageHeight = pdf.internal.pageSize.getHeight();
+drawTopBar("Meer lenzen testen?");
+
+const toolURL  = "https://tvlrental.nl/lens-comparison/";
+const shotData = await screenshotTool(); // <-- screenshot mét knoppen/labels
 
 // Plaats screenshot ZONDER squeeze: cover (cropt indien nodig)
 const shotBox = {
@@ -927,7 +914,7 @@ pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
 const btnW = Math.min(300, pageWidth - PAGE_MARGIN * 2);
 const btnH = 32;
 const btnX = (pageWidth - btnW) / 2;
-const btnY = pageHeight - BOTTOM_BAR - btnH - 24;
+const btnY = pageHeight - BOTTOM_BAR - btnH - 14;
 pdf.setDrawColor(0,0,0);
 pdf.setFillColor(0,0,0);
 pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
