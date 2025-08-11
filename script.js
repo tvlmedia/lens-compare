@@ -706,6 +706,61 @@ function getSensorText() {
   const label = cameras[cam]?.[fmt]?.label || "";
   return `${cam} – ${label}`;
 }
+// helper: wacht tot een <img> echt geladen is
+function waitForImage(imgEl) {
+  return new Promise((resolve, reject) => {
+    if (imgEl.complete && imgEl.naturalWidth > 0) return resolve();
+    imgEl.onload = () => resolve();
+    imgEl.onerror = reject;
+  });
+}
+
+// Capture van viewer + UI met dezelfde targetAR/zoom als pagina 1
+async function captureViewerWithUI() {
+  const viewerEl = document.getElementById("comparisonWrapper");
+  if (!viewerEl) return null;
+
+  // gebruik exact dezelfde targetAR en zoom als pagina 1
+  const { w: sW, h: sH } = getCurrentWH();
+  const targetAR = sW / sH;
+  const zoom = Math.max(1, BASE_SENSOR.w / sW);
+
+  // originele bronnen onthouden
+  const origLeftSrc  = afterImgTag.src;
+  const origRightSrc = beforeImgTag.src;
+
+  // resolutie gebaseerd op echte hoogte van de viewer
+  const DPR = window.devicePixelRatio || 1;
+  const imgBoxH = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+
+  // sensorgecropt renderen (zelfde als pagina 1)
+  const leftSrcImg  = await loadHTMLImage(origLeftSrc);
+  const rightSrcImg = await loadHTMLImage(origRightSrc);
+  const leftCropped  = await renderToSensorAR(leftSrcImg,  targetAR, imgBoxH, zoom);
+  const rightCropped = await renderToSensorAR(rightSrcImg, targetAR, imgBoxH, zoom);
+
+  // tijdelijk tonen zodat html2canvas exact dezelfde crop/AR ziet
+  afterImgTag.src  = leftCropped.dataURL;
+  beforeImgTag.src = rightCropped.dataURL;
+  await Promise.all([waitForImage(afterImgTag), waitForImage(beforeImgTag)]);
+  await new Promise(r => requestAnimationFrame(r));
+
+  // slider even verbergen voor de screenshot
+  const sliderEl = document.getElementById("slider");
+  const prevVis = sliderEl?.style.visibility;
+  if (sliderEl) sliderEl.style.visibility = "hidden";
+
+  try {
+    // screenshot van viewer + UI (zelfde bounding box als je huidige screenshotTool)
+    return await screenshotTool();
+  } finally {
+    // alles terugzetten
+    afterImgTag.src  = origLeftSrc;
+    beforeImgTag.src = origRightSrc;
+    if (sliderEl) sliderEl.style.visibility = prevVis || "";
+  }
+}
+
 async function captureViewerOnly() {
   const viewerEl = document.getElementById("comparisonWrapper");
   if (!viewerEl) {
