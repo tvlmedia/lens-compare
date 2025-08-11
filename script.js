@@ -579,8 +579,14 @@ async function buildSplitFromSensor(leftURL, rightURL, W, H) {
 
   return cvs.toDataURL("image/jpeg", 1.0);
 }
-
+function getSensorText() {
+  const cam = cameraSelect.value;
+  const fmt = sensorFormatSelect.value;
+  const label = cameras[cam]?.[fmt]?.label || "";
+  return `${cam} – ${label}`;
+}
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
+  
   const { jsPDF } = window.jspdf; // ← belangrijk
   // Zorg dat de cache (pillar/letterbox + slider) up-to-date is
 updateFullscreenBars();
