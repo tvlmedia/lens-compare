@@ -836,7 +836,7 @@ updateFullscreenBars();
       baseline: "middle"
     });
   }
-  function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
+  function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "", ctaFontSize = 24 }) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const barHeight  = BOTTOM_BAR;
@@ -870,10 +870,10 @@ updateFullscreenBars();
     pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
   }
 
-  // gecentreerde CTA-knop in de balk
+  // gecentreerde CTA (schaalt met fontgrootte)
   if (ctaLabel && ctaUrl) {
-    const btnW = Math.min(320, pageWidth - 2 * PAGE_MARGIN);
-    const btnH = 32;
+    const btnW = Math.min(360, pageWidth - 2 * PAGE_MARGIN);
+    const btnH = Math.max(32, ctaFontSize + 12);
     const btnX = Math.round((pageWidth - btnW) / 2);
     const btnY = Math.round(pageHeight - (barHeight / 2) - (btnH / 2));
 
@@ -882,8 +882,11 @@ updateFullscreenBars();
     pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
 
     pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(12);
-    pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 3, { align: "center", baseline: "middle" });
+    pdf.setFontSize(ctaFontSize); // ← “scale” van de zin
+    pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + Math.round(ctaFontSize/6), {
+      align: "center",
+      baseline: "middle"
+    });
 
     pdf.link(btnX, btnY, btnW, btnH, { url: ctaUrl });
   }
@@ -1033,16 +1036,19 @@ const shotBox = {
 };
 
 // Nog steeds geen vervorming: contain i.p.v. cover
-await placeContainWithBox(pdf, shotData, shotBox); // behoud AR, geen vervorming
-// CTA-knop in zwarte bottombar
+// Plaats de afbeelding en maak 'm klikbaar
+const placed = await placeContainWithBox(pdf, shotData, shotBox);
+pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
+
+// Grotere CTA-tekst in de balk
 drawBottomBar({
   text: "",
   link: "",
   logo,
   ctaLabel: "Open de interactieve Lens Comparison Tool",
-  ctaUrl: toolURL
+  ctaUrl: toolURL,
+  ctaFontSize: 24   // ← groter; pas naar smaak aan
 });
-
 const safeLeft  = leftName.replace(/\s+/g, "");
 const safeRight = rightName.replace(/\s+/g, "");
 const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
