@@ -901,7 +901,7 @@ drawTopBar("Meer lenzen testen?");
 // Screenshot van tool met knoppen
 const shotData = await screenshotTool();
 const toolURL = "https://tvlrental.nl/lens-comparison/";
-const placed = await placeContainWithBox(pdf, shotData, {
+const placed = await placeCoverWithBox(pdf, shotData, {
   x: PAGE_MARGIN,
   y: TOP_BAR + PAGE_MARGIN,
   w: pageWidth - PAGE_MARGIN * 2,
