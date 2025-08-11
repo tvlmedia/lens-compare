@@ -738,50 +738,20 @@ async function captureViewerOnly() {
   }
 }
 
-// --- PDF link helpers: absoluut maken + via redirector sturen ---
+// --- PDF link helpers: maak URL absoluut en linkbaar ---
 function ensureAbsoluteUrl(url) {
   if (!url) return "";
-  let abs = "";
-  try { abs = new URL(url, "https://tvlrental.nl/").href; } catch { return ""; }
-  const allowed = ["tvlrental.nl", "www.tvlrental.nl"];
-  return allowed.includes(new URL(abs).hostname) ? abs : "";
-}
-function withUTM(url, extra = {}) {
-  try {
-    const u = new URL(url);
-    u.searchParams.set("utm_source", "pdf");
-    u.searchParams.set("utm_medium", "lens-tool");
-    u.searchParams.set("utm_campaign", "comparison");
-    Object.entries(extra).forEach(([k,v]) => v && u.searchParams.set(k, v));
-    return u.href;
-  } catch { return url; }
+  if (/^https?:\/\//i.test(url)) return url;
+  try { return new URL(url, "https://tvlrental.nl/").href; }
+  catch { return "https://tvlrental.nl/"; }
 }
 function pdfLinkRect(pdf, x, y, w, h, url) {
   const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.link(x, y, w, h, { url: toRedirect(withUTM(abs)) });
+  if (abs) pdf.link(x, y, w, h, { url: abs }); // <-- i.p.v. linkRect
 }
 function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.textWithLink(text, x, y, { url: toRedirect(withUTM(abs)), ...opts });
-  else pdf.text(text, x, y, opts);
-}
-// Gebruik je GH-pages redirector:
-const REDIRECTOR = "https://tvlmedia.github.io/lens-compare/out.html";
-
-function toRedirect(absUrl) {
-  const u = new URL(REDIRECTOR);
-  u.searchParams.set("to", absUrl);
-  return u.href;
-}
-
-function pdfLinkRect(pdf, x, y, w, h, url) {
-  const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.link(x, y, w, h, { url: toRedirect(abs) });
-}
-
-function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
-  const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.textWithLink(text, x, y, { url: toRedirect(abs), ...opts });
+  if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
   else pdf.text(text, x, y, opts);
 }
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
