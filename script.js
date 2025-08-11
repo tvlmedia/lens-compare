@@ -661,7 +661,7 @@ updateFullscreenBars();
   // regel 1: sensor mode (bovenin de balk)
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);                 // pas evt. aan (14–18)
-  const ySensor = pageHeight - barHeight + 20; // afstand vanaf bovenzijde balk
+  const ySensor = pageHeight - barHeight + 40; // afstand vanaf bovenzijde balk
   pdf.text(`Camera/Sensor mode: ${sensorText}`, pageWidth / 2, ySensor, {
     align: "center",
     baseline: "middle"
