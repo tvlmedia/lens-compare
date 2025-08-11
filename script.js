@@ -698,6 +698,29 @@ function getSensorText() {
   const label = cameras[cam]?.[fmt]?.label || "";
   return `${cam} – ${label}`;
 }
+async function captureViewerOnly() {
+  const viewerEl = document.getElementById("comparisonWrapper");
+  if (!viewerEl) {
+    console.error("Viewer element niet gevonden!");
+    return null;
+  }
+
+  const sliderEl = document.getElementById("slider");
+  const prevVis = sliderEl?.style.visibility;
+
+  try {
+    if (sliderEl) sliderEl.style.visibility = "hidden";
+
+    const canvas = await html2canvas(viewerEl, {
+      scale: 2,
+      backgroundColor: "#000"
+    });
+
+    return canvas.toDataURL("image/jpeg", 0.95);
+  } finally {
+    if (sliderEl) sliderEl.style.visibility = prevVis || "";
+  }
+}
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
   const { jsPDF } = window.jspdf; // ← belangrijk
