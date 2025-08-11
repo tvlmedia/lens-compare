@@ -747,7 +747,7 @@ function ensureAbsoluteUrl(url) {
 }
 function pdfLinkRect(pdf, x, y, w, h, url) {
   const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.linkRect(x, y, w, h, { url: abs });
+  if (abs) pdf.link(x, y, w, h, { url: abs }); // <-- i.p.v. linkRect
 }
 function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   const abs = ensureAbsoluteUrl(url);
