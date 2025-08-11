@@ -738,7 +738,7 @@ async function captureViewerOnly() {
   }
 }
 
-// --- PDF link helpers: maak URL absoluut en stuur via redirector ---
+// --- PDF link helpers: absoluut maken + via redirector sturen ---
 function ensureAbsoluteUrl(url) {
   if (!url) return "";
   if (/^https?:\/\//i.test(url)) return url;
@@ -746,9 +746,11 @@ function ensureAbsoluteUrl(url) {
   catch { return "https://tvlrental.nl/"; }
 }
 
-// Stuur alle PDF-klikbare links via /out.html?to=<doel>
+// Gebruik je GH-pages redirector:
+const REDIRECTOR = "https://tvlmedia.github.io/lens-compare/out.html";
+
 function toRedirect(absUrl) {
-  const u = new URL("/out.html", "https://tvlrental.nl/");
+  const u = new URL(REDIRECTOR);
   u.searchParams.set("to", absUrl);
   return u.href;
 }
