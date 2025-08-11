@@ -750,6 +750,7 @@ async function captureViewerWithUI() {
   const viewerEl = document.getElementById("comparisonWrapper");
   if (!viewerEl) return null;
 
+  // zelfde AR/zoom als de PDF
   const { w: sW, h: sH } = getCurrentWH();
   const targetAR = sW / sH;
   const zoom = Math.max(1, BASE_SENSOR.w / sW);
@@ -757,22 +758,17 @@ async function captureViewerWithUI() {
   const origLeftSrc  = afterImgTag.src;
   const origRightSrc = beforeImgTag.src;
 
+  // render links/rechts eerst naar exact sensor-AR (geen squeeze)
   const DPR = window.devicePixelRatio || 1;
-  const imgBoxH = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+  const H = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+  const L = await loadHTMLImage(origLeftSrc);
+  const R = await loadHTMLImage(origRightSrc);
+  const leftC  = await renderToSensorAR(L, targetAR, H, zoom);
+  const rightC = await renderToSensorAR(R, targetAR, H, zoom);
 
-  const leftSrcImg  = await loadHTMLImage(origLeftSrc);
-  const rightSrcImg = await loadHTMLImage(origRightSrc);
-
-  const leftCropped  = await renderToSensorAR(leftSrcImg,  targetAR, imgBoxH, zoom);
-  const rightCropped = await renderToSensorAR(rightSrcImg, targetAR, imgBoxH, zoom);
-
-  // tijdelijk de gecropte versies tonen
-  afterImgTag.src  = leftCropped.dataURL;
-  beforeImgTag.src = rightCropped.dataURL;
-  await Promise.all([
-    new Promise(r => { if (afterImgTag.complete) r(); else afterImgTag.onload = r; }),
-    new Promise(r => { if (beforeImgTag.complete) r(); else beforeImgTag.onload = r; })
-  ]);
+  // tijdelijk tonen zodat html2canvas exact dit ziet
+  afterImgTag.src  = leftC.dataURL;
+  beforeImgTag.src = rightC.dataURL;
   await new Promise(r => requestAnimationFrame(r));
 
   const sliderEl = document.getElementById("slider");
@@ -780,7 +776,7 @@ async function captureViewerWithUI() {
   if (sliderEl) sliderEl.style.visibility = "hidden";
 
   try {
-    return await screenshotTool();  // dataURL met UI
+    return await screenshotTool(); // maakt een uitsnede van controls + viewer + labels
   } finally {
     // herstel
     afterImgTag.src  = origLeftSrc;
@@ -1003,19 +999,13 @@ drawBottomBar({
   logo
 });
 
-  // --- Pagina 4: CTA + viewer-only screenshot ---
+ // --- Pagina 4: viewer-shot met UI, AR-correct geplaatst ---
 pdf.addPage();
 fillBlack();
 
-const pageWidth  = pdf.internal.pageSize.getWidth();
-const pageHeight = pdf.internal.pageSize.getHeight();
-
 const toolURL = "https://tvlrental.nl/lens-comparison/";
+const shotData = await captureViewerWithUI(); // de functie hierboven
 
-// Met UI/labels
-// nieuw
-const shotData = await captureViewerWithUI(); // pre-cropt naar exact sensor-AR
-// Plaats zonder squeeze (cover)
 const shotBox = {
   x: PAGE_MARGIN,
   y: PAGE_MARGIN,
@@ -1023,15 +1013,18 @@ const shotBox = {
   h: pageHeight - BOTTOM_BAR - PAGE_MARGIN * 2
 };
 
-// Nog steeds geen vervorming: contain i.p.v. cover
+// contain i.p.v. cover —> nooit squeeze bij 6:5 / 4:3
 const placed = await placeContainWithBox(pdf, shotData, shotBox);
-  pdfLinkRect(pdf, placed.x, placed.y, placed.w, placed.h, toolURL);
-// CTA-knop in zwarte bottombar
+
+// maak het hele geplaatste vlak klikbaar
+pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
+
+// brede CTA in de bottombar
 drawBottomBar({
   text: "",
   link: "",
-  logo,
-  ctaLabel: "KLIK HIER OM MEER LENZEN TE TESTEN",
+  logo, // als je ‘m gebruikt
+  ctaLabel: "Open de interactieve Lens Comparison Tool",
   ctaUrl: toolURL
 });
 
