@@ -826,10 +826,13 @@ updateFullscreenBars();
     pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
 
     pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(18); // was 12, nu 1.5x zo groot en opvallender
-pdf.setFont("helvetica", "bold"); // maakt het vetgedrukt
-pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 5, { align: "center", baseline: "middle" });
-    pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 3, { align: "center", baseline: "middle" });
+ pdf.setFontSize(18); // groter
+pdf.setFont("helvetica", "normal"); // normaal, geen rare bold-render
+pdf.setTextColor(255, 255, 255); // wit
+pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 6, { 
+  align: "center", 
+  baseline: "middle" 
+});
 
   pdfLinkRect(pdf, btnX, btnY, btnW, btnH, ctaUrl);
   }
