@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Even geduld…</title>
+<script>
+  (function () {
+    const to = new URLSearchParams(location.search).get('to');
+    if (!to) return;
+    // Probeer het doel in een nieuw tabblad te openen
+    window.open(to, '_blank');
+    // Optioneel: direct terug naar de PDF of een bedankpagina tonen:
+    // history.back();
+    // of: location.replace('/bedankt');
+  })();
+</script>
+<p>Je link wordt in een nieuw tabblad geopend…</p>
