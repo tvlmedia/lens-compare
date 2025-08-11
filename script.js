@@ -531,6 +531,14 @@ async function placeContain(pdf, dataURL, box) {
   const fit = fitContain(im.naturalWidth || im.width, im.naturalHeight || im.height, box.w, box.h);
   pdf.addImage(dataURL, "JPEG", box.x + fit.x, box.y + fit.y, fit.w, fit.h);
 }
+// Zelfde als placeContain maar geeft de werkelijke plaatsing terug (x,y,w,h)
+async function placeContainWithBox(pdf, dataURL, box) {
+  const im = await loadHTMLImage(dataURL);
+  const fit = fitContain(im.naturalWidth || im.width, im.naturalHeight || im.height, box.w, box.h);
+  const x = box.x + fit.x, y = box.y + fit.y, w = fit.w, h = fit.h;
+  pdf.addImage(dataURL, "JPEG", x, y, w, h);
+  return { x, y, w, h };
+}
 // Maak een nette CTA-"knop" met klikbare link
 function drawCtaButton({ pdf, x, y, w, h, label, url }) {
   // achtergrond
@@ -545,12 +553,39 @@ function drawCtaButton({ pdf, x, y, w, h, label, url }) {
   pdf.link(x, y, w, h, { url });
 }
 
-// Screenshot van de huidige tool (comparisonWrapper + labels)
+// Screenshot met knoppen + viewer + labels/RAW (klikbaar)
 async function screenshotTool() {
-  // Neem alleen het hoofd-beeld (comparisonWrapper); dat is het duidelijkst
-  const target = document.getElementById("comparisonWrapper");
-  const canvas = await html2canvas(target, { scale: 2, useCORS: true, backgroundColor: "#000" });
-  return canvas.toDataURL("image/jpeg", 1.0);
+  const big = await html2canvas(document.body, { scale: 2, useCORS: true, backgroundColor: "#000" });
+
+  const parts = [".controls", "#comparisonWrapper", "#infoContainer"]
+    .map(s => document.querySelector(s))
+    .filter(Boolean);
+
+  // fallback: alleen viewer
+  if (!parts.length) {
+    const r = document.getElementById("comparisonWrapper").getBoundingClientRect();
+    return cropFromCanvas(big, r.left, r.top, r.width, r.height);
+  }
+
+  const rects = parts.map(el => el.getBoundingClientRect());
+  const left   = Math.min(...rects.map(r => r.left));
+  const right  = Math.max(...rects.map(r => r.right));
+  const top    = Math.min(...rects.map(r => r.top));
+  const bottom = Math.max(...rects.map(r => r.bottom));
+
+  return cropFromCanvas(big, left, top, right - left, bottom - top);
+}
+
+// helper: crop uit html2canvas resultaat (rekening houdend met scale:2)
+function cropFromCanvas(sourceCanvas, sx, sy, sw, sh) {
+  const out = document.createElement("canvas");
+  out.width  = Math.max(1, Math.round(sw * 2));
+  out.height = Math.max(1, Math.round(sh * 2));
+  const ctx = out.getContext("2d", { alpha:false });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(sourceCanvas, sx * 2, sy * 2, sw * 2, sh * 2, 0, 0, out.width, out.height);
+  return out.toDataURL("image/jpeg", 1.0);
 }
 function getCurrentSplitFraction() {
   const wrapperRect = comparisonWrapper.getBoundingClientRect();
@@ -681,7 +716,7 @@ updateFullscreenBars();
   // regel 1: sensor mode (bovenin de balk)
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(14);                 // pas evt. aan (14–18)
-  const ySensor = pageHeight - barHeight + 40; // afstand vanaf bovenzijde balk
+  const ySensor = pageHeight - barHeight + 44; // afstand vanaf bovenzijde balk
   pdf.text(`Camera/Sensor mode: ${sensorText}`, pageWidth / 2, ySensor, {
     align: "center",
     baseline: "middle"
@@ -806,15 +841,18 @@ drawTopBar("Meer lenzen testen?");
 // Content-box die we al gebruikten
 const fullBox4 = { x: 0, y: TOP_BAR, w: pageWidth, h: pageHeight - TOP_BAR - BOTTOM_BAR };
 
-// 4a) Screenshot van de tool (het viewer-beeld)
-const toolShot = await screenshotTool();
-await placeContain(pdf, toolShot, {
+// 4a) Screenshot van de tool (met knoppen) + klikbare overlay
+const toolURL = "https://tvlrental.nl/lens-comparison/";
+const shotData = await screenshotTool();
+const placed = await placeContainWithBox(pdf, shotData, {
   x: PAGE_MARGIN,
   y: TOP_BAR + PAGE_MARGIN,
   w: pageWidth - PAGE_MARGIN * 2,
-  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2 - 70 // ruimte voor knop
+  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2 - 70
 });
-
+// Screenshot zelf klikbaar maken
+pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
+  
 // 4b) Grote CTA-knop onder het screenshot
 const btnW = Math.min(420, pageWidth - PAGE_MARGIN * 2);
 const btnH = 42;
@@ -831,12 +869,8 @@ drawCtaButton({
 });
 
 // 4c) Zwarte bottombar + logo (consistent met de rest)
-drawBottomBar(
-  "Bezoek de interactieve tool voor meer combinaties en updates.",
-  "https://tvlrental.nl/lens-comparison/",
-  logo
-);
-
+drawBottomBar("", "", logo);
+  
   const safeLeft  = leftName.replace(/\s+/g, "");
   const safeRight = rightName.replace(/\s+/g, "");
   const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
