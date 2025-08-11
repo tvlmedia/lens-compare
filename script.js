@@ -574,13 +574,15 @@ async function screenshotTool() {
   const bottom = Math.max(...rects.map(r => r.bottom));
 
   const PAD = 12;
-return cropFromCanvas(
-  big,
-  Math.max(0, left - PAD),
-  Math.max(0, top - PAD),
-  (right - left) + PAD * 2,
-  (bottom - top) + PAD * 2
-);
+  return cropFromCanvas(
+    big,
+    Math.max(0, left - PAD),
+    Math.max(0, top - PAD),
+    (right - left) + PAD * 2,
+    (bottom - top) + PAD * 2
+  );
+} // ← deze sluit screenshotTool() netjes af
+// helper: crop uit html2canvas resultaat …
 
 // helper: crop uit html2canvas resultaat (rekening houdend met scale:2)
 function cropFromCanvas(sourceCanvas, sx, sy, sw, sh) {
