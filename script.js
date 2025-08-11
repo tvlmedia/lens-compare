@@ -814,11 +814,11 @@ updateFullscreenBars();
     pdf.setFontSize(12);
     pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 3, { align: "center", baseline: "middle" });
 
-    pdf.link(btnX, btnY, btnW, btnH, { url: ctaUrl });
-}
-    }
+   pdf.link(btnX, btnY, btnW, btnH, { url: ctaUrl });
+  }                         // <- sluit de if
+}                           // <- sluit de functie drawBottomBar
 
-  function drawBottomBarPage1(logo, sensorText) {
+function drawBottomBarPage1(logo, sensorText) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const barHeight  = BOTTOM_BAR;
