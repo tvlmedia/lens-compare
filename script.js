@@ -351,10 +351,16 @@ setDownloadButton(downloadLeftRawButton,  leftKey);
 setDownloadButton(downloadRightRawButton, rightKey);
 
   // Zet HTML met <a> links
-  leftLabel.innerHTML  =
-    `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}</a>`;
-  rightLabel.innerHTML =
-    `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}</a>`;
+  leftLabel.innerHTML = `
+  Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">
+    ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}
+  </a>
+`;
+rightLabel.innerHTML = `
+  Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">
+    ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}
+  </a>
+`;
 } // ← BELANGRIJK: functie hier echt sluiten
 
 
@@ -730,6 +736,23 @@ async function captureViewerOnly() {
   } finally {
     if (sliderEl) sliderEl.style.visibility = prevVis || "";
   }
+}
+
+// --- PDF link helpers: maak URL absoluut en linkbaar ---
+function ensureAbsoluteUrl(url) {
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url)) return url;
+  try { return new URL(url, "https://tvlrental.nl/").href; }
+  catch { return "https://tvlrental.nl/"; }
+}
+function pdfLinkRect(pdf, x, y, w, h, url) {
+  const abs = ensureAbsoluteUrl(url);
+  if (abs) pdf.link(x, y, w, h, { url: abs });
+}
+function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
+  const abs = ensureAbsoluteUrl(url);
+  if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
+  else pdf.text(text, x, y, opts);
 }
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
