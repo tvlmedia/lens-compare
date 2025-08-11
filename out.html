@@ -2,14 +2,21 @@
 <meta charset="utf-8">
 <title>Even geduld…</title>
 <script>
-  (function () {
-    const to = new URLSearchParams(location.search).get('to');
-    if (!to) return;
-    // Probeer het doel in een nieuw tabblad te openen
-    window.open(to, '_blank');
-    // Optioneel: direct terug naar de PDF of een bedankpagina tonen:
-    // history.back();
-    // of: location.replace('/bedankt');
-  })();
+(function () {
+  const to = new URLSearchParams(location.search).get('to');
+  if (!to) return;
+
+  try {
+    // Altijd absolute URL maken t.o.v. tvlrental.nl
+    const abs = new URL(to, "https://tvlrental.nl/").href;
+    // Open in nieuw tabblad zonder window access
+    window.open(abs, "_blank", "noopener,noreferrer");
+  } catch (e) {
+    console.error("Ongeldige URL:", to);
+  }
+
+  // Eventueel terug naar de PDF of bedankpagina
+  // location.replace('/bedankt');
+})();
 </script>
 <p>Je link wordt in een nieuw tabblad geopend…</p>
