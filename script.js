@@ -824,22 +824,7 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
   else pdf.text(text, x, y, opts);
 }
-// --- PDF helpers: maak elke link absoluut en extern ---
-function ensureAbsoluteUrl(url) {
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
-  try { return new URL(url, "https://tvlrental.nl/").href; } 
-  catch { return "https://tvlrental.nl/"; }
-}
-function pdfLinkRect(pdf, x, y, w, h, url) {
-  const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.link(x, y, w, h, { url: abs });
-}
-function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
-  const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
-  else pdf.text(text, x, y, opts);
-}
+
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
   const { jsPDF } = window.jspdf; // ← belangrijk
