@@ -1056,31 +1056,29 @@ drawBottomBar({
 
  
 
-// --- Pagina 4: viewer-shot MET UI, netjes geschaald ---
+ // --- Pagina 4: viewer-shot met UI ---
 pdf.addPage();
 fillBlack();
 
-const toolURL_P4 = "https://tvlrental.nl/lens-comparison/";
+const toolURL = "https://tvlrental.nl/lens-comparison/";
+const viewerShot = await captureViewerWithUI(); // gebruikt je (enige) captureViewerWithUI()
 
-// Screenshot alleen het actieve viewer-beeld, zonder letterbox/pillarbox
-let viewerShot = await screenshotActiveImage();
+const shotBox = {
+  x: PAGE_MARGIN,
+  y: PAGE_MARGIN,
+  w: pageW - PAGE_MARGIN * 2,
+  h: pageH - BOTTOM_BAR - PAGE_MARGIN * 2
+};
 
-// Fallback naar splitData als er iets misgaat
-if (!viewerShot) viewerShot = splitData;
+const placed = await placeContainWithBox(pdf, viewerShot, shotBox);
+pdfLinkRect(pdf, placed.x, placed.y, placed.w, placed.h, toolURL);
 
-// Zelfde box als pagina 1 → zelfde visuele schaal
-const placedP4 = await placeContainWithBox(pdf, viewerShot, fullBox);
-
-// Maak de geplaatste afbeelding klikbaar
-pdfLinkRect(pdf, placedP4.x, placedP4.y, placedP4.w, placedP4.h, toolURL_P4);
-
-// Onderbalk met CTA
 drawBottomBar({
   text: "",
   link: "",
   logo,
   ctaLabel: "Open de interactieve Lens Comparison Tool",
-  ctaUrl: toolURL_P4
+  ctaUrl: toolURL
 });
 
 const safeLeft  = leftName.replace(/\s+/g, "");
