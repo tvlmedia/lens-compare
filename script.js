@@ -848,25 +848,26 @@ const placed = await placeContainWithBox(pdf, shotData, {
   x: PAGE_MARGIN,
   y: TOP_BAR + PAGE_MARGIN,
   w: pageWidth - PAGE_MARGIN * 2,
-  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2 - 70
+  h: pageHeight - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2 - 40 // minder marge onder → groter beeld
 });
 // Screenshot zelf klikbaar maken
 pdf.link(placed.x, placed.y, placed.w, placed.h, { url: toolURL });
   
 // 4b) Grote CTA-knop onder het screenshot
-const btnW = Math.min(420, pageWidth - PAGE_MARGIN * 2);
-const btnH = 42;
+const btnW = Math.min(300, pageWidth - PAGE_MARGIN * 2); // smaller
+const btnH = 32; // lager
 const btnX = (pageWidth - btnW) / 2;
-const btnY = pageHeight - BOTTOM_BAR - btnH - 18;
-drawCtaButton({
-  pdf,
-  x: btnX,
-  y: btnY,
-  w: btnW,
-  h: btnH,
-  label: "Open de interactieve Lens Comparison Tool",
-  url: "https://tvlrental.nl/lens-comparison/"
+const btnY = pageHeight - BOTTOM_BAR - btnH - 14;
+pdf.setDrawColor(0, 0, 0);
+pdf.setFillColor(0, 0, 0);
+pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
+pdf.setTextColor(255, 255, 255);
+pdf.setFontSize(12);
+pdf.text("Open de interactieve Lens Comparison Tool", btnX + btnW / 2, btnY + btnH / 2 + 3, {
+  align: "center",
+  baseline: "middle"
 });
+pdf.link(btnX, btnY, btnW, btnH, { url: "https://tvlrental.nl/lens-comparison/" });
 
 // 4c) Zwarte bottombar + logo (consistent met de rest)
 drawBottomBar("", "", logo);
