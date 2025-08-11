@@ -962,7 +962,8 @@ const shotBox = {
 };
 
 // Nog steeds geen vervorming: contain i.p.v. cover
-await placeContainWithBox(pdf, shotData, shotBox);
+const shotData = await screenshotTool(); // Hele viewer
+const placed   = await placeContainWithBox(pdf, shotData, shotBox);
 // CTA-knop in zwarte bottombar
 drawBottomBar({
   text: "",
