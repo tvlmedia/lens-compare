@@ -258,7 +258,8 @@ const rightLabel = document.getElementById("rightLabel");
 const downloadLeftRawButton  = document.getElementById("downloadLeftRawButton");
 const downloadRightRawButton = document.getElementById("downloadRightRawButton");
 
-
+// Direct bij pageload 1x runnen
+onFsChange();
 
 function updateLensInfo() {
   const left = leftSelect.value;
@@ -349,17 +350,11 @@ resetSplitToMiddle();
 setDownloadButton(downloadLeftRawButton,  leftKey);
 setDownloadButton(downloadRightRawButton, rightKey);
 
-  /// Zet HTML met <a> links (altijd in nieuw tabblad openen)
-leftLabel.innerHTML = `
-  Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">
-    ${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}
-  </a>
-`;
-rightLabel.innerHTML = `
-  Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">
-    ${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}
-  </a>
-`;
+  // Zet HTML met <a> links
+  leftLabel.innerHTML  =
+    `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}</a>`;
+  rightLabel.innerHTML =
+    `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}</a>`;
 } // ← BELANGRIJK: functie hier echt sluiten
 
 
@@ -594,8 +589,19 @@ async function screenshotActiveImage() {
 
   return out.toDataURL("image/jpeg", 1.0);
 }
-
-  
+// Maak een nette CTA-"knop" met klikbare link
+function drawCtaButton({ pdf, x, y, w, h, label, url }) {
+  // zwarte achtergrond
+  pdf.setDrawColor(0, 0, 0);
+  pdf.setFillColor(0, 0, 0);
+  pdf.roundedRect(x, y, w, h, 6, 6, "F");
+  // witte tekst
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(12);
+  pdf.text(label, x + w / 2, y + Math.round(h / 2) + 4, { align: "center", baseline: "middle" });
+  // klikbare zone
+  pdf.link(x, y, w, h, { url });
+}
 
 async function screenshotTool() {
   const DPR   = window.devicePixelRatio || 1;
@@ -702,117 +708,29 @@ function getSensorText() {
   const label = cameras[cam]?.[fmt]?.label || "";
   return `${cam} – ${label}`;
 }
-// helper: wacht tot een <img> echt geladen is
-function waitForImage(imgEl) {
-  return new Promise((resolve, reject) => {
-    if (imgEl.complete && imgEl.naturalWidth > 0) return resolve();
-    imgEl.onload = () => resolve();
-    imgEl.onerror = reject;
-  });
-}
-
 async function captureViewerOnly() {
   const viewerEl = document.getElementById("comparisonWrapper");
-  if (!viewerEl) return null;
-
-  const { w: sW, h: sH } = getCurrentWH();
-  const targetAR = sW / sH;
-  const zoom = Math.max(1, BASE_SENSOR.w / sW);
-
-  const origLeftSrc  = afterImgTag.src;
-  const origRightSrc = beforeImgTag.src;
-
-  const DPR = window.devicePixelRatio || 1;
-  const imgBoxH = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
-
-  const leftSrcImg  = await loadHTMLImage(origLeftSrc);
-  const rightSrcImg = await loadHTMLImage(origRightSrc);
-
-  const leftCropped  = await renderToSensorAR(leftSrcImg,  targetAR, imgBoxH, zoom);
-  const rightCropped = await renderToSensorAR(rightSrcImg, targetAR, imgBoxH, zoom);
-
-  afterImgTag.src  = leftCropped.dataURL;
-  beforeImgTag.src = rightCropped.dataURL;
-  await Promise.all([waitForImage(afterImgTag), waitForImage(beforeImgTag)]);
-  await new Promise(r => requestAnimationFrame(r));
+  if (!viewerEl) {
+    console.error("Viewer element niet gevonden!");
+    return null;
+  }
 
   const sliderEl = document.getElementById("slider");
   const prevVis = sliderEl?.style.visibility;
-  if (sliderEl) sliderEl.style.visibility = "hidden";
 
   try {
+    if (sliderEl) sliderEl.style.visibility = "hidden";
+
     const canvas = await html2canvas(viewerEl, {
       scale: 2,
-      useCORS: true,
       backgroundColor: "#000"
     });
+
     return canvas.toDataURL("image/jpeg", 0.95);
   } finally {
-    afterImgTag.src  = origLeftSrc;
-    beforeImgTag.src = origRightSrc;
     if (sliderEl) sliderEl.style.visibility = prevVis || "";
   }
 }
-
-async function captureViewerWithUI() {
-  const viewerEl = document.getElementById("comparisonWrapper");
-  if (!viewerEl) return null;
-
-  // zelfde AR/zoom-setup als captureViewerOnly()
-  const { w: sW, h: sH } = getCurrentWH();
-  const targetAR = sW / sH;
-  const zoom = Math.max(1, BASE_SENSOR.w / sW);
-
-  const origLeftSrc  = afterImgTag.src;
-  const origRightSrc = beforeImgTag.src;
-
-  const DPR = window.devicePixelRatio || 1;
-  const imgBoxH = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
-
-  const leftSrcImg  = await loadHTMLImage(origLeftSrc);
-  const rightSrcImg = await loadHTMLImage(origRightSrc);
-
-  const leftCropped  = await renderToSensorAR(leftSrcImg,  targetAR, imgBoxH, zoom);
-  const rightCropped = await renderToSensorAR(rightSrcImg, targetAR, imgBoxH, zoom);
-
-  // tijdelijk de gecropte versies tonen, zodat html2canvas exact de juiste AR ziet
-  afterImgTag.src  = leftCropped.dataURL;
-  beforeImgTag.src = rightCropped.dataURL;
-  await Promise.all([waitForImage(afterImgTag), waitForImage(beforeImgTag)]);
-  await new Promise(r => requestAnimationFrame(r));
-
-  // slider verbergen
-  const sliderEl = document.getElementById("slider");
-  const prevVis = sliderEl?.style.visibility;
-  if (sliderEl) sliderEl.style.visibility = "hidden";
-
-  try {
-    // ↙️ dit capture’t de gecombineerde bbox van .controls, #comparisonWrapper en #infoContainer
-    return await screenshotTool();  // geeft dataURL terug
-  } finally {
-    // herstel beelden + slider
-    afterImgTag.src  = origLeftSrc;
-    beforeImgTag.src = origRightSrc;
-    if (sliderEl) sliderEl.style.visibility = prevVis || "";
-  }
-}
-// --- PDF helpers: maak elke link absoluut en extern ---
-function ensureAbsoluteUrl(url) {
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
-  try { return new URL(url, "https://tvlrental.nl/").href; } 
-  catch { return "https://tvlrental.nl/"; }
-}
-function pdfLinkRect(pdf, x, y, w, h, url) {
-  const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.link(x, y, w, h, { url: abs });
-}
-function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
-  const abs = ensureAbsoluteUrl(url);
-  if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
-  else pdf.text(text, x, y, opts);
-}
-
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
   const { jsPDF } = window.jspdf; // ← belangrijk
@@ -847,62 +765,98 @@ updateFullscreenBars();
       baseline: "middle"
     });
   }
-  function drawBottomBar(pdf, description, link, ctaUrl, cta) {
+  function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
+  const pageWidth  = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const barHeight = 70;
+  const barHeight  = BOTTOM_BAR;
 
   // zwarte balk
   pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, pageHeight - barHeight, pdf.internal.pageSize.getWidth(), barHeight, "F");
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  // beschrijving links
-  pdf.setFontSize(10);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(description || "", 20, pageHeight - barHeight + 20, { maxWidth: pdf.internal.pageSize.getWidth() - 160 });
+  // linkertekst (beschrijving)
+  if (text) {
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
+  }
 
-  // link onder de beschrijving
+  // optionele link onder de tekst
   if (link) {
-    const displayText = "Klik hier voor meer info";
+    const displayText = "Klik hier voor alle info over deze lens";
     pdf.setFontSize(10);
     pdf.setTextColor(0, 102, 255);
-    pdfTextWithLink(pdf, displayText, 20, pageHeight - barHeight + 55, link);
+    pdf.textWithLink(displayText, 20, pageHeight - barHeight + 55, { url: link });
   }
 
-  // CTA rechts
-  if (ctaUrl && cta) {
-    const btnW = pdf.getTextWidth(cta) + 10;
-    const btnH = 12;
-    const btnX = pdf.internal.pageSize.getWidth() - btnW - 20;
-    const btnY = pageHeight - barHeight + 42;
+  // logo rechts
+  if (logo) {
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
 
-    pdf.setDrawColor(255, 255, 255);
-    pdf.rect(btnX, btnY - btnH + 3, btnW, btnH, "S");
+  // gecentreerde CTA-knop in de balk
+  if (ctaLabel && ctaUrl) {
+    const btnW = Math.min(320, pageWidth - 2 * PAGE_MARGIN);
+    const btnH = 32;
+    const btnX = Math.round((pageWidth - btnW) / 2);
+    const btnY = Math.round(pageHeight - (barHeight / 2) - (btnH / 2));
+
+    pdf.setDrawColor(0, 0, 0);
+    pdf.setFillColor(0, 0, 0);
+    pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
 
     pdf.setTextColor(255, 255, 255);
-    pdf.text(cta, btnX + 5, btnY);
+    pdf.setFontSize(12);
+    pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 3, { align: "center", baseline: "middle" });
 
-    pdfLinkRect(pdf, btnX, btnY - btnH + 3, btnW, btnH, ctaUrl);
+    pdf.link(btnX, btnY, btnW, btnH, { url: ctaUrl });
   }
 }
-  function drawBottomBarPage1(pdf, cta) {
+  function drawBottomBarPage1(logo, sensorText) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const barHeight  = 40;
-  const yCta = pageHeight - barHeight / 2 + 5;
+  const barHeight  = BOTTOM_BAR;
 
+  // zwarte balk
   pdf.setFillColor(0, 0, 0);
   pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  pdf.setFontSize(14);
+  // regel 1: sensor mode (bovenin de balk)
   pdf.setTextColor(255, 255, 255);
-  pdf.text(cta, pageWidth / 2, yCta, { align: "center" });
+  pdf.setFontSize(14);                 // pas evt. aan (14–18)
+  const ySensor = pageHeight - barHeight + 48;
+  pdf.text(`Camera/Sensor mode: ${sensorText}`, pageWidth / 2, ySensor, {
+    align: "center",
+    baseline: "middle"
+  });
 
-  // Maak de hele CTA‑tekst klikbaar
+  // regel 2: CTA (onderin de balk)
+  const cta = "Benieuwd naar alle lenzen? Klik hier";
+  pdf.setFontSize(16);
+  const yCta = pageHeight - 18;        // afstand boven onderrand
+  pdf.text(cta, pageWidth / 2, yCta, { align: "center", baseline: "middle" });
+
+  // klikbare link over de CTA-tekst
   const textWidth = pdf.getTextWidth(cta);
   const linkX = (pageWidth - textWidth) / 2;
-  const linkY = yCta - 10;
+  const linkY = yCta - 10;             // kleine marge
   const linkH = 20;
-  pdfLinkRect(pdf, linkX, linkY, textWidth, linkH, "https://tvlrental.nl/lenses/");
+  pdf.link(linkX, linkY, textWidth, linkH, { url: "https://tvlrental.nl/lenses/" });
+
+  // logo rechts
+  if (logo) {
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
 }
   function fillBlack() {
     const pw = pdf.internal.pageSize.getWidth();
@@ -938,7 +892,8 @@ const zoom = Math.max(1, BASE_SENSOR.w / sW);
   const focal     = focalLengthSelect.value;
   const t         = tStopSelect.value;
 
- 
+  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
+const logo = await loadHTMLImage(logoUrl);
 const sensorText = getSensorText(); // bv. "Sony Venice – 6K 3:2"
   
 
@@ -963,33 +918,29 @@ drawTopBar(`${leftText} vs ${rightText}`);
 await placeContain(pdf, splitData, fullBox);
 // Sensor‑tekst net boven de bottombar
 
-drawBottomBarPage1(pdf, "Benieuwd naar alle lenzen? Klik hier");
+drawBottomBarPage1(logo, sensorText);
   
   // --- Pagina 2: LINKER beeld ---
 pdf.addPage();
 fillBlack();
 drawTopBar(`${leftText} – ${sensorText}`);
 await placeContain(pdf, leftData, fullBox);
-drawBottomBar(
-  pdf,
-  lensDescriptions[leftName]?.text || "",
-  lensDescriptions[leftName]?.url || "",
-  "https://tvlrental.nl/lenses/",
-  "Alle lenzen bekijken"
-);
+drawBottomBar({
+  text: lensDescriptions[leftName]?.text || "",
+  link: lensDescriptions[leftName]?.url || "",
+  logo
+});
 
 // --- Pagina 3: RECHTER beeld ---
 pdf.addPage();
 fillBlack();
 drawTopBar(`${rightText} – ${sensorText}`);
 await placeContain(pdf, rightData, fullBox);
-drawBottomBar(
-  pdf,
-  lensDescriptions[rightName]?.text || "",
-  lensDescriptions[rightName]?.url || "",
-  "https://tvlrental.nl/lenses/",
-  "Alle lenzen bekijken"
-);
+drawBottomBar({
+  text: lensDescriptions[rightName]?.text || "",
+  link: lensDescriptions[rightName]?.url || "",
+  logo
+});
 
   // --- Pagina 4: CTA + viewer-only screenshot ---
 pdf.addPage();
@@ -1001,7 +952,7 @@ const pageHeight = pdf.internal.pageSize.getHeight();
 const toolURL = "https://tvlrental.nl/lens-comparison/";
 
 // Met UI/labels
-const shotData = await captureViewerWithUI(); // viewer + UI (controls + labels)
+const shotData = await screenshotTool();
 // Plaats zonder squeeze (cover)
 const shotBox = {
   x: PAGE_MARGIN,
@@ -1011,12 +962,16 @@ const shotBox = {
 };
 
 // Nog steeds geen vervorming: contain i.p.v. cover
-// Plaats de afbeelding en maak 'm klikbaar
-const placed = await placeContainWithBox(pdf, shotData, shotBox);
-pdfLinkRect(pdf, placed.x, placed.y, placed.w, placed.h, toolURL);
+await placeContainWithBox(pdf, shotData, shotBox);
+// CTA-knop in zwarte bottombar
+drawBottomBar({
+  text: "",
+  link: "",
+  logo,
+  ctaLabel: "Open de interactieve Lens Comparison Tool",
+  ctaUrl: toolURL
+});
 
-// Grotere CTA-tekst in de balk
-drawBottomBar(pdf, "", "", toolURL, "Open de interactieve Lens Comparison Tool");
 const safeLeft  = leftName.replace(/\s+/g, "");
 const safeRight = rightName.replace(/\s+/g, "");
 const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
@@ -1255,45 +1210,3 @@ function onGlobalKeydown(e) {
   }
 }
 window.addEventListener("keydown", onGlobalKeydown, { capture: true });
-// --- Enforcer: alle <a> openen in nieuw tabblad ---
-(function enforceBlankTargets(){
-  const setBlank = (a) => {
-    if (!a.target) a.target = "_blank";
-    // voeg noopener/noreferrer toe als het (nog) niet staat
-    const rel = (a.getAttribute("rel") || "").split(/\s+/);
-    if (!rel.includes("noopener")) rel.push("noopener");
-    if (!rel.includes("noreferrer")) rel.push("noreferrer");
-    a.setAttribute("rel", rel.join(" ").trim());
-  };
-
-  // 1) Bestaande anchors
-  document.querySelectorAll("a[href]").forEach(setBlank);
-
-  // 2) Toekomstige/dynamische anchors
-  const mo = new MutationObserver((muts) => {
-    muts.forEach(m => {
-      // nieuw toegevoegde nodes
-      m.addedNodes.forEach(node => {
-        if (node.nodeType !== 1) return;
-        if (node.matches?.("a[href]")) setBlank(node);
-        node.querySelectorAll?.("a[href]").forEach(setBlank);
-      });
-      // attribute-wijzigingen
-      if (m.type === "attributes" && m.target.matches?.("a[href]")) {
-        setBlank(m.target);
-      }
-    });
-  });
-  mo.observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ["href", "target", "rel"]
-  });
-
-  // 3) Safety: ook op click (bijv. very-late injected)
-  document.addEventListener("click", (e) => {
-    const a = e.target.closest?.("a[href]");
-    if (a) setBlank(a);
-  }, { capture: true });
-})();
