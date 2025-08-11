@@ -699,7 +699,7 @@ const zoom = Math.max(1, BASE_SENSOR.w / sW);
 
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
 const logo = await loadHTMLImage(logoUrl);
-
+const sensorText = getSensorText(); // bv. "Sony Venice – 6K 3:2"
   
 
   // === Sensor-canvas render (1:1 met viewer) ===
@@ -721,17 +721,23 @@ const rightData = rightSensor.dataURL;
 drawTopBar(`${leftText} vs ${rightText}`);
   const fullBox = { x: 0, y: TOP_BAR, w: pageW, h: pageH - TOP_BAR - BOTTOM_BAR };
 await placeContain(pdf, splitData, fullBox);
+  pdf.setFontSize(12);
+pdf.setTextColor(220, 220, 220);
+pdf.text(`Camera/Sensor mode: ${sensorText}`,
+         pageW / 2,
+         pageH - BOTTOM_BAR - 12,
+         { align: "center" });
 drawBottomBarPage1(logo);
   
   pdf.addPage();
   fillBlack();
-  drawTopBar(leftText);
+  drawTopBar(`${leftText} – ${sensorText}`);
   await placeContain(pdf, leftData,  fullBox);
   drawBottomBar(lensDescriptions[leftName]?.text || "", lensDescriptions[leftName]?.url);
 
   pdf.addPage();
   fillBlack();
-  drawTopBar(rightText);
+  drawTopBar(`${rightText} – ${sensorText}`);
   await placeContain(pdf, rightData, fullBox);
   drawBottomBar(lensDescriptions[rightName]?.text || "", lensDescriptions[rightName]?.url);
 
