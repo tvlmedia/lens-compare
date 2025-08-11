@@ -977,7 +977,7 @@ const safeLeft  = leftName.replace(/\s+/g, "");
 const safeRight = rightName.replace(/\s+/g, "");
 const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
 pdf.save(filename);
-
+}); // ← sluit de addEventListener("click", async () => { ... })
  
 
 
