@@ -951,9 +951,8 @@ const pageHeight = pdf.internal.pageSize.getHeight();
 
 const toolURL = "https://tvlrental.nl/lens-comparison/";
 
-// Screenshot mét UI/labels
+// Met UI/labels
 const shotData = await screenshotTool();
-
 // Plaats zonder squeeze (cover)
 const shotBox = {
   x: PAGE_MARGIN,
@@ -962,8 +961,8 @@ const shotBox = {
   h: pageHeight - BOTTOM_BAR - PAGE_MARGIN * 2
 };
 
-await placeCoverWithBox(pdf, shotData, shotBox);
-
+// Nog steeds geen vervorming: contain i.p.v. cover
+await placeContainWithBox(pdf, shotData, shotBox);
 // CTA-knop in zwarte bottombar
 drawBottomBar({
   text: "",
