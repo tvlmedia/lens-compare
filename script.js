@@ -898,9 +898,10 @@ drawTopBar("Meer lenzen testen?");
 
 
 
-// 4a) Zelfde split als pagina 1 → gegarandeerd juiste AR/zoom
+// Screenshot van tool met knoppen
+const shotData = await screenshotTool();
 const toolURL = "https://tvlrental.nl/lens-comparison/";
-const placed = await placeContainWithBox(pdf, splitData, {
+const placed = await placeContainWithBox(pdf, shotData, {
   x: PAGE_MARGIN,
   y: TOP_BAR + PAGE_MARGIN,
   w: pageWidth - PAGE_MARGIN * 2,
