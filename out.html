@@ -6,17 +6,27 @@
   const to = new URLSearchParams(location.search).get('to');
   if (!to) return;
 
-  try {
-    // Altijd absolute URL maken t.o.v. tvlrental.nl
-    const abs = new URL(to, "https://tvlrental.nl/").href;
-    // Open in nieuw tabblad zonder window access
-    window.open(abs, "_blank", "noopener,noreferrer");
-  } catch (e) {
-    console.error("Ongeldige URL:", to);
-  }
+  let abs = '';
+  try { abs = new URL(to, "https://tvlrental.nl/").href; } catch { /* noop */ }
+  if (!abs) abs = "https://tvlrental.nl/";
 
-  // Eventueel terug naar de PDF of bedankpagina
-  // location.replace('/bedankt');
+  // Probeer nieuw tabblad
+  const w = window.open(abs, "_blank", "noopener,noreferrer");
+
+  // Fallback: als popup geblokt → ga in dezelfde tab na korte delay
+  if (!w) setTimeout(() => (location.href = abs), 600);
+
+  // Eventueel: history vriendelijk terug
+  // setTimeout(() => history.replaceState(null, "", "/"), 2000);
 })();
 </script>
 <p>Je link wordt in een nieuw tabblad geopend…</p>
+<p><a id="fallback" href="#">Klik hier als er niets gebeurt</a></p>
+<script>
+  // Zorg dat de fallback-anker ook werkt zonder JS-inject
+  (function() {
+    const to = new URLSearchParams(location.search).get('to') || "/";
+    const abs = new URL(to, "https://tvlrental.nl/").href;
+    document.getElementById('fallback').href = abs;
+  })();
+</script>
