@@ -765,27 +765,31 @@ updateFullscreenBars();
       baseline: "middle"
     });
   }
-  function drawBottomBar(text = "", link = "", logo) {
+  function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const barHeight  = BOTTOM_BAR;
 
+  // zwarte balk
   pdf.setFillColor(0, 0, 0);
   pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
 
-  pdf.setFontSize(12);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
-
-  if (link) {
-    const displayText = "Klik hier voor alle info over deze lens";
-    const x = 20, y = pageHeight - barHeight + 55;
-    pdf.setFontSize(10);
-    pdf.setTextColor(0, 102, 255);
-    pdf.textWithLink(displayText, x, y, { url: link });
+  // linkertekst (beschrijving)
+  if (text) {
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
   }
 
-  // ← logo toevoegen (net als op pagina 1)
+  // optionele link onder de tekst
+  if (link) {
+    const displayText = "Klik hier voor alle info over deze lens";
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 102, 255);
+    pdf.textWithLink(displayText, 20, pageHeight - barHeight + 55, { url: link });
+  }
+
+  // logo rechts
   if (logo) {
     const targetHeight = 50;
     const ratio = logo.width / logo.height;
@@ -793,6 +797,24 @@ updateFullscreenBars();
     const xLogo = pageWidth - targetWidth - 12;
     const yLogo = pageHeight - targetHeight - 12;
     pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
+
+  // gecentreerde CTA-knop in de balk
+  if (ctaLabel && ctaUrl) {
+    const btnW = Math.min(320, pageWidth - 2 * PAGE_MARGIN);
+    const btnH = 32;
+    const btnX = Math.round((pageWidth - btnW) / 2);
+    const btnY = Math.round(pageHeight - (barHeight / 2) - (btnH / 2));
+
+    pdf.setDrawColor(0, 0, 0);
+    pdf.setFillColor(0, 0, 0);
+    pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(12);
+    pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 3, { align: "center", baseline: "middle" });
+
+    pdf.link(btnX, btnY, btnW, btnH, { url: ctaUrl });
   }
 }
   function drawBottomBarPage1(logo, sensorText) {
