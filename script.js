@@ -41,21 +41,21 @@ const cameras = {
   "Sony FX6": {
     "4K DCI":               { w: 35.616, h: 18.858, label: "4K DCI" },
   },
- "Blackmagic URSA Cine 12K LF": {
-  "12K Open Gate": { w: 35.635, h: 23.316, label: "12K Open Gate" },
-  "12K 16:9":      { w: 35.635, h: 18.792, label: "12K 16:9" },
-  "12K 17:9":      { w: 35.635, h: 18.792, label: "12K 17:9" },
-  "12K 2.4:1":     { w: 35.635, h: 14.825, label: "12K 2.4:1" },
-  "12K 6:5":       { w: 27.979, h: 23.316, label: "12K 6:5" },
-  "9K 3:2":        { w: 27.283, h: 18.166, label: "9K 3:2" },
-  "9K 17:9":       { w: 27.005, h: 14.198, label: "9K 17:9" },
-  "9K 2.4:1":      { w: 27.005, h: 11.206, label: "9K 2.4:1" },
-  "9K 16:9":       { w: 25.195, h: 14.198, label: "9K 16:9" },
-  "9K 6:5":        { w: 22.272, h: 18.583, label: "9K 6:5" }
-}, // ← komma hier om aan te geven dat er nog een volgende camera volgt
-"65mm": {
-  "65mm": { w: 49.105, h: 36.829, label: "65mm" }
-}
+  "Blackmagic URSA Cine 12K LF": {
+    "12K Open Gate":        { w: 35.635, h: 23.316, label: "12K Open Gate" },
+    "12K 16:9":             { w: 35.635, h: 18.792, label: "12K 16:9" },
+    "12K 17:9":             { w: 35.635, h: 18.792, label: "12K 17:9" },
+    "12K 2.4:1":            { w: 35.635, h: 14.825, label: "12K 2.4:1" },
+    "12K 6:5":              { w: 27.979, h: 23.316, label: "12K 6:5" },
+    "9K 3:2":               { w: 27.283, h: 18.166, label: "9K 3:2" },
+    "9K 17:9":              { w: 27.005, h: 14.198, label: "9K 17:9" },
+    "9K 2.4:1":             { w: 27.005, h: 11.206, label: "9K 2.4:1" },
+    "9K 16:9":              { w: 25.195, h: 14.198, label: "9K 16:9" },
+    "9K 6:5":               { w: 22.272, h: 18.583, label: "9K 6:5" },
+  }
+  "65mm": {
+    "65mm":               { w: 49.105, h: 36.829, label: "65mm" },
+    }
 };
 
 // Pak de elementen
