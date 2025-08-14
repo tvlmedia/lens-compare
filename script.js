@@ -883,50 +883,9 @@ function waitForImage(imgEl) {
   });
 }
 
-// Capture van viewer + UI met dezelfde targetAR/zoom als pagina 1
+
 // Capture van viewer + UI, ZONDER extra Venice-zoom (pagina 4 moet 1:1 zijn)
-
-async function captureViewerWithUI() {
-  const viewerEl = document.getElementById("comparisonWrapper");
-  if (!viewerEl) return null;
-
-  // Zelfde AR + zoom als de PDF-pagina’s
-  const { w: sW, h: sH } = getCurrentWH();
-  const targetAR = sW / sH;
-  const zoom = Math.max(1, BASE_SENSOR.w / sW); // <<< dezelfde Venice-zoom!
-
-  const origLeftSrc  = afterImgTag.src;
-  const origRightSrc = beforeImgTag.src;
-
-  // Render links/rechts eerst naar exact sensor-AR met dezelfde zoom/crop
-  const DPR = window.devicePixelRatio || 1;
-  const H   = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
-  const L   = await loadHTMLImage(origLeftSrc);
-  const R   = await loadHTMLImage(origRightSrc);
-
-  const leftC  = await renderToSensorAR(L, targetAR, H, zoom);
-  const rightC = await renderToSensorAR(R, targetAR, H, zoom);
-
-  // Tijdelijk tonen zodat html2canvas precies dit ziet
-  afterImgTag.src  = leftC.dataURL;
-  beforeImgTag.src = rightC.dataURL;
-  await new Promise(r => requestAnimationFrame(r));
-
-  // Slider verbergen voor de screenshot
-  const sliderEl = document.getElementById("slider");
-  const prevVis  = sliderEl?.style.visibility;
-  if (sliderEl) sliderEl.style.visibility = "hidden";
-
-  try {
-    // Maakt een crop van controls + viewer + labels
-    return await screenshotTool();
-  } finally {
-    // Herstel
-    afterImgTag.src  = origLeftSrc;
-    beforeImgTag.src = origRightSrc;
-    if (sliderEl) sliderEl.style.visibility = prevVis || "";
-  }
-}
+async function captureViewerWith
 
 // --- PDF link helpers: maak URL absoluut en linkbaar ---
 function ensureAbsoluteUrl(url) {
