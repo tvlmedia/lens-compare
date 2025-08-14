@@ -627,6 +627,25 @@ document.getElementById("toggleButton").addEventListener("click", () => {
     });
   })();
 }
+function whenImagesReadyThenReset() {
+  const wait = (im) => (im.complete && im.naturalWidth > 0)
+    ? Promise.resolve()
+    : new Promise((res, rej) => { im.onload = res; im.onerror = rej; });
+
+  Promise.all([wait(beforeImgTag), wait(afterImgTag)]).then(() => {
+    updateFullscreenBars();   // zet lb-waarden (0 buiten FS)
+    resetSplitToMiddle();     // clip-path + slider juist
+  });
+}
+
+// na je eerste update:
+updateImages();
+whenImagesReadyThenReset();
+
+// en zorg dat elke wijziging dit ook triggert:
+beforeImgTag.addEventListener('load', whenImagesReadyThenReset);
+afterImgTag.addEventListener('load',  whenImagesReadyThenReset);
+
 
 document.getElementById("fullscreenButton")?.addEventListener("click", toggleFullscreen);
 
