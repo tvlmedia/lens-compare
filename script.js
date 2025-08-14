@@ -1247,17 +1247,35 @@ drawBottomBar({
     ctaUrl: toolURL_P4
 });
 
-const mm = `${focal}mm`;
-const tVal = t.replace(".", "_"); // punt vervangen voor underscore
-const camera = cameraSelect.value || "UnknownCamera";
-const sensorMode = sensorSelect.value || "UnknownSensorMode";
+// ==== Bestandsnaam maken in vorm:
+// TVLRENTAL_Lens1_Lens2_mm_Tstop_Camera_Sensormode ====
 
-const safeLeft = leftName.replace(/\s+/g, "");
-const safeRight = rightName.replace(/\s+/g, "");
-const safeCamera = camera.replace(/\s+/g, "");
-const safeSensorMode = sensorMode.replace(/\s+/g, "");
+const makeSafe = (s) => (s || "")
+  .toString()
+  // laat alleen letters, cijfers en underscores toe
+  .replace(/[^\w]+/g, "");
 
-const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${mm}_T${tVal}_${safeCamera}_${safeSensorMode}.pdf`;
+// mm staat in jouw code al als "35mm" (zonder spatie), dus direct gebruiken
+const tVal = String(t).replace(/\./g, "_"); // "2.8" -> "2_8"
+
+// Haal camera & sensormode op
+const cameraName = cameraSelect.value || "UnknownCamera";
+// gebruik het label als het er is (bijv. "6K 3:2"), anders de key
+const sensorModeLabel =
+  (cameras[cameraName]?.[sensorFormatSelect.value]?.label) ||
+  sensorFormatSelect.value || "UnknownSensorMode";
+
+// Maak de delen safe
+const safeLeft        = makeSafe(leftName);
+const safeRight       = makeSafe(rightName);
+const safeCamera      = makeSafe(cameraName);
+const safeSensorMode  = makeSafe(sensorModeLabel);
+const safeFocal       = makeSafe(focal); // "35mm" blijft "35mm"
+
+// Bouw bestandsnaam
+const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${safeFocal}_T${tVal}_${safeCamera}_${safeSensorMode}.pdf`;
+
+// Opslaan
 pdf.save(filename);
 }); // ← sluit de addEventListener("click", async () => { ... })
  
