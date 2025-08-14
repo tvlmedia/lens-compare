@@ -659,103 +659,7 @@ function loadHTMLImage(src) {
     im.src = src;
   });
 }
-function drawUIOverlay(pdf, placedBox, { frac, leftText, rightText, sensorText }) {
-  // Guardrails
-  if (!placedBox || typeof placedBox.x !== "number") return;
-  if (typeof frac !== "number") frac = 0.5;
-  if (!leftText)  leftText  = "";
-  if (!rightText) rightText = "";
-  if (!sensorText) sensorText = "";
 
-  const { x, y, w, h } = placedBox;
-
-  // --- Slider indicator (middenlijn + "knopje")
-  const splitX = x + (w * Math.min(1, Math.max(0, frac)));
-  pdf.setDrawColor(255);     // wit
-  pdf.setLineWidth(0.8);
-  pdf.line(splitX, y, splitX, y + h);
-
-  // "knopje" in het midden
-  const knobR = Math.max(2, Math.min(6, h * 0.015));  // schaalt mee met beeld
-  pdf.setFillColor(255, 255, 255);
-  pdf.roundedRect(splitX - knobR, y + (h * 0.5) - knobR, knobR * 2, knobR * 2, knobR, knobR, "F");
-
-  // --- Typo setup
-  const pad = Math.max(6, Math.min(14, w * 0.015));
-  const topY = y + pad;
-  const botY = y + h - pad;
-  const fontSmall = Math.max(7, Math.min(11, h * 0.025));
-  const fontTiny  = Math.max(6, Math.min(9,  h * 0.02));
-
-  // Zachte label‑achtergrond (optioneel, simpel en betrouwbaar)
-  function drawLabelBg(px, py, tw, th) {
-    const bgPadX = 4, bgPadY = 2;
-    pdf.setFillColor(0, 0, 0);
-    pdf.roundedRect(px - bgPadX, py - th + 1 - bgPadY, tw + bgPadX * 2, th + bgPadY * 2, 2, 2, "F");
-  }
-
-  // Tekst helper (meet + optionele bg)
-  function drawTextWithBg(text, tx, ty, { align = "left", size = fontSmall, bg = false } = {}) {
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(size);
-    const tw = pdf.getTextWidth(text);
-    const th = size; // benadering
-    let px = tx;
-    if (align === "right") px = tx - tw;
-    if (bg) drawLabelBg(px, ty, tw, th);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(text, tx, ty, { align });
-    return { x: px, y: ty - th, w: tw, h: th };
-    // (return kan gebruikt worden voor link‑rects als je wilt)
-  }
-
-  // --- Linker en rechter label bovenin
-  drawTextWithBg(leftText,  x + pad,      topY + fontSmall, { align: "left",  size: fontSmall, bg: true });
-  drawTextWithBg(rightText, x + w - pad,  topY + fontSmall, { align: "right", size: fontSmall, bg: true });
-
-  // --- Sensor badge onderin rechts
-  drawTextWithBg(sensorText, x + w - pad, botY, { align: "right", size: fontTiny, bg: true });
-
-  // --- Knoppenrij (UI‑mockup, vector)
-  // Let op: standaard Helvetica heeft geen emoji. Gebruik ASCII‑iconen.
-  const buttons = ["FLIP", "FULL", "DETAIL", "PDF"];
-  const btnH = Math.max(12, Math.min(18, h * 0.04));
-  const btnPadX = 5, btnPadY = 3, gap = 4;
-  const btnY = topY + fontSmall + 6;
-  let cursorX = x + w - pad;
-
-  pdf.setFontSize(Math.max(7, Math.min(10, h * 0.022)));
-
-  for (let i = 0; i < buttons.length; i++) {
-    const label = buttons[i];
-    const tw = pdf.getTextWidth(label);
-    const bw = tw + btnPadX * 2;
-    const bx = cursorX - bw;
-    const by = btnY;
-
-    // knop
-    pdf.setFillColor(20, 20, 20);
-    pdf.setDrawColor(255, 255, 255);
-    pdf.setLineWidth(0.3);
-    pdf.roundedRect(bx, by, bw, btnH, 2, 2, "FD");
-
-    // label centreren
-    pdf.setTextColor(255, 255, 255);
-    const tx = bx + bw / 2;
-    const ty = by + btnH / 2 + 3.2; // optisch centreren
-    pdf.text(label, tx, ty, { align: "center" });
-
-    // optioneel: klikbare linkrects naar je live UI acties/pagina
-    // pdf.link(bx, by, bw, btnH, { url: "https://tvlrental.nl/lens-tool#"+label.toLowerCase() });
-
-    cursorX = bx - gap;
-  }
-
-  // --- Kleine “mockup” hint onder de knoppen (optioneel)
-  pdf.setFontSize(Math.max(6, Math.min(8, h * 0.018)));
-  pdf.setTextColor(200, 200, 200);
-  pdf.text("UI‑mockup (illustratie)", x + pad, btnY + btnH, { align: "left" });
-}
 function fitContain(srcW, srcH, boxW, boxH) {
   const srcAR = srcW / srcH, boxAR = boxW / boxH;
   let w, h;
@@ -919,130 +823,7 @@ async function screenshotTool() {
     SCALE
   );
 }
-function drawSiteToolbarAndLabels(pdf, placedBox, {
-  frac,
-  leftText, rightText,           // “Lens: …”
-  sensorText,                    // “Sony Venice – 6K 3:2”
-  ui = {},                       // { camera, mode, leftName, rightName, tStop, focal }
-  links = {}                     // { tool, leftRaw, rightRaw, leftLens, rightLens }
-}) {
-  if (!placedBox) return;
-  const { x, y, w, h } = placedBox;
 
-  // ==== 0) Split-lijn in beeld (dun, geen knopje)
-  const splitX = x + w * Math.min(1, Math.max(0, typeof frac === "number" ? frac : 0.5));
-  pdf.setDrawColor(255); pdf.setLineWidth(0.8);
-  pdf.line(splitX, y, splitX, y + h);
-
-  // ==== 1) Toolbar boven het beeld (zoals op je site)
-  const barGap = 12;          // afstand tot beeld
-  const barH   = Math.max(28, Math.min(36, h * 0.065));
-  const barY   = Math.max(12, y - barGap - barH); // boven het beeld
-  const barX   = x;
-  const barW   = w;
-
-  // achtergrondbalk (donker grijs/zwart)
-  pdf.setFillColor(16,16,16);
-  pdf.roundedRect(barX, barY, barW, barH, 6, 6, "F");
-
-  // pill-helper
-  function pill(label, cx, cy, padX = 12, padY = 6) {
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(Math.max(10, Math.min(12, h * 0.024)));
-    const tw = pdf.getTextWidth(label);
-    const bw = Math.round(tw + padX * 2);
-    const bh = Math.round(Math.min(barH - 8, Math.max(20, tw ? 22 : 22)));
-    const bx = cx - bw;                // we lopen van rechts naar links
-    const by = cy + Math.round((barH - bh) / 2);
-
-    pdf.setFillColor(34,34,34);
-    pdf.setDrawColor(80); pdf.setLineWidth(0.6);
-    pdf.roundedRect(bx, by, bw, bh, 8, 8, "FD");
-
-    pdf.setTextColor(255,255,255);
-    pdf.text(label, bx + bw/2, by + bh/2 + 3, { align: "center" });
-    return { x: bx, y: by, w: bw, h: bh };
-  }
-
-  // volgorde & waarden zoals je site‑header
-  const itemsRight = [
-    { label: ui.focal || ""      },
-    { label: ui.tStop || ""      },
-    { label: ui.rightName || ""  },
-    { label: ui.leftName || ""   },
-    { label: ui.mode || ""       },  // bv "4K 2.39:1"
-    { label: ui.camera || ""     },  // bv "Sony Venice"
-    { label: "Download PDF"      },
-    { label: "Detail View"       },
-    { label: "Fullscreen"        },
-    { label: "Flip"              }
-  ];
-
-  let cursorX = barX + barW - 8;  // begin rechts
-  const cy = barY;
-
-  // teken de pills rechts→links
-  for (const it of itemsRight) {
-    if (!it.label) continue;
-    const p = pill(it.label, cursorX, cy);
-    // klikbare zones allemaal naar de tool
-    if (links.tool) pdf.link(p.x, p.y, p.w, p.h, { url: links.tool });
-    cursorX = p.x - 6;
-  }
-
-  // ==== 2) Labels + RAW knoppen onder het beeld
-  const underGap = 8;
-  const baseY = y + h + underGap;
-
-  // lens‑labels
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(Math.max(10, Math.min(12, h * 0.024)));
-  pdf.setTextColor(220);
-
-  const leftLabelW  = pdf.getTextWidth(leftText);
-  const rightLabelW = pdf.getTextWidth(rightText);
-
-  const leftLabelX  = x + w * 0.25 - leftLabelW/2;
-  const rightLabelX = x + w * 0.75 - rightLabelW/2;
-  const labelsY     = baseY + 16;
-
-  pdf.text(leftText,  leftLabelX + leftLabelW/2,  labelsY, { align: "center" });
-  pdf.text(rightText, rightLabelX + rightLabelW/2, labelsY, { align: "center" });
-
-  // RAW‑buttons
-  function darkButton(label, bx, by) {
-    const padX = 10, padY = 6;
-    pdf.setFontSize(Math.max(10, Math.min(11, h * 0.022)));
-    const tw = pdf.getTextWidth(label);
-    const bw = tw + padX * 2;
-    const bh = 22;
-    pdf.setFillColor(30,30,30);
-    pdf.setDrawColor(120); pdf.setLineWidth(0.6);
-    pdf.roundedRect(bx - bw/2, by, bw, bh, 6, 6, "FD");
-    pdf.setTextColor(255,255,255);
-    pdf.text(label, bx, by + bh/2 + 3, { align: "center" });
-    return { x: bx - bw/2, y: by, w: bw, h: bh };
-  }
-
-  const btnY = labelsY + 12;
-  const leftBtn  = darkButton("Download Left RAW",  x + w * 0.25, btnY);
-  const rightBtn = darkButton("Download Right RAW", x + w * 0.75, btnY);
-
-  if (links.leftRaw)  pdf.link(leftBtn.x,  leftBtn.y,  leftBtn.w,  leftBtn.h,  { url: links.leftRaw  });
-  if (links.rightRaw) pdf.link(rightBtn.x, rightBtn.y, rightBtn.w, rightBtn.h, { url: links.rightRaw });
-
-  // ==== 3) Klein sensor‑badge rechtsonder in beeld (zoals je site)
-  pdf.setFontSize(Math.max(7, Math.min(9, h * 0.020)));
-  const badgeTxt = sensorText;
-  const tw = pdf.getTextWidth(badgeTxt);
-  const bh = 14, bw = tw + 8;
-  const bx = x + w - bw - 6;
-  const by = y + h - bh - 6;
-  pdf.setFillColor(0,0,0);
-  pdf.roundedRect(bx, by, bw, bh, 3, 3, "F");
-  pdf.setTextColor(255,255,255);
-  pdf.text(badgeTxt, bx + bw/2, by + bh/2 + 3, { align: "center" });
-}
 // helper: crop uit html2canvas resultaat (rekening houdend met scale:2)
 function cropFromCanvas(sourceCanvas, sx, sy, sw, sh, SCALE = window.devicePixelRatio || 1) {
   const out = document.createElement("canvas");
@@ -1184,105 +965,370 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   else pdf.text(text, x, y, opts);
 }
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
-  const { jsPDF } = window.jspdf;
+  
+  const { jsPDF } = window.jspdf; // ← belangrijk
+  // Zorg dat de cache (pillar/letterbox + slider) up-to-date is
+updateFullscreenBars();
 
-  // 1) Screenshot exact jouw UI (wrapper) op hoge resolutie
-  const targetEl = document.getElementById("pdfShotWrapper"); // <-- pas aan naar jouw wrapper id
-  if (!targetEl) {
-    alert("PDF wrapper element niet gevonden (pdfShotWrapper).");
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+
+  // Layout constants
+  const TOP_BAR = 40;
+  const BOTTOM_BAR = 80;
+  const PAGE_MARGIN = 24;
+
+  function getContentBox(pageW, pageH) {
+    const x = PAGE_MARGIN;
+    const y = TOP_BAR + PAGE_MARGIN;
+    const w = pageW - PAGE_MARGIN * 2;
+    const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
+    return { x, y, w, h };
+  }
+
+  
+  function drawTopBar(text) {
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const barHeight = TOP_BAR;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, barHeight, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, {
+      align: "center",
+      baseline: "middle"
+    });
+  }
+  function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
+  const pageWidth  = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const barHeight  = BOTTOM_BAR;
+
+  // zwarte balk
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+  // linkertekst (beschrijving)
+  if (text) {
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
+  }
+
+  // optionele link onder de tekst
+  if (link) {
+    const displayText = "Klik hier voor alle info over deze lens";
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 102, 255);
+   pdfTextWithLink(pdf, displayText, 20, pageHeight - barHeight + 55, link);
+  }
+
+  // logo rechts
+  if (logo) {
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
+
+  // gecentreerde CTA-knop in de balk
+  if (ctaLabel && ctaUrl) {
+    const btnW = Math.min(320, pageWidth - 2 * PAGE_MARGIN);
+    const btnH = 32;
+    const btnX = Math.round((pageWidth - btnW) / 2);
+    const btnY = Math.round(pageHeight - (barHeight / 2) - (btnH / 2));
+
+    pdf.setDrawColor(0, 0, 0);
+    pdf.setFillColor(0, 0, 0);
+    pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
+
+    pdf.setTextColor(255, 255, 255);
+ pdf.setFontSize(18); // groter
+pdf.setFont("helvetica", "normal"); // normaal, geen rare bold-render
+pdf.setTextColor(255, 255, 255); // wit
+pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 6, { 
+  align: "center", 
+  baseline: "middle" 
+});
+
+  pdfLinkRect(pdf, btnX, btnY, btnW, btnH, ctaUrl);
+  }
+}
+  function drawBottomBarPage1(logo, sensorText) {
+  const pageWidth  = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const barHeight  = BOTTOM_BAR;
+
+  // zwarte balk
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+  // regel 1: sensor mode (bovenin de balk)
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(14);                 // pas evt. aan (14–18)
+  const ySensor = pageHeight - barHeight + 48;
+  pdf.text(`Camera/Sensor mode: ${sensorText}`, pageWidth / 2, ySensor, {
+    align: "center",
+    baseline: "middle"
+  });
+
+  // regel 2: CTA (onderin de balk)
+  const cta = "Benieuwd naar alle lenzen? Klik hier";
+  pdf.setFontSize(16);
+  const yCta = pageHeight - 18;        // afstand boven onderrand
+  pdf.text(cta, pageWidth / 2, yCta, { align: "center", baseline: "middle" });
+
+  // klikbare link over de CTA-tekst
+  const textWidth = pdf.getTextWidth(cta);
+  const linkX = (pageWidth - textWidth) / 2;
+  const linkY = yCta - 10;             // kleine marge
+  const linkH = 20;
+  pdfLinkRect(pdf, linkX, linkY, textWidth, linkH, "https://tvlrental.nl/lenses/");
+  // logo rechts
+  if (logo) {
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
+}
+  function fillBlack() {
+    const pw = pdf.internal.pageSize.getWidth();
+    const ph = pdf.internal.pageSize.getHeight();
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pw, ph, "F");
+  }
+
+  // Data uit UI
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  const box   = getContentBox(pageW, pageH);
+
+// Sensor‑AR uit de huidige selectie (exact zoals de viewer)
+const { w: sW, h: sH } = getCurrentWH();
+const targetAR = sW / sH;
+
+// Export-resolutie (scherpte).  ~300 DPI benadering op A4 landscape content-box
+const exportScale = 8; // 2.5–3 is meestal top; 3 geeft veel detail
+const exportH = Math.round(box.h * exportScale);
+
+  // Zoom/crop factor tov Venice breedte: nooit “uitzoomen”, alleen extra crop als kleiner is
+const zoom = Math.max(1, BASE_SENSOR.w / sW);
+// Wil je minder agressief? Neem bv: const zoom = 1 + 0.6 * (Math.max(1, BASE_SENSOR.w / sW) - 1);
+  
+  
+
+  
+  const leftText  = leftLabel.textContent;
+  const rightText = rightLabel.textContent;
+  const leftName  = leftSelect.value;
+  const rightName = rightSelect.value;
+  const focal     = focalLengthSelect.value;
+  const t         = tStopSelect.value;
+
+  const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
+const logo = await loadHTMLImage(logoUrl);
+const sensorText = getSensorText(); // bv. "Sony Venice – 6K 3:2"
+  
+
+  // === Sensor-canvas render (1:1 met viewer) ===
+const li = await loadHTMLImage(afterImgTag.src);   // left = after
+const ri = await loadHTMLImage(beforeImgTag.src);  // right = before
+
+const leftSensor  = await renderToSensorAR(li, targetAR, exportH, zoom);
+const rightSensor = await renderToSensorAR(ri, targetAR, exportH, zoom);
+
+// Split canvas met dezelfde (W,H) als sensor-canvassen
+const splitData = await buildSplitFromSensor(leftSensor.dataURL, rightSensor.dataURL, leftSensor.W, leftSensor.H);
+
+// Voor losse pagina's gebruiken we de sensor-canvassen zelf
+const leftData  = leftSensor.dataURL;
+const rightData = rightSensor.dataURL;
+
+  // === PDF render ===
+  fillBlack();
+drawTopBar(`${leftText} vs ${rightText}`);
+  const fullBox = { x: 0, y: TOP_BAR, w: pageW, h: pageH - TOP_BAR - BOTTOM_BAR };
+await placeContain(pdf, splitData, fullBox);
+// Sensor‑tekst net boven de bottombar
+
+drawBottomBarPage1(logo, sensorText);
+  
+  // --- Pagina 2: LINKER beeld ---
+pdf.addPage();
+fillBlack();
+drawTopBar(`${leftText} – ${sensorText}`);
+await placeContain(pdf, leftData, fullBox);
+drawBottomBar({
+  text: lensDescriptions[leftName]?.text || "",
+  link: lensDescriptions[leftName]?.url || "",
+  logo
+});
+
+// --- Pagina 3: RECHTER beeld ---
+pdf.addPage();
+fillBlack();
+drawTopBar(`${rightText} – ${sensorText}`);
+await placeContain(pdf, rightData, fullBox);
+drawBottomBar({
+  text: lensDescriptions[rightName]?.text || "",
+  link: lensDescriptions[rightName]?.url || "",
+  logo
+});
+
+ 
+
+ // --- Pagina 4 (UI-versie, zelfde scaling als p1–p3) ---
+pdf.addPage();
+fillBlack();
+
+const toolURL_P4 = "https://tvlrental.nl/lens-comparison/";
+
+// Screenshot viewer + UI
+let viewerShot = await captureViewerWithUI(); // gebruikt jouw nieuwe korte versie
+if (!viewerShot) viewerShot = splitData; // fallback naar split-image
+
+// Plaats de screenshot met dezelfde contain-scaling als p1/p2/p3
+const placedP4 = await placeContainWithBox(pdf, viewerShot, fullBox);
+
+// Maak de hele afbeelding klikbaar
+pdfLinkRect(pdf, placedP4.x, placedP4.y, placedP4.w, placedP4.h, toolURL_P4);
+
+// Onderste balk met CTA
+drawBottomBar({
+    text: "",
+    link: "",
+    logo,
+    ctaLabel: "Open de interactieve Lens Comparison Tool",
+    ctaUrl: toolURL_P4
+});
+
+// ==== Bestandsnaam maken in vorm:
+// TVLRENTAL_Lens1_Lens2_mm_Tstop_Camera_Sensormode ====
+
+const makeSafe = (s) => (s || "")
+  .toString()
+  // laat alleen letters, cijfers en underscores toe
+  .replace(/[^\w]+/g, "");
+
+// mm staat in jouw code al als "35mm" (zonder spatie), dus direct gebruiken
+const tVal = String(t).replace(/\./g, "_"); // "2.8" -> "2_8"
+
+// Haal camera & sensormode op
+const cameraName = cameraSelect.value || "UnknownCamera";
+// gebruik het label als het er is (bijv. "6K 3:2"), anders de key
+const sensorModeLabel =
+  (cameras[cameraName]?.[sensorFormatSelect.value]?.label) ||
+  sensorFormatSelect.value || "UnknownSensorMode";
+
+// Maak de delen safe
+const safeLeft        = makeSafe(leftName);
+const safeRight       = makeSafe(rightName);
+const safeCamera      = makeSafe(cameraName);
+const safeSensorMode  = makeSafe(sensorModeLabel);
+const safeFocal       = makeSafe(focal); // "35mm" blijft "35mm"
+
+// Bouw bestandsnaam
+const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${safeFocal}_T${tVal}_${safeCamera}_${safeSensorMode}.pdf`;
+
+// Opslaan
+pdf.save(filename);
+}); // ← sluit de addEventListener("click", async () => { ... })
+ 
+
+
+// ==== DETAIL VIEWER ====
+const detailOverlay = document.getElementById("detailOverlay");
+const leftDetail = document.getElementById("leftDetail");
+const rightDetail = document.getElementById("rightDetail");
+const leftDetailImg = leftDetail.querySelector("img");
+const rightDetailImg = rightDetail.querySelector("img");
+const detailToggleButton = document.getElementById("detailViewToggle");
+
+let detailActive = false;
+
+detailToggleButton.addEventListener("click", () => {
+  detailActive = !detailActive;
+  detailOverlay.classList.toggle("active", detailActive);
+  detailToggleButton.classList.toggle("active", detailActive);
+  if (!detailActive) {
+    leftDetail.style.display = "none";
+    rightDetail.style.display = "none";
+  }
+});
+document.addEventListener("mousemove", (e) => {
+  if (!detailActive) return;
+
+  const r = comparisonWrapper.getBoundingClientRect();
+
+  // Alleen tonen wanneer je muis boven het beeld hangt
+  const inside =
+    e.clientX >= r.left && e.clientX <= r.right &&
+    e.clientY >= r.top  && e.clientY <= r.bottom;
+
+  if (!inside) {
+    leftDetail.style.display = "none";
+    rightDetail.style.display = "none";
     return;
   }
 
-  // Zwarte achtergrond zodat de PDF matcht met je site
-  const bg = "#000";
+  // Cursorpositie RELATIEF tot het beeld (voor zoom sampling)
+  const xIn = e.clientX - r.left;
+  const yIn = e.clientY - r.top;
 
-  const DPR = Math.max(1, window.devicePixelRatio || 1);
-  const canvas = await html2canvas(targetEl, {
-    backgroundColor: bg,
-    useCORS: true,      // zorg dat je images CORS‑ok zijn of van dezelfde origin komen
-    allowTaint: false,
-    scale: DPR
-  });
+  // Vierkantjes POSITIONEREN op de echte muispositie (mag buiten vak)
+  // omdat #detailOverlay nu full-screen is
+  const xOut = e.clientX;
+  const yOut = e.clientY;
 
-  const dataURL = canvas.toDataURL("image/jpeg", 1.0);
+  const zoom = 3.2;
+  const size = 260;
 
-  // 2) Maak PDF en plaats de screenshot "contain" met nette marges
-  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+  const updateZoomViewer = (detail, detailImg, sourceImg) => {
+    if (detailImg.src !== sourceImg.src) detailImg.src = sourceImg.src;
 
-  const PAGE_MARGIN = 24;
-  const pageW = pdf.internal.pageSize.getWidth();
-  const pageH = pdf.internal.pageSize.getHeight();
+    const imageRect = sourceImg.getBoundingClientRect();
+    const relX = (e.clientX - imageRect.left) / imageRect.width;
+    const relY = (e.clientY - imageRect.top) / imageRect.height;
 
-  // optioneel: kleine top/bottom balkjes in stijl (maar géén nep-UI daarbinnen)
-  const TOP_BAR    = 40;
-  const BOTTOM_BAR = 40;
+    const zoomedWidth  = imageRect.width * zoom;
+    const zoomedHeight = imageRect.height * zoom;
+    const offsetX = -relX * zoomedWidth  + size / 2;
+    const offsetY = -relY * zoomedHeight + size / 2;
 
-  // achtergrond
-  pdf.setFillColor(0,0,0);
-  pdf.rect(0,0,pageW,pageH,"F");
+    // Zet de viewer OP de muis (full-screen overlay → kan buiten het vak)
+    detail.style.left = `${xOut - size / 2}px`;
+    detail.style.top  = `${yOut - size / 2}px`;
+    detail.style.display = "block";
 
-  // titelbalk (optioneel subtiel)
-  pdf.setTextColor(255,255,255);
-  pdf.setFontSize(14);
-  pdf.text("Lens Comparison — site screenshot", pageW/2, Math.round(TOP_BAR/2)+4, { align: "center" });
-
-  // content box
-  const box = {
-    x: PAGE_MARGIN,
-    y: TOP_BAR + PAGE_MARGIN,
-    w: pageW - PAGE_MARGIN*2,
-    h: pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN*2
+    detailImg.style.width  = `${zoomedWidth}px`;
+    detailImg.style.height = `${zoomedHeight}px`;
+    detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
   };
 
-  // contain‑fit berekening
-  const imgW = canvas.width;
-  const imgH = canvas.height;
-  const imgAR = imgW / imgH;
-  const boxAR = box.w / box.h;
-  let drawW, drawH, drawX, drawY;
-
-  if (imgAR > boxAR) {                 // te breed → pas breedte
-    drawW = box.w;
-    drawH = Math.round(drawW / imgAR);
-    drawX = box.x;
-    drawY = box.y + Math.round((box.h - drawH) / 2);
-  } else {                              // te smal → pas hoogte
-    drawH = box.h;
-    drawW = Math.round(drawH * imgAR);
-    drawX = box.x + Math.round((box.w - drawW) / 2);
-    drawY = box.y;
-  }
-
-  pdf.addImage(dataURL, "JPEG", drawX, drawY, drawW, drawH);
-
-  // optionele subtiele footer
-  pdf.setFontSize(10);
-  pdf.text("© TVL Rental — export is 1‑op‑1 site‑screenshot", pageW/2, pageH - Math.round(BOTTOM_BAR/2) + 3, { align: "center" });
-
-  // 3) Bestandsnaam zoals jij hem wilt (we houden je bestaande variabelen aan waar mogelijk)
-  const leftName  = leftSelect.value || "Left";
-  const rightName = rightSelect.value || "Right";
-  const focal     = (focalLengthSelect.value || "").replace(/[^\w]+/g,"");
-  const t         = (tStopSelect.value || "").replace(/\./g,"_");
-  const cam       = (cameraSelect.value || "").replace(/[^\w]+/g,"");
-  const modeLabel = ((cameras[cameraSelect.value]?.[sensorFormatSelect.value]?.label) || sensorFormatSelect.value || "").replace(/[^\w]+/g,"");
-
-  const makeSafe = s => (s||"").toString().replace(/[^\w]+/g,"");
-  const filename = `TVLRENTAL_${makeSafe(leftName)}_${makeSafe(rightName)}_${focal}_T${t}_${cam}_${modeLabel}.pdf`;
-
-  pdf.save(filename);
+  updateZoomViewer(leftDetail,  leftDetailImg,  afterImgTag);
+  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag);
 });
 
-  
 
-// (optioneel) maak het hele beeld klikbaar naar de tool
-
-
-
-
+comparisonWrapper.addEventListener("mouseleave", () => {
+  leftDetail.style.display = "none";
+  rightDetail.style.display = "none";
+});
 
 // ⎋ Sluit detail viewer met ESC
-
+document.addEventListener("keydown", (e) => {
+ if (e.key === "Escape" && detailActive) {
+  detailActive = false;
+  detailOverlay.classList.remove("active");
+  detailToggleButton.classList.remove("active"); // <== DIT OOK!
+  leftDetail.style.display = "none";
+  rightDetail.style.display = "none";
+}
+});
 // VERVANGT updateFullscreenBars()
 function updateFullscreenBars() {
   // ✅ Alleen letter/pillarbox berekenen in fullscreen
