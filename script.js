@@ -1456,7 +1456,7 @@ const safeFocal      = makeSafe(focal);
 
 const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${safeFocal}_T${tVal}_${safeCamera}_${safeSensorMode}.pdf`;
 pdf.save(filename);
-
+});
 
 // ==== DETAIL VIEWER ====
 const detailOverlay = document.getElementById("detailOverlay");
