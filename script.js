@@ -1184,91 +1184,93 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   else pdf.text(text, x, y, opts);
 }
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
-  
-  const { jsPDF } = window.jspdf; // ← belangrijk
-  // Zorg dat de cache (pillar/letterbox + slider) up-to-date is
-updateFullscreenBars();
+  const { jsPDF } = window.jspdf;
 
+  // 1) Screenshot exact jouw UI (wrapper) op hoge resolutie
+  const targetEl = document.getElementById("pdfShotWrapper"); // <-- pas aan naar jouw wrapper id
+  if (!targetEl) {
+    alert("PDF wrapper element niet gevonden (pdfShotWrapper).");
+    return;
+  }
+
+  // Zwarte achtergrond zodat de PDF matcht met je site
+  const bg = "#000";
+
+  const DPR = Math.max(1, window.devicePixelRatio || 1);
+  const canvas = await html2canvas(targetEl, {
+    backgroundColor: bg,
+    useCORS: true,      // zorg dat je images CORS‑ok zijn of van dezelfde origin komen
+    allowTaint: false,
+    scale: DPR
+  });
+
+  const dataURL = canvas.toDataURL("image/jpeg", 1.0);
+
+  // 2) Maak PDF en plaats de screenshot "contain" met nette marges
   const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
 
-  // Layout constants
-  const TOP_BAR = 40;
-  const BOTTOM_BAR = 80;
   const PAGE_MARGIN = 24;
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
 
-  function getContentBox(pageW, pageH) {
-    const x = PAGE_MARGIN;
-    const y = TOP_BAR + PAGE_MARGIN;
-    const w = pageW - PAGE_MARGIN * 2;
-    const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
-    return { x, y, w, h };
+  // optioneel: kleine top/bottom balkjes in stijl (maar géén nep-UI daarbinnen)
+  const TOP_BAR    = 40;
+  const BOTTOM_BAR = 40;
+
+  // achtergrond
+  pdf.setFillColor(0,0,0);
+  pdf.rect(0,0,pageW,pageH,"F");
+
+  // titelbalk (optioneel subtiel)
+  pdf.setTextColor(255,255,255);
+  pdf.setFontSize(14);
+  pdf.text("Lens Comparison — site screenshot", pageW/2, Math.round(TOP_BAR/2)+4, { align: "center" });
+
+  // content box
+  const box = {
+    x: PAGE_MARGIN,
+    y: TOP_BAR + PAGE_MARGIN,
+    w: pageW - PAGE_MARGIN*2,
+    h: pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN*2
+  };
+
+  // contain‑fit berekening
+  const imgW = canvas.width;
+  const imgH = canvas.height;
+  const imgAR = imgW / imgH;
+  const boxAR = box.w / box.h;
+  let drawW, drawH, drawX, drawY;
+
+  if (imgAR > boxAR) {                 // te breed → pas breedte
+    drawW = box.w;
+    drawH = Math.round(drawW / imgAR);
+    drawX = box.x;
+    drawY = box.y + Math.round((box.h - drawH) / 2);
+  } else {                              // te smal → pas hoogte
+    drawH = box.h;
+    drawW = Math.round(drawH * imgAR);
+    drawX = box.x + Math.round((box.w - drawW) / 2);
+    drawY = box.y;
   }
 
-  
-  function drawTopBar(text) {
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const barHeight = TOP_BAR;
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, barHeight, "F");
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(16);
-    pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, {
-      align: "center",
-      baseline: "middle"
-    });
-  }
-  function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
-  const pageWidth  = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const barHeight  = BOTTOM_BAR;
+  pdf.addImage(dataURL, "JPEG", drawX, drawY, drawW, drawH);
 
-  // zwarte balk
-  pdf.setFillColor(0, 0, 0);
-  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+  // optionele subtiele footer
+  pdf.setFontSize(10);
+  pdf.text("© TVL Rental — export is 1‑op‑1 site‑screenshot", pageW/2, pageH - Math.round(BOTTOM_BAR/2) + 3, { align: "center" });
 
-  // linkertekst (beschrijving)
-  if (text) {
-    pdf.setFontSize(12);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
-  }
+  // 3) Bestandsnaam zoals jij hem wilt (we houden je bestaande variabelen aan waar mogelijk)
+  const leftName  = leftSelect.value || "Left";
+  const rightName = rightSelect.value || "Right";
+  const focal     = (focalLengthSelect.value || "").replace(/[^\w]+/g,"");
+  const t         = (tStopSelect.value || "").replace(/\./g,"_");
+  const cam       = (cameraSelect.value || "").replace(/[^\w]+/g,"");
+  const modeLabel = ((cameras[cameraSelect.value]?.[sensorFormatSelect.value]?.label) || sensorFormatSelect.value || "").replace(/[^\w]+/g,"");
 
-  // optionele link onder de tekst
-  if (link) {
-    const displayText = "Klik hier voor alle info over deze lens";
-    pdf.setFontSize(10);
-    pdf.setTextColor(0, 102, 255);
-   pdfTextWithLink(pdf, displayText, 20, pageHeight - barHeight + 55, link);
-  }
+  const makeSafe = s => (s||"").toString().replace(/[^\w]+/g,"");
+  const filename = `TVLRENTAL_${makeSafe(leftName)}_${makeSafe(rightName)}_${focal}_T${t}_${cam}_${modeLabel}.pdf`;
 
-  // logo rechts
-  if (logo) {
-    const targetHeight = 50;
-    const ratio = logo.width / logo.height;
-    const targetWidth = targetHeight * ratio;
-    const xLogo = pageWidth - targetWidth - 12;
-    const yLogo = pageHeight - targetHeight - 12;
-    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
-  }
-
-  // gecentreerde CTA-knop in de balk
-  if (ctaLabel && ctaUrl) {
-    const btnW = Math.min(320, pageWidth - 2 * PAGE_MARGIN);
-    const btnH = 32;
-    const btnX = Math.round((pageWidth - btnW) / 2);
-    const btnY = Math.round(pageHeight - (barHeight / 2) - (btnH / 2));
-
-    pdf.setDrawColor(0, 0, 0);
-    pdf.setFillColor(0, 0, 0);
-    pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
-
-    pdf.setTextColor(255, 255, 255);
- pdf.setFontSize(18); // groter
-pdf.setFont("helvetica", "normal"); // normaal, geen rare bold-render
-pdf.setTextColor(255, 255, 255); // wit
-pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 6, { 
-  align: "center", 
-  baseline: "middle" 
+  pdf.save(filename);
 });
 
   pdfLinkRect(pdf, btnX, btnY, btnW, btnH, ctaUrl);
