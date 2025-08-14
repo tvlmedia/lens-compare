@@ -883,7 +883,50 @@ function waitForImage(imgEl) {
   });
 }
 
+// plaats dit BOVEN je addEventListener op downloadPdfButton
+async function captureViewerWithUI() {
+  console.log("[captureViewerWithUI] start");
+  const viewerEl = document.getElementById("comparisonWrapper");
+  if (!viewerEl) return null;
 
+  const { w: sW, h: sH } = getCurrentWH();
+  const targetAR = sW / sH;
+  const zoom = Math.max(1, BASE_SENSOR.w / sW);
+
+  const origLeftSrc  = afterImgTag.src;
+  const origRightSrc = beforeImgTag.src;
+
+  const DPR = window.devicePixelRatio || 1;
+  const H   = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+  const L   = await loadHTMLImage(origLeftSrc);
+  const R   = await loadHTMLImage(origRightSrc);
+
+  const leftC  = await renderToSensorAR(L, targetAR, H, zoom);
+  const rightC = await renderToSensorAR(R, targetAR, H, zoom);
+
+  afterImgTag.src  = leftC.dataURL;
+  beforeImgTag.src = rightC.dataURL;
+
+  // wacht tot de nieuwe beelden echt geladen zijn
+  await Promise.all([waitForImage(afterImgTag), waitForImage(beforeImgTag)]);
+
+  const sliderEl = document.getElementById("slider");
+  const prevVis  = sliderEl?.style.visibility;
+  if (sliderEl) sliderEl.style.visibility = "hidden";
+
+  try {
+    const shot = await screenshotTool();
+    console.log("[captureViewerWithUI] got shot?", !!shot);
+    return shot;
+  } finally {
+    afterImgTag.src  = origLeftSrc;
+    beforeImgTag.src = origRightSrc;
+    if (sliderEl) sliderEl.style.visibility = prevVis || "";
+  }
+}
+
+// als je <script type="module"> gebruikt of zeker wilt zijn dat hij globaal is:
+window.captureViewerWithUI = captureViewerWithUI;
 
 
 // --- PDF link helpers: maak URL absoluut en linkbaar ---
