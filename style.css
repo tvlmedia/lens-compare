@@ -517,3 +517,39 @@ body.dragging * {
     border: 1px solid rgba(255,255,255,0.6);
     box-sizing: border-box;
 }
+/* container */
+#comparisonWrapper{
+  position:relative;
+  background:#000;
+}
+
+/* onderlaag (right/before) */
+#beforeImgTag{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover; /* of contain als je dat wilt */
+  display:block;
+}
+
+/* bovenlaag (left/after) die we clippen */
+#afterWrapper{
+  position:absolute; inset:0;
+  overflow:hidden; /* belangrijk voor clipPath fallback */
+}
+#afterWrapper > img{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* schuif-lijn */
+#slider{
+  position:absolute;
+  width:2px;
+  background:#fff;
+  box-shadow:0 0 0 1px rgba(0,0,0,.4);
+  z-index:5;
+  will-change:left,top,height;
+  pointer-events:auto;
+}
