@@ -1247,26 +1247,11 @@ drawBottomBar({
     ctaUrl: toolURL_P4
 });
 
-// mm en T‑stop
-const mm   = focal; // "35mm"
-const tVal = t;     // "2.8"
-
-// Camera en sensormode
-const safeCamera     = (cameraSelect?.value || "").replace(/\s+/g, "");
-const safeSensorMode = (sensorFormatSelect?.value || "").replace(/\s+/g, "");
-
-// Lensnamen
-const safeLeft  = (leftName  || "").replace(/\s+/g, "");
-const safeRight = (rightName || "").replace(/\s+/g, "");
-
-// Bestandsnaam
-const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${mm}_T${tVal}_${safeCamera}_${safeSensorMode}.pdf`;
-
-// PDF opslaan
+const safeLeft  = leftName.replace(/\s+/g, "");
+const safeRight = rightName.replace(/\s+/g, "");
+const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
 pdf.save(filename);
-
-// ⬅️ BELANGRIJK: sluit de click‑handler af
-});
+}); // ← sluit de addEventListener("click", async () => { ... })
  
 
 
