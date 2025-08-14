@@ -884,8 +884,7 @@ function waitForImage(imgEl) {
 }
 
 
-// Capture van viewer + UI, ZONDER extra Venice-zoom (pagina 4 moet 1:1 zijn)
-async function captureViewerWith
+
 
 // --- PDF link helpers: maak URL absoluut en linkbaar ---
 function ensureAbsoluteUrl(url) {
