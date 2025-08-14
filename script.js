@@ -1247,9 +1247,17 @@ drawBottomBar({
     ctaUrl: toolURL_P4
 });
 
-const safeLeft  = leftName.replace(/\s+/g, "");
+const mm = `${focal}mm`;
+const tVal = t.replace(".", "_"); // punt vervangen voor underscore
+const camera = cameraSelect.value || "UnknownCamera";
+const sensorMode = sensorSelect.value || "UnknownSensorMode";
+
+const safeLeft = leftName.replace(/\s+/g, "");
 const safeRight = rightName.replace(/\s+/g, "");
-const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
+const safeCamera = camera.replace(/\s+/g, "");
+const safeSensorMode = sensorMode.replace(/\s+/g, "");
+
+const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${mm}_T${tVal}_${safeCamera}_${safeSensorMode}.pdf`;
 pdf.save(filename);
 }); // ← sluit de addEventListener("click", async () => { ... })
  
