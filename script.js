@@ -659,7 +659,103 @@ function loadHTMLImage(src) {
     im.src = src;
   });
 }
+function drawUIOverlay(pdf, placedBox, { frac, leftText, rightText, sensorText }) {
+  // Guardrails
+  if (!placedBox || typeof placedBox.x !== "number") return;
+  if (typeof frac !== "number") frac = 0.5;
+  if (!leftText)  leftText  = "";
+  if (!rightText) rightText = "";
+  if (!sensorText) sensorText = "";
 
+  const { x, y, w, h } = placedBox;
+
+  // --- Slider indicator (middenlijn + "knopje")
+  const splitX = x + (w * Math.min(1, Math.max(0, frac)));
+  pdf.setDrawColor(255);     // wit
+  pdf.setLineWidth(0.8);
+  pdf.line(splitX, y, splitX, y + h);
+
+  // "knopje" in het midden
+  const knobR = Math.max(2, Math.min(6, h * 0.015));  // schaalt mee met beeld
+  pdf.setFillColor(255, 255, 255);
+  pdf.roundedRect(splitX - knobR, y + (h * 0.5) - knobR, knobR * 2, knobR * 2, knobR, knobR, "F");
+
+  // --- Typo setup
+  const pad = Math.max(6, Math.min(14, w * 0.015));
+  const topY = y + pad;
+  const botY = y + h - pad;
+  const fontSmall = Math.max(7, Math.min(11, h * 0.025));
+  const fontTiny  = Math.max(6, Math.min(9,  h * 0.02));
+
+  // Zachte label‑achtergrond (optioneel, simpel en betrouwbaar)
+  function drawLabelBg(px, py, tw, th) {
+    const bgPadX = 4, bgPadY = 2;
+    pdf.setFillColor(0, 0, 0);
+    pdf.roundedRect(px - bgPadX, py - th + 1 - bgPadY, tw + bgPadX * 2, th + bgPadY * 2, 2, 2, "F");
+  }
+
+  // Tekst helper (meet + optionele bg)
+  function drawTextWithBg(text, tx, ty, { align = "left", size = fontSmall, bg = false } = {}) {
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(size);
+    const tw = pdf.getTextWidth(text);
+    const th = size; // benadering
+    let px = tx;
+    if (align === "right") px = tx - tw;
+    if (bg) drawLabelBg(px, ty, tw, th);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, tx, ty, { align });
+    return { x: px, y: ty - th, w: tw, h: th };
+    // (return kan gebruikt worden voor link‑rects als je wilt)
+  }
+
+  // --- Linker en rechter label bovenin
+  drawTextWithBg(leftText,  x + pad,      topY + fontSmall, { align: "left",  size: fontSmall, bg: true });
+  drawTextWithBg(rightText, x + w - pad,  topY + fontSmall, { align: "right", size: fontSmall, bg: true });
+
+  // --- Sensor badge onderin rechts
+  drawTextWithBg(sensorText, x + w - pad, botY, { align: "right", size: fontTiny, bg: true });
+
+  // --- Knoppenrij (UI‑mockup, vector)
+  // Let op: standaard Helvetica heeft geen emoji. Gebruik ASCII‑iconen.
+  const buttons = ["FLIP", "FULL", "DETAIL", "PDF"];
+  const btnH = Math.max(12, Math.min(18, h * 0.04));
+  const btnPadX = 5, btnPadY = 3, gap = 4;
+  const btnY = topY + fontSmall + 6;
+  let cursorX = x + w - pad;
+
+  pdf.setFontSize(Math.max(7, Math.min(10, h * 0.022)));
+
+  for (let i = 0; i < buttons.length; i++) {
+    const label = buttons[i];
+    const tw = pdf.getTextWidth(label);
+    const bw = tw + btnPadX * 2;
+    const bx = cursorX - bw;
+    const by = btnY;
+
+    // knop
+    pdf.setFillColor(20, 20, 20);
+    pdf.setDrawColor(255, 255, 255);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(bx, by, bw, btnH, 2, 2, "FD");
+
+    // label centreren
+    pdf.setTextColor(255, 255, 255);
+    const tx = bx + bw / 2;
+    const ty = by + btnH / 2 + 3.2; // optisch centreren
+    pdf.text(label, tx, ty, { align: "center" });
+
+    // optioneel: klikbare linkrects naar je live UI acties/pagina
+    // pdf.link(bx, by, bw, btnH, { url: "https://tvlrental.nl/lens-tool#"+label.toLowerCase() });
+
+    cursorX = bx - gap;
+  }
+
+  // --- Kleine “mockup” hint onder de knoppen (optioneel)
+  pdf.setFontSize(Math.max(6, Math.min(8, h * 0.018)));
+  pdf.setTextColor(200, 200, 200);
+  pdf.text("UI‑mockup (illustratie)", x + pad, btnY + btnH, { align: "left" });
+}
 function fitContain(srcW, srcH, boxW, boxH) {
   const srcAR = srcW / srcH, boxAR = boxW / boxH;
   let w, h;
@@ -1188,11 +1284,8 @@ fillBlack();
 const toolURL_P4 = "https://tvlrental.nl/lens-comparison/";
 
 // Screenshot viewer + UI
-let viewerShot = await captureViewerWithUI(); // gebruikt jouw nieuwe korte versie
-if (!viewerShot) viewerShot = splitData; // fallback naar split-image
-
-// Plaats de screenshot met dezelfde contain-scaling als p1/p2/p3
-const placedP4 = await placeContainWithBox(pdf, viewerShot, fullBox);
+const placedP4 = await placeContainWithBox(pdf, splitData, fullBox);
+drawUIOverlay(pdf, placedP4, { frac: getCurrentSplitFraction(), leftText, rightText, sensorText });
 
 // Maak de hele afbeelding klikbaar
 pdfLinkRect(pdf, placedP4.x, placedP4.y, placedP4.w, placedP4.h, toolURL_P4);
