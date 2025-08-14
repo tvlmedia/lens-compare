@@ -513,3 +513,7 @@ body.dragging * {
 
 /* Slider moet boven de balken liggen */
 #slider { z-index: 10; }
+#comparisonWrapper {
+    border: 1px solid rgba(255,255,255,0.6);
+    box-sizing: border-box;
+}
