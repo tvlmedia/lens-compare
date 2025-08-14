@@ -919,66 +919,129 @@ async function screenshotTool() {
     SCALE
   );
 }
-function drawSiteUIOverlay(pdf, placedBox, { frac, leftText, rightText, sensorText, links = {} }) {
+function drawSiteToolbarAndLabels(pdf, placedBox, {
+  frac,
+  leftText, rightText,           // “Lens: …”
+  sensorText,                    // “Sony Venice – 6K 3:2”
+  ui = {},                       // { camera, mode, leftName, rightName, tStop, focal }
+  links = {}                     // { tool, leftRaw, rightRaw, leftLens, rightLens }
+}) {
   if (!placedBox) return;
   const { x, y, w, h } = placedBox;
 
-  // --- Splitlijn (dun, geen “knopje”)
+  // ==== 0) Split-lijn in beeld (dun, geen knopje)
   const splitX = x + w * Math.min(1, Math.max(0, typeof frac === "number" ? frac : 0.5));
   pdf.setDrawColor(255); pdf.setLineWidth(0.8);
   pdf.line(splitX, y, splitX, y + h);
 
-  // typografie
-  const pad = Math.max(6, Math.min(14, w * 0.015));
-  const fontSmall = Math.max(7, Math.min(11, h * 0.025));
-  const fontTiny  = Math.max(6, Math.min(9,  h * 0.020));
-  pdf.setFont("helvetica", "normal");
+  // ==== 1) Toolbar boven het beeld (zoals op je site)
+  const barGap = 12;          // afstand tot beeld
+  const barH   = Math.max(28, Math.min(36, h * 0.065));
+  const barY   = Math.max(12, y - barGap - barH); // boven het beeld
+  const barX   = x;
+  const barW   = w;
 
-  // kleine zwarte label-badge helper
-  function badge(tx, ty, text, align = "left", size = fontSmall) {
-    pdf.setFontSize(size);
-    const tw = pdf.getTextWidth(text);
-    const th = size;
-    const px = align === "right" ? (tx - tw) : tx;
-    pdf.setFillColor(0, 0, 0);
-    pdf.roundedRect(px - 4, ty - th + 1 - 2, tw + 8, th + 4, 2, 2, "F");
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(text, tx, ty, { align });
-    return { x: px - 4, y: ty - th - 1, w: tw + 8, h: th + 4 };
+  // achtergrondbalk (donker grijs/zwart)
+  pdf.setFillColor(16,16,16);
+  pdf.roundedRect(barX, barY, barW, barH, 6, 6, "F");
+
+  // pill-helper
+  function pill(label, cx, cy, padX = 12, padY = 6) {
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(Math.max(10, Math.min(12, h * 0.024)));
+    const tw = pdf.getTextWidth(label);
+    const bw = Math.round(tw + padX * 2);
+    const bh = Math.round(Math.min(barH - 8, Math.max(20, tw ? 22 : 22)));
+    const bx = cx - bw;                // we lopen van rechts naar links
+    const by = cy + Math.round((barH - bh) / 2);
+
+    pdf.setFillColor(34,34,34);
+    pdf.setDrawColor(80); pdf.setLineWidth(0.6);
+    pdf.roundedRect(bx, by, bw, bh, 8, 8, "FD");
+
+    pdf.setTextColor(255,255,255);
+    pdf.text(label, bx + bw/2, by + bh/2 + 3, { align: "center" });
+    return { x: bx, y: by, w: bw, h: bh };
   }
 
-  // --- Lens badges links/rechts bovenin (zoals op je site)
-  const leftBadge  = badge(x + pad,      y + pad + fontSmall, leftText,  "left",  fontSmall);
-  const rightBadge = badge(x + w - pad,  y + pad + fontSmall, rightText, "right", fontSmall);
+  // volgorde & waarden zoals je site‑header
+  const itemsRight = [
+    { label: ui.focal || ""      },
+    { label: ui.tStop || ""      },
+    { label: ui.rightName || ""  },
+    { label: ui.leftName || ""   },
+    { label: ui.mode || ""       },  // bv "4K 2.39:1"
+    { label: ui.camera || ""     },  // bv "Sony Venice"
+    { label: "Download PDF"      },
+    { label: "Detail View"       },
+    { label: "Fullscreen"        },
+    { label: "Flip"              }
+  ];
 
-  // (optioneel) klikbare lenslinks
-  if (links.left)  pdf.link(leftBadge.x,  leftBadge.y,  leftBadge.w,  leftBadge.h,  { url: links.left  });
-  if (links.right) pdf.link(rightBadge.x, rightBadge.y, rightBadge.w, rightBadge.h, { url: links.right });
+  let cursorX = barX + barW - 8;  // begin rechts
+  const cy = barY;
 
-  // --- Knoppenrij rechtsboven: PDF | DETAIL | FULL | FLIP (exacte volgorde)
-  const buttons = ["PDF", "DETAIL", "FULL", "FLIP"];
-  const btnH = Math.max(14, Math.min(18, h * 0.042));
-  const gap = 4, padX = 6, padY = 3;
-  let cx = x + w - pad; const cy = y + pad + fontSmall + 8; // onder de badges
+  // teken de pills rechts→links
+  for (const it of itemsRight) {
+    if (!it.label) continue;
+    const p = pill(it.label, cursorX, cy);
+    // klikbare zones allemaal naar de tool
+    if (links.tool) pdf.link(p.x, p.y, p.w, p.h, { url: links.tool });
+    cursorX = p.x - 6;
+  }
 
-  pdf.setFontSize(Math.max(7, Math.min(10, h * 0.022)));
-  for (const label of buttons) {
+  // ==== 2) Labels + RAW knoppen onder het beeld
+  const underGap = 8;
+  const baseY = y + h + underGap;
+
+  // lens‑labels
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(Math.max(10, Math.min(12, h * 0.024)));
+  pdf.setTextColor(220);
+
+  const leftLabelW  = pdf.getTextWidth(leftText);
+  const rightLabelW = pdf.getTextWidth(rightText);
+
+  const leftLabelX  = x + w * 0.25 - leftLabelW/2;
+  const rightLabelX = x + w * 0.75 - rightLabelW/2;
+  const labelsY     = baseY + 16;
+
+  pdf.text(leftText,  leftLabelX + leftLabelW/2,  labelsY, { align: "center" });
+  pdf.text(rightText, rightLabelX + rightLabelW/2, labelsY, { align: "center" });
+
+  // RAW‑buttons
+  function darkButton(label, bx, by) {
+    const padX = 10, padY = 6;
+    pdf.setFontSize(Math.max(10, Math.min(11, h * 0.022)));
     const tw = pdf.getTextWidth(label);
     const bw = tw + padX * 2;
-    const bx = cx - bw, by = cy;
-    pdf.setFillColor(20,20,20); pdf.setDrawColor(255); pdf.setLineWidth(0.3);
-    pdf.roundedRect(bx, by, bw, btnH, 2, 2, "FD");
+    const bh = 22;
+    pdf.setFillColor(30,30,30);
+    pdf.setDrawColor(120); pdf.setLineWidth(0.6);
+    pdf.roundedRect(bx - bw/2, by, bw, bh, 6, 6, "FD");
     pdf.setTextColor(255,255,255);
-    pdf.text(label, bx + bw/2, by + btnH/2 + 3.2, { align: "center" });
-
-    // (optioneel) allemaal laten linken naar je tool:
-    if (links.tool) pdf.link(bx, by, bw, btnH, { url: links.tool });
-
-    cx = bx - gap;
+    pdf.text(label, bx, by + bh/2 + 3, { align: "center" });
+    return { x: bx - bw/2, y: by, w: bw, h: bh };
   }
 
-  // --- Sensor badge rechtsonder in beeld
-  badge(x + w - pad, y + h - pad, sensorText, "right", fontTiny);
+  const btnY = labelsY + 12;
+  const leftBtn  = darkButton("Download Left RAW",  x + w * 0.25, btnY);
+  const rightBtn = darkButton("Download Right RAW", x + w * 0.75, btnY);
+
+  if (links.leftRaw)  pdf.link(leftBtn.x,  leftBtn.y,  leftBtn.w,  leftBtn.h,  { url: links.leftRaw  });
+  if (links.rightRaw) pdf.link(rightBtn.x, rightBtn.y, rightBtn.w, rightBtn.h, { url: links.rightRaw });
+
+  // ==== 3) Klein sensor‑badge rechtsonder in beeld (zoals je site)
+  pdf.setFontSize(Math.max(7, Math.min(9, h * 0.020)));
+  const badgeTxt = sensorText;
+  const tw = pdf.getTextWidth(badgeTxt);
+  const bh = 14, bw = tw + 8;
+  const bx = x + w - bw - 6;
+  const by = y + h - bh - 6;
+  pdf.setFillColor(0,0,0);
+  pdf.roundedRect(bx, by, bw, bh, 3, 3, "F");
+  pdf.setTextColor(255,255,255);
+  pdf.text(badgeTxt, bx + bw/2, by + bh/2 + 3, { align: "center" });
 }
 // helper: crop uit html2canvas resultaat (rekening houdend met scale:2)
 function cropFromCanvas(sourceCanvas, sx, sy, sw, sh, SCALE = window.devicePixelRatio || 1) {
@@ -1346,29 +1409,32 @@ drawTopBar(`${leftText.replace(/^Lens:\s*/i,"")} vs ${rightText.replace(/^Lens:\
 
 const placedP4 = await placeContainWithBox(pdf, splitData, fullBox);
 
-// Overlay die je site-UI nabootst (geen bolletje, juiste labels/volgorde)
-drawSiteUIOverlay(pdf, placedP4, {
+const placedP4 = await placeContainWithBox(pdf, splitData, fullBox);
+
+drawSiteToolbarAndLabels(pdf, placedP4, {
   frac: getCurrentSplitFraction(),
   leftText,
   rightText,
   sensorText,
+  ui: {
+    camera: cameraSelect.value,
+    mode:   (cameras[cameraSelect.value]?.[sensorFormatSelect.value]?.label) || sensorFormatSelect.value,
+    leftName:  leftSelect.value,
+    rightName: rightSelect.value,
+    tStop: `T${tStopSelect.value}`,
+    focal: focalLengthSelect.value
+  },
   links: {
-    left:  lensDescriptions[leftName]?.url  || "",
-    right: lensDescriptions[rightName]?.url || "",
-    tool:  toolURL_P4
+    tool:     "https://tvlrental.nl/lens-comparison/",
+    leftRaw:  (function(){
+      const k = leftSelect.value.toLowerCase().replace(/\s+/g,"_") + "_" + focalLengthSelect.value + "_t" + tStopSelect.value.replace(".","_");
+      return rawFileMap[k] ? new URL(rawFileMap[k], location.href).href : "";
+    })(),
+    rightRaw: (function(){
+      const k = rightSelect.value.toLowerCase().replace(/\s+/g,"_") + "_" + focalLengthSelect.value + "_t" + tStopSelect.value.replace(".","_");
+      return rawFileMap[k] ? new URL(rawFileMap[k], location.href).href : "";
+    })()
   }
-});
-
-// Maak het beeld klikbaar naar de live tool
-pdfLinkRect(pdf, placedP4.x, placedP4.y, placedP4.w, placedP4.h, toolURL_P4);
-
-// Onderste balk met CTA (zoals je al had)
-drawBottomBar({
-  text: "",
-  link: "",
-  logo,
-  ctaLabel: "Open de interactieve Lens Comparison Tool",
-  ctaUrl: toolURL_P4
 });
 
 // ==== Bestandsnaam maken in vorm:
