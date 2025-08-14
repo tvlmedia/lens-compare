@@ -929,77 +929,110 @@ async function captureViewerWithUI() {
 window.captureViewerWithUI = captureViewerWithUI;
 
 
-// helpt om te wachten tot de overlay echt gepaint is
-function waitNextPaint() {
-  return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+// --- PDF link helpers: maak URL absoluut en linkbaar ---
+function ensureAbsoluteUrl(url) {
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url)) return url;
+  try { return new URL(url, "https://tvlrental.nl/").href; }
+  catch { return "https://tvlrental.nl/"; }
 }
+function pdfLinkRect(pdf, x, y, w, h, url) {
+  const abs = ensureAbsoluteUrl(url);
+  if (abs) pdf.link(x, y, w, h, { url: abs }); // <-- i.p.v. linkRect
+}
+function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
+  const abs = ensureAbsoluteUrl(url);
+  if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
+  else pdf.text(text, x, y, opts);
+}
+document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
+  
+  const { jsPDF } = window.jspdf; // ← belangrijk
+  // Zorg dat de cache (pillar/letterbox + slider) up-to-date is
+updateFullscreenBars();
 
-async function captureViewerWithUI() {
-  updateFullscreenBars();
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
 
-  const viewerEl = document.getElementById("comparisonWrapper");
-  if (!viewerEl) return null;
+  // Layout constants
+  const TOP_BAR = 40;
+  const BOTTOM_BAR = 80;
+  const PAGE_MARGIN = 24;
 
-  // 1) Bouw eerst een split-afbeelding 1:1 met je viewer (sensor-AR + actuele slider)
-  const { w: sW, h: sH } = getCurrentWH();
-  const targetAR = sW / sH;
-  const zoom = Math.max(1, BASE_SENSOR.w / sW);
-
-  const DPR = window.devicePixelRatio || 1;
-  const outH = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
-
-  const Limg = await loadHTMLImage(afterImgTag.src);   // left = after
-  const Rimg = await loadHTMLImage(beforeImgTag.src);  // right = before
-
-  const Lsens = await renderToSensorAR(Limg, targetAR, outH, zoom);
-  const Rsens = await renderToSensorAR(Rimg, targetAR, outH, zoom);
-
-  const splitDataURL = await buildSplitFromSensor(Lsens.dataURL, Rsens.dataURL, Lsens.W, Lsens.H);
-
-  // 2) Leg die split tijdelijk als overlay bovenop de viewer (geen src‑wissels!)
-  const overlay = document.createElement("img");
-  overlay.src = splitDataURL;
-  overlay.alt = "";
-  overlay.style.position = "absolute";
-  overlay.style.inset = "0";
-  overlay.style.zIndex = "9999";
-  overlay.style.pointerEvents = "none";
-  overlay.style.blockSize = "100%";   // fallback voor height:100% in sommige browsers
-  overlay.style.inlineSize = "100%";  // fallback voor width:100%
-
-  // verberg de echte lagen zodat je geen dubbele lijn ziet
-  const prevAfterVis  = afterWrapper.style.visibility;
-  const prevBeforeVis = beforeImgTag.style.visibility;
-  const prevSliderVis = slider.style.visibility;
-  afterWrapper.style.visibility = "hidden";
-  beforeImgTag.style.visibility = "hidden";
-  slider.style.visibility = "hidden";
-
-  viewerEl.appendChild(overlay);
-
-  // 3) Wacht tot overlay zichtbaar is en maak screenshot
-  await waitNextPaint();
-
-  const TIMEOUT_MS = 5000;
-  let shot = null;
-  try {
-    shot = await Promise.race([
-      (async () => await screenshotTool())(),
-      new Promise((_, rej) => setTimeout(() => rej(new Error("capture-timeout")), TIMEOUT_MS))
-    ]);
-  } finally {
-    // 4) Altijd alles terugzetten
-    try { viewerEl.removeChild(overlay); } catch {}
-    afterWrapper.style.visibility = prevAfterVis || "";
-    beforeImgTag.style.visibility = prevBeforeVis || "";
-    slider.style.visibility = prevSliderVis || "";
+  function getContentBox(pageW, pageH) {
+    const x = PAGE_MARGIN;
+    const y = TOP_BAR + PAGE_MARGIN;
+    const w = pageW - PAGE_MARGIN * 2;
+    const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
+    return { x, y, w, h };
   }
 
-  return shot;
-}
+  
+  function drawTopBar(text) {
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const barHeight = TOP_BAR;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, barHeight, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, {
+      align: "center",
+      baseline: "middle"
+    });
+  }
+  function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
+  const pageWidth  = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const barHeight  = BOTTOM_BAR;
 
-// houd ‘m globaal beschikbaar
-window.captureViewerWithUI = captureViewerWithUI;
+  // zwarte balk
+  pdf.setFillColor(0, 0, 0);
+  pdf.rect(0, pageHeight - barHeight, pageWidth, barHeight, "F");
+
+  // linkertekst (beschrijving)
+  if (text) {
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, 20, pageHeight - barHeight + 25, { maxWidth: pageWidth - 120 });
+  }
+
+  // optionele link onder de tekst
+  if (link) {
+    const displayText = "Klik hier voor alle info over deze lens";
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 102, 255);
+   pdfTextWithLink(pdf, displayText, 20, pageHeight - barHeight + 55, link);
+  }
+
+  // logo rechts
+  if (logo) {
+    const targetHeight = 50;
+    const ratio = logo.width / logo.height;
+    const targetWidth = targetHeight * ratio;
+    const xLogo = pageWidth - targetWidth - 12;
+    const yLogo = pageHeight - targetHeight - 12;
+    pdf.addImage(logo, "PNG", xLogo, yLogo, targetWidth, targetHeight);
+  }
+
+  // gecentreerde CTA-knop in de balk
+  if (ctaLabel && ctaUrl) {
+    const btnW = Math.min(320, pageWidth - 2 * PAGE_MARGIN);
+    const btnH = 32;
+    const btnX = Math.round((pageWidth - btnW) / 2);
+    const btnY = Math.round(pageHeight - (barHeight / 2) - (btnH / 2));
+
+    pdf.setDrawColor(0, 0, 0);
+    pdf.setFillColor(0, 0, 0);
+    pdf.roundedRect(btnX, btnY, btnW, btnH, 4, 4, "F");
+
+    pdf.setTextColor(255, 255, 255);
+ pdf.setFontSize(18); // groter
+pdf.setFont("helvetica", "normal"); // normaal, geen rare bold-render
+pdf.setTextColor(255, 255, 255); // wit
+pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 6, { 
+  align: "center", 
+  baseline: "middle" 
+});
+
   pdfLinkRect(pdf, btnX, btnY, btnW, btnH, ctaUrl);
   }
 }
