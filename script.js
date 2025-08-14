@@ -1400,39 +1400,62 @@ drawBottomBar({
 
  
 
- placedP4 = await placeContainWithBox(pdf
-// ==== Bestandsnaam maken in vorm:
-// TVLRENTAL_Lens1_Lens2_mm_Tstop_Camera_Sensormode ====
+// --- Pagina 4: split + UI overlay (zoals in de viewer) ---
+pdf.addPage();
+fillBlack();
 
-const makeSafe = (s) => (s || "")
-  .toString()
-  // laat alleen letters, cijfers en underscores toe
-  .replace(/[^\w]+/g, "");
+drawTopBar(`${leftText.replace(/^Lens:\s*/i,"")} vs ${rightText.replace(/^Lens:\s*/i,"")} – ${sensorText}`);
 
-// mm staat in jouw code al als "35mm" (zonder spatie), dus direct gebruiken
+// Plaats het split-beeld en onthoud de exacte plaatsing
+const placedP4 = await placeContainWithBox(pdf, splitData, fullBox);
+
+// Overlay met toolbar/labels (klikbare pills/RAW knoppen)
+drawSiteToolbarAndLabels(pdf, placedP4, {
+  frac: getCurrentSplitFraction(),
+  leftText,
+  rightText,
+  sensorText,
+  ui: {
+    camera: cameraSelect.value,
+    mode:   (cameras[cameraSelect.value]?.[sensorFormatSelect.value]?.label) || sensorFormatSelect.value,
+    leftName:  leftSelect.value,
+    rightName: rightSelect.value,
+    tStop: `T${tStopSelect.value}`,
+    focal: focalLengthSelect.value
+  },
+  links: {
+    tool: "https://tvlrental.nl/lens-comparison/",
+    leftRaw:  (() => {
+      const k = leftSelect.value.toLowerCase().replace(/\s+/g,"_") + "_" + focalLengthSelect.value + "_t" + tStopSelect.value.replace(".","_");
+      return rawFileMap[k] ? new URL(rawFileMap[k], location.href).href : "";
+    })(),
+    rightRaw: (() => {
+      const k = rightSelect.value.toLowerCase().replace(/\s+/g,"_") + "_" + focalLengthSelect.value + "_t" + tStopSelect.value.replace(".","_");
+      return rawFileMap[k] ? new URL(rawFileMap[k], location.href).href : "";
+    })()
+  }
+});
+
+// (optioneel) maak het hele beeld klikbaar naar de tool
+pdfLinkRect(pdf, placedP4.x, placedP4.y, placedP4.w, placedP4.h, "https://tvlrental.nl/lens-comparison/");
+
+// ==== Bestandsnaam opbouw ====
+const makeSafe = (s) => (s || "").toString().replace(/[^\w]+/g, "");
 const tVal = String(t).replace(/\./g, "_"); // "2.8" -> "2_8"
 
-// Haal camera & sensormode op
 const cameraName = cameraSelect.value || "UnknownCamera";
-// gebruik het label als het er is (bijv. "6K 3:2"), anders de key
 const sensorModeLabel =
   (cameras[cameraName]?.[sensorFormatSelect.value]?.label) ||
   sensorFormatSelect.value || "UnknownSensorMode";
 
-// Maak de delen safe
-const safeLeft        = makeSafe(leftName);
-const safeRight       = makeSafe(rightName);
-const safeCamera      = makeSafe(cameraName);
-const safeSensorMode  = makeSafe(sensorModeLabel);
-const safeFocal       = makeSafe(focal); // "35mm" blijft "35mm"
+const safeLeft       = makeSafe(leftName);
+const safeRight      = makeSafe(rightName);
+const safeCamera     = makeSafe(cameraName);
+const safeSensorMode = makeSafe(sensorModeLabel);
+const safeFocal      = makeSafe(focal);
 
-// Bouw bestandsnaam
 const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${safeFocal}_T${tVal}_${safeCamera}_${safeSensorMode}.pdf`;
-
-// Opslaan
 pdf.save(filename);
-}); // ← sluit de addEventListener("click", async () => { ... })
- 
 
 
 // ==== DETAIL VIEWER ====
