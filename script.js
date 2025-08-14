@@ -927,27 +927,64 @@ async function captureViewerWithUI() {
   }
 }
 
-async function captureViewerOnly() {
+async function captureViewerWithUI() {
   const viewerEl = document.getElementById("comparisonWrapper");
-  if (!viewerEl) {
-    console.error("Viewer element niet gevonden!");
-    return null;
-  }
+  if (!viewerEl) return null;
 
+  // zelfde AR als huidige sensor, geen extra zoom
+  const { w: sW, h: sH } = getCurrentWH();
+  const targetAR = sW / sH;
+  const zoom = 1;
+
+  // huidige bronnen
+  const origLeftSrc  = afterImgTag.src;   // linker (after)
+  const origRightSrc = beforeImgTag.src;  // rechter (before)
+
+  // render beide naar exact sensor‑AR op schermhoogte
+  const DPR = window.devicePixelRatio || 1;
+  const H   = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
+  const L   = await loadHTMLImage(origLeftSrc);
+  const R   = await loadHTMLImage(origRightSrc);
+
+  const leftC  = await renderToSensorAR(L, targetAR, H, zoom);
+  const rightC = await renderToSensorAR(R, targetAR, H, zoom);
+
+  // bouw één composiet "split" op basis van actuele slider‑positie
+  const splitURL = await buildSplitFromSensor(leftC.dataURL, rightC.dataURL, leftC.W, leftC.H);
+
+  // verstop originele lagen + slider
   const sliderEl = document.getElementById("slider");
-  const prevVis = sliderEl?.style.visibility;
+  const prevVisL = afterImgTag.style.visibility;
+  const prevVisR = beforeImgTag.style.visibility;
+  const prevSliderVis = sliderEl?.style.visibility;
+
+  afterImgTag.style.visibility = "hidden";
+  beforeImgTag.style.visibility = "hidden";
+  if (sliderEl) sliderEl.style.visibility = "hidden";
+
+  // tijdelijke overlay met de gebakken split
+  const temp = new Image();
+  temp.src = splitURL;
+  temp.style.position = "absolute";
+  temp.style.left = "0";
+  temp.style.top = "0";
+  temp.style.width = "100%";
+  temp.style.height = "100%";
+  temp.style.objectFit = "cover";
+  temp.style.zIndex = "5";
+  temp.style.pointerEvents = "none";
+  viewerEl.appendChild(temp);
+  await waitForImage(temp);
 
   try {
-    if (sliderEl) sliderEl.style.visibility = "hidden";
-
-    const canvas = await html2canvas(viewerEl, {
-      scale: 2,
-      backgroundColor: "#000"
-    });
-
-    return canvas.toDataURL("image/jpeg", 0.95);
+    // screenshot van UI + viewer (met overlay)
+    return await screenshotTool();
   } finally {
-    if (sliderEl) sliderEl.style.visibility = prevVis || "";
+    // herstel
+    viewerEl.removeChild(temp);
+    afterImgTag.style.visibility = prevVisL || "";
+    beforeImgTag.style.visibility = prevVisR || "";
+    if (sliderEl) sliderEl.style.visibility = prevSliderVis || "";
   }
 }
 
@@ -967,7 +1004,6 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   if (abs) pdf.textWithLink(text, x, y, { url: abs, ...opts });
   else pdf.text(text, x, y, opts);
 }
-ync function captureViewerW
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
   
   const { jsPDF } = window.jspdf; // ← belangrijk
