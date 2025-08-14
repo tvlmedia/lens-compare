@@ -1400,43 +1400,7 @@ drawBottomBar({
 
  
 
-// --- Pagina 4 ---
-pdf.addPage();
-fillBlack();
-
-const toolURL_P4 = "https://tvlrental.nl/lens-comparison/";
-drawTopBar(`${leftText.replace(/^Lens:\s*/i,"")} vs ${rightText.replace(/^Lens:\s*/i,"")} – ${sensorText}`);
-
-const placedP4 = await placeContainWithBox(pdf, splitData, fullBox);
-
-const placedP4 = await placeContainWithBox(pdf, splitData, fullBox);
-
-drawSiteToolbarAndLabels(pdf, placedP4, {
-  frac: getCurrentSplitFraction(),
-  leftText,
-  rightText,
-  sensorText,
-  ui: {
-    camera: cameraSelect.value,
-    mode:   (cameras[cameraSelect.value]?.[sensorFormatSelect.value]?.label) || sensorFormatSelect.value,
-    leftName:  leftSelect.value,
-    rightName: rightSelect.value,
-    tStop: `T${tStopSelect.value}`,
-    focal: focalLengthSelect.value
-  },
-  links: {
-    tool:     "https://tvlrental.nl/lens-comparison/",
-    leftRaw:  (function(){
-      const k = leftSelect.value.toLowerCase().replace(/\s+/g,"_") + "_" + focalLengthSelect.value + "_t" + tStopSelect.value.replace(".","_");
-      return rawFileMap[k] ? new URL(rawFileMap[k], location.href).href : "";
-    })(),
-    rightRaw: (function(){
-      const k = rightSelect.value.toLowerCase().replace(/\s+/g,"_") + "_" + focalLengthSelect.value + "_t" + tStopSelect.value.replace(".","_");
-      return rawFileMap[k] ? new URL(rawFileMap[k], location.href).href : "";
-    })()
-  }
-});
-
+ placedP4 = await placeContainWithBox(pdf
 // ==== Bestandsnaam maken in vorm:
 // TVLRENTAL_Lens1_Lens2_mm_Tstop_Camera_Sensormode ====
 
