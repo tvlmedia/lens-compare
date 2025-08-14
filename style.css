@@ -553,3 +553,9 @@ body.dragging * {
   will-change:left,top,height;
   pointer-events:auto;
 }
+#comparisonWrapper{position:relative;background:#000;overflow:hidden;}
+#beforeImgTag{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1;}
+#afterWrapper{position:absolute;inset:0;overflow:hidden;z-index:2;clip-path:inset(0 50% 0 0);-webkit-clip-path:inset(0 50% 0 0);}
+#afterWrapper > #afterImgTag{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+#slider{position:absolute;width:2px;background:#fff;z-index:5;cursor:ew-resize;will-change:left,top,height;touch-action:none;}
+
