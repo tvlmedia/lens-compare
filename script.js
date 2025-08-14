@@ -883,47 +883,62 @@ function waitForImage(imgEl) {
   });
 }
 
-// plaats dit BOVEN je addEventListener op downloadPdfButton
 async function captureViewerWithUI() {
-  console.log("[captureViewerWithUI] start");
+  // Zorg dat je letterbox/pillarbox up-to-date is
+  updateFullscreenBars();
+
   const viewerEl = document.getElementById("comparisonWrapper");
   if (!viewerEl) return null;
 
+  // 1) Maak sensor‑gecorrigeerde left/right canvassen (zoals je al doet)
   const { w: sW, h: sH } = getCurrentWH();
   const targetAR = sW / sH;
   const zoom = Math.max(1, BASE_SENSOR.w / sW);
 
-  const origLeftSrc  = afterImgTag.src;
-  const origRightSrc = beforeImgTag.src;
-
   const DPR = window.devicePixelRatio || 1;
   const H   = Math.max(1, Math.round(viewerEl.getBoundingClientRect().height * DPR));
-  const L   = await loadHTMLImage(origLeftSrc);
-  const R   = await loadHTMLImage(origRightSrc);
 
-  const leftC  = await renderToSensorAR(L, targetAR, H, zoom);
-  const rightC = await renderToSensorAR(R, targetAR, H, zoom);
+  const L0 = await loadHTMLImage(afterImgTag.src);   // left = after
+  const R0 = await loadHTMLImage(beforeImgTag.src);  // right = before
+  const L  = await renderToSensorAR(L0, targetAR, H, zoom);
+  const R  = await renderToSensorAR(R0, targetAR, H, zoom);
 
-  afterImgTag.src  = leftC.dataURL;
-  beforeImgTag.src = rightC.dataURL;
+  // 2) Bouw één split‑image met je huidige slider‑positie (inclusief witte middenlijn)
+  const splitData = await buildSplitFromSensor(L.dataURL, R.dataURL, L.W, L.H);
 
-  // wacht tot de nieuwe beelden echt geladen zijn
-  await Promise.all([waitForImage(afterImgTag), waitForImage(beforeImgTag)]);
+  // 3) Leg tijdelijk een overlay boven de viewer, zodat html2canvas wél exact dit ziet
+  const overlay = document.createElement("img");
+  overlay.src = splitData;
+  overlay.style.position = "absolute";
+  overlay.style.inset = "0";
+  overlay.style.zIndex = "9999";
+  overlay.style.pointerEvents = "none";
 
-  const sliderEl = document.getElementById("slider");
-  const prevVis  = sliderEl?.style.visibility;
-  if (sliderEl) sliderEl.style.visibility = "hidden";
+  const prevAfterVis  = afterWrapper.style.visibility;
+  const prevBeforeVis = beforeImgTag.style.visibility;
+  const prevSliderVis = slider.style.visibility;
+
+  // Verberg de echte lagen (clip-path wordt toch genegeerd door html2canvas)
+  afterWrapper.style.visibility  = "hidden";
+  beforeImgTag.style.visibility  = "hidden";
+  slider.style.visibility        = "hidden"; // witte middenlijn zit al in splitData
+
+  viewerEl.appendChild(overlay);
 
   try {
-    const shot = await screenshotTool();
-    console.log("[captureViewerWithUI] got shot?", !!shot);
-    return shot;
+    // 4) Screenshot met UI (controls + info), nu met echte split in beeld
+    return await screenshotTool();
   } finally {
-    afterImgTag.src  = origLeftSrc;
-    beforeImgTag.src = origRightSrc;
-    if (sliderEl) sliderEl.style.visibility = prevVis || "";
+    // 5) Opruimen / herstellen
+    viewerEl.removeChild(overlay);
+    afterWrapper.style.visibility  = prevAfterVis || "";
+    beforeImgTag.style.visibility  = prevBeforeVis || "";
+    slider.style.visibility        = prevSliderVis || "";
   }
 }
+
+// Zorg dat hij globaal beschikbaar blijft
+window.captureViewerWithUI = captureViewerWithUI;
 
 // als je <script type="module"> gebruikt of zeker wilt zijn dat hij globaal is:
 window.captureViewerWithUI = captureViewerWithUI;
