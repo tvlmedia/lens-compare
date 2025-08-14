@@ -4,7 +4,6 @@ if (window.innerWidth < 768) {
 }
 // === SENSOR DATA (mm) – Venice is je basis (6K 3:2) ===
 const cameras = {
-  const cameras = {
   "ARRI Alexa Mini LF": {
     "Open Gate": { w: 36.696, h: 25.542, label: "Open Gate" },
     "2.39:1": { w: 36.696, h: 15.312, label: "2.39:1" },
