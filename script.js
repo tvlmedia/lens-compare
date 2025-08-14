@@ -1285,7 +1285,7 @@ const toolURL_P4 = "https://tvlrental.nl/lens-comparison/";
 
 // Screenshot viewer + UI
 const placedP4 = await placeContainWithBox(pdf, splitData, fullBox);
-drawUIOverlay(pdf, placedP4, { frac: getCurrentSplitFraction(), leftText, rightText, sensorText });
+
 
 // Maak de hele afbeelding klikbaar
 pdfLinkRect(pdf, placedP4.x, placedP4.y, placedP4.w, placedP4.h, toolURL_P4);
