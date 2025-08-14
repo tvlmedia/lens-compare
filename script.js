@@ -1247,11 +1247,23 @@ drawBottomBar({
     ctaUrl: toolURL_P4
 });
 
+// mm en T-stop
+const mm   = focal; // huidige focal length
+const tVal = t;     // huidige T-stop
+
+// Camera en sensormode uit de dropdowns
+const safeCamera     = document.getElementById("cameraSelect").value.replace(/\s+/g, "");
+const safeSensorMode = document.getElementById("sensorModeSelect").value.replace(/\s+/g, "");
+
+// Lensnamen
 const safeLeft  = leftName.replace(/\s+/g, "");
 const safeRight = rightName.replace(/\s+/g, "");
-const filename = `TVL_Rental_Lens_Comparison_${safeLeft}_${safeRight}_${focal}_T${t}.pdf`;
+
+// Bestandsnaam samenstellen
+const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${mm}_T${tVal}_${safeCamera}_${safeSensorMode}.pdf`;
+
+// PDF opslaan
 pdf.save(filename);
-}); // ← sluit de addEventListener("click", async () => { ... })
  
 
 
