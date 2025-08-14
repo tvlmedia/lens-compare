@@ -919,7 +919,67 @@ async function screenshotTool() {
     SCALE
   );
 }
+function drawSiteUIOverlay(pdf, placedBox, { frac, leftText, rightText, sensorText, links = {} }) {
+  if (!placedBox) return;
+  const { x, y, w, h } = placedBox;
 
+  // --- Splitlijn (dun, geen “knopje”)
+  const splitX = x + w * Math.min(1, Math.max(0, typeof frac === "number" ? frac : 0.5));
+  pdf.setDrawColor(255); pdf.setLineWidth(0.8);
+  pdf.line(splitX, y, splitX, y + h);
+
+  // typografie
+  const pad = Math.max(6, Math.min(14, w * 0.015));
+  const fontSmall = Math.max(7, Math.min(11, h * 0.025));
+  const fontTiny  = Math.max(6, Math.min(9,  h * 0.020));
+  pdf.setFont("helvetica", "normal");
+
+  // kleine zwarte label-badge helper
+  function badge(tx, ty, text, align = "left", size = fontSmall) {
+    pdf.setFontSize(size);
+    const tw = pdf.getTextWidth(text);
+    const th = size;
+    const px = align === "right" ? (tx - tw) : tx;
+    pdf.setFillColor(0, 0, 0);
+    pdf.roundedRect(px - 4, ty - th + 1 - 2, tw + 8, th + 4, 2, 2, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(text, tx, ty, { align });
+    return { x: px - 4, y: ty - th - 1, w: tw + 8, h: th + 4 };
+  }
+
+  // --- Lens badges links/rechts bovenin (zoals op je site)
+  const leftBadge  = badge(x + pad,      y + pad + fontSmall, leftText,  "left",  fontSmall);
+  const rightBadge = badge(x + w - pad,  y + pad + fontSmall, rightText, "right", fontSmall);
+
+  // (optioneel) klikbare lenslinks
+  if (links.left)  pdf.link(leftBadge.x,  leftBadge.y,  leftBadge.w,  leftBadge.h,  { url: links.left  });
+  if (links.right) pdf.link(rightBadge.x, rightBadge.y, rightBadge.w, rightBadge.h, { url: links.right });
+
+  // --- Knoppenrij rechtsboven: PDF | DETAIL | FULL | FLIP (exacte volgorde)
+  const buttons = ["PDF", "DETAIL", "FULL", "FLIP"];
+  const btnH = Math.max(14, Math.min(18, h * 0.042));
+  const gap = 4, padX = 6, padY = 3;
+  let cx = x + w - pad; const cy = y + pad + fontSmall + 8; // onder de badges
+
+  pdf.setFontSize(Math.max(7, Math.min(10, h * 0.022)));
+  for (const label of buttons) {
+    const tw = pdf.getTextWidth(label);
+    const bw = tw + padX * 2;
+    const bx = cx - bw, by = cy;
+    pdf.setFillColor(20,20,20); pdf.setDrawColor(255); pdf.setLineWidth(0.3);
+    pdf.roundedRect(bx, by, bw, btnH, 2, 2, "FD");
+    pdf.setTextColor(255,255,255);
+    pdf.text(label, bx + bw/2, by + btnH/2 + 3.2, { align: "center" });
+
+    // (optioneel) allemaal laten linken naar je tool:
+    if (links.tool) pdf.link(bx, by, bw, btnH, { url: links.tool });
+
+    cx = bx - gap;
+  }
+
+  // --- Sensor badge rechtsonder in beeld
+  badge(x + w - pad, y + h - pad, sensorText, "right", fontTiny);
+}
 // helper: crop uit html2canvas resultaat (rekening houdend met scale:2)
 function cropFromCanvas(sourceCanvas, sx, sy, sw, sh, SCALE = window.devicePixelRatio || 1) {
   const out = document.createElement("canvas");
@@ -1277,26 +1337,38 @@ drawBottomBar({
 
  
 
- // --- Pagina 4 (UI-versie, zelfde scaling als p1–p3) ---
+// --- Pagina 4 ---
 pdf.addPage();
 fillBlack();
 
 const toolURL_P4 = "https://tvlrental.nl/lens-comparison/";
+drawTopBar(`${leftText.replace(/^Lens:\s*/i,"")} vs ${rightText.replace(/^Lens:\s*/i,"")} – ${sensorText}`);
 
-// Screenshot viewer + UI
 const placedP4 = await placeContainWithBox(pdf, splitData, fullBox);
 
+// Overlay die je site-UI nabootst (geen bolletje, juiste labels/volgorde)
+drawSiteUIOverlay(pdf, placedP4, {
+  frac: getCurrentSplitFraction(),
+  leftText,
+  rightText,
+  sensorText,
+  links: {
+    left:  lensDescriptions[leftName]?.url  || "",
+    right: lensDescriptions[rightName]?.url || "",
+    tool:  toolURL_P4
+  }
+});
 
-// Maak de hele afbeelding klikbaar
+// Maak het beeld klikbaar naar de live tool
 pdfLinkRect(pdf, placedP4.x, placedP4.y, placedP4.w, placedP4.h, toolURL_P4);
 
-// Onderste balk met CTA
+// Onderste balk met CTA (zoals je al had)
 drawBottomBar({
-    text: "",
-    link: "",
-    logo,
-    ctaLabel: "Open de interactieve Lens Comparison Tool",
-    ctaUrl: toolURL_P4
+  text: "",
+  link: "",
+  logo,
+  ctaLabel: "Open de interactieve Lens Comparison Tool",
+  ctaUrl: toolURL_P4
 });
 
 // ==== Bestandsnaam maken in vorm:
