@@ -1,0 +1,10 @@
+{
+  "name": "tvl-lens-tools",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf dist && mkdir -p dist && cp -r src/* dist && npx javascript-obfuscator dist/script.js --output dist/script.js --compact true --controlFlowFlattening true --deadCodeInjection true --stringArray true --stringArrayEncoding rc4"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "^4.1.0"
+  }
+}
