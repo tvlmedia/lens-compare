@@ -468,6 +468,12 @@ const scaleSlider = document.getElementById("scaleSlider");
 const scaleVal    = document.getElementById("scaleVal");
 let userScale = 1; // 1 = 100%
 
+function syncTStopsOnContextChange() {
+  const t = tStopLeftSelect.value || "2.8";
+  tStopLeftSelect.value  = t;
+  tStopRightSelect.value = t;
+}
+
 function setUserScaleFromPct(pct) {
   // clamp 100–120%
   userScale = Math.min(1.2, Math.max(1.0, pct / 100));
@@ -627,13 +633,26 @@ function updateImages() {
 
 
 
+// Info-tekst updaten bij lenskeuze
 [leftSelect, rightSelect].forEach(el =>
   el.addEventListener("change", updateLensInfo)
 );
 
-[leftSelect, rightSelect, tStopSelect, focalLengthSelect].forEach(el =>
-  el.addEventListener("change", updateImages)
-);
+// Render-triggers
+tStopLeftSelect.addEventListener("change", updateImages);
+tStopRightSelect.addEventListener("change", updateImages);
+
+focalLengthSelect.addEventListener("change", () => {
+  syncTStopsOnContextChange(); // eerst T-stops gelijk trekken
+  updateImages();              // dan renderen
+});
+
+[leftSelect, rightSelect].forEach(el => {
+  el.addEventListener("change", () => {
+    syncTStopsOnContextChange(); // bij lenswissel ook sync
+    updateImages();
+  });
+});
 
 leftSelect.value = "IronGlass Red P";
 rightSelect.value = "IronGlass Zeiss Jena";
@@ -641,6 +660,9 @@ tStopSelect.value = "2.8";
 focalLengthSelect.value = "35mm";
 updateLensInfo();
 updateImages();
+
+tStopLeftSelect.value  = "2.8";
+tStopRightSelect.value = "2.8";
 
 // Init (optioneel: standaard op Venice 6K 3:2)
 cameraSelect.value = "Sony Venice";
@@ -698,13 +720,14 @@ window.addEventListener("touchmove", (e) => {
   updateSliderPosition(e.touches[0].clientX);
 }, { passive: false });
 document.getElementById("toggleButton").addEventListener("click", () => {
-  const left = leftSelect.value;
-  const right = rightSelect.value;
-  leftSelect.value = right;
-  rightSelect.value = left;
+  // lenzen wisselen
+  const l = leftSelect.value; leftSelect.value = rightSelect.value; rightSelect.value = l;
+  // T-stops meewisselen
+  const t = tStopLeftSelect.value; tStopLeftSelect.value = tStopRightSelect.value; tStopRightSelect.value = t;
+
+  updateLensInfo();
   updateImages();
 });
-
  function toggleFullscreen() {
   (async () => {
     if (isWrapperFullscreen()) {
@@ -1230,7 +1253,10 @@ const zoom = Math.max(1, BASE_SENSOR.w / sW);
   const leftName  = leftSelect.value;
   const rightName = rightSelect.value;
   const focal     = focalLengthSelect.value;
-  const t         = tStopSelect.value;
+  const tLeftRaw  = tStopLeftSelect.value;
+const tRightRaw = tStopRightSelect.value;
+const tLeft  = String(tLeftRaw).replace(/\./g, "_");
+const tRight = String(tRightRaw).replace(/\./g, "_");
 
   const logoUrl = "https://tvlmedia.github.io/lens-compare/LOGOVOORPDF.png";
 const logo = await loadHTMLImage(logoUrl);
@@ -1317,8 +1343,7 @@ const makeSafe = (s) => (s || "")
   // laat alleen letters, cijfers en underscores toe
   .replace(/[^\w]+/g, "");
 
-// mm staat in jouw code al als "35mm" (zonder spatie), dus direct gebruiken
-const tVal = String(t).replace(/\./g, "_"); // "2.8" -> "2_8"
+
 
 // Haal camera & sensormode op
 const cameraName = cameraSelect.value || "UnknownCamera";
@@ -1335,8 +1360,8 @@ const safeSensorMode  = makeSafe(sensorModeLabel);
 const safeFocal       = makeSafe(focal); // "35mm" blijft "35mm"
 
 // Bouw bestandsnaam
-const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${safeFocal}_T${tVal}_${safeCamera}_${safeSensorMode}.pdf`;
-
+const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${safeFocal}_T${tLeft}vsT${tRight}_${safeCamera}_${safeSensorMode}.pdf`;
+  
 // Opslaan
 pdf.save(filename);
 }); // ← sluit de addEventListener("click", async () => { ... })
