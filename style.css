@@ -581,3 +581,113 @@ body.dragging * {
   height: 100% !important;
   object-fit: cover !important;
 }
+/* === NETTE LAYOUT VOOR DE CONTROLS === */
+.controls.desktop-only {
+  position: sticky;           /* blijft in beeld tijdens scrollen */
+  top: 0;
+  z-index: 50;
+  background: rgba(15,15,15,.9);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 16px auto 20px;
+  width: min(1100px, calc(100% - 32px));
+  box-shadow: 0 6px 16px rgba(0,0,0,.35);
+}
+
+/* elke rij: nette wrap + centreren */
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;    /* mooi gecentreerd */
+  gap: 10px;
+  margin: 6px 0;
+}
+
+/* de twee lens-selectors onder elkaar op mobiel, naast elkaar op desktop */
+.controls-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+/* compacte, gelijke hoogtes voor alle inputs/knoppen */
+.controls select,
+.control-button,
+#scaleCtrl input[type="range"] {
+  height: 36px;
+  line-height: 34px;
+}
+
+.controls select,
+.control-button {
+  padding: 0 12px;
+  background: #161616;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+}
+
+.controls select:focus,
+.control-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,123,255,.35);
+  border-color: #007bff;
+}
+
+/* scale label als chipje */
+#scaleCtrl {
+  display: inline-flex !important;
+  align-items: center;
+  gap: .5rem;
+  padding: 6px 10px;
+  background: #161616;
+  border: 1px solid #3a3a3a;
+  border-radius: 999px;
+  font-size: 13px;
+  line-height: 1;
+}
+#scaleCtrl input[type="range"] {
+  width: 140px;
+  height: 4px;
+}
+
+/* “Flare: OFF/ON” visueel gelijk met buttons */
+#flareToggle.control-button {
+  min-width: 120px;
+}
+
+/* kleine labels inline (zoals “Focal Length”) */
+.controls-row label[for="focalLength"] {
+  font-size: 12px;
+  color: #bbb;
+  margin-right: 4px;
+}
+
+/* max breedtes per type voor rust */
+#cameraSelect,
+#sensorFormatSelect { min-width: 180px; }
+#leftLens, #rightLens { min-width: 220px; }
+#focalLength { min-width: 120px; }
+#tStopLeftSelect, #tStopRightSelect { min-width: 100px; }
+
+/* responsief gedrag */
+@media (max-width: 1024px) {
+  .controls-column { grid-template-columns: 1fr; }  /* lenzen onder elkaar */
+}
+
+@media (max-width: 767px) {
+  .controls.desktop-only {
+    position: static;          /* sticky uit op mobiel voor rust */
+    width: 100%;
+    margin: 8px 0 16px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  .controls-row { justify-content: center; }
+  #scaleCtrl input[type="range"] { width: 120px; }
+}
