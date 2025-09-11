@@ -581,84 +581,38 @@ body.dragging * {
   height: 100% !important;
   object-fit: cover !important;
 }
+/* Controls container */
 .controls.desktop-only {
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* centreren */
+  gap: 12px;
   position: sticky;
-  top: 64px;                 /* pas aan i.v.m. WP admin bar/header */
+  top: 0;
   z-index: 50;
   background: rgba(15,15,15,.9);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  padding: 14px 16px;
+  border-radius: 10px;
+  padding: 12px 16px;
   margin: 16px auto 20px;
   width: min(1100px, calc(100% - 32px));
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
 }
 
-.controls-grid{
-  display:grid;
-  gap:12px 16px;
-  grid-template-columns: repeat(12, minmax(0,1fr));
-  align-items: center;
+/* Rij voor knoppen en inputs */
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* centreren */
+  gap: 10px;
+  margin: 6px 0;
 }
 
-.group{ display:flex; flex-direction:column; gap:6px; }
-.group .inline{ display:flex; gap:8px; }
-.group-label{
-  font-size:11px; letter-spacing:.02em; color:#bdbdbd;
-  text-transform: uppercase;
-}
-
-/* Row 1 */
-.group.actions{ grid-column: 1 / -1; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
-.group.scale   { grid-column: span 3; align-items:center; }
-.group.camera  { grid-column: span 4; }
-.group.sensor  { grid-column: span 3; }
-.group.flare   { grid-column: span 2; align-items:center; }
-
-/* Row 2 */
-.group.lens.left  { grid-column: 1 / span 5; }
-.group.focal      { grid-column: 6 / span 2; align-items:center; }
-.group.lens.right { grid-column: 8 / span 5; }
-
-/* Inputs/knoppen: gelijke hoogte */
-.controls select,
-.control-button,
-#scaleCtrl input[type="range"] { height:36px; }
-
-.controls select,
-.control-button{
-  padding:0 12px;
-  background:#161616;
-  border:1px solid #3a3a3a;
-  border-radius:8px;
-}
-.controls select:focus,
-.control-button:focus{
-  outline:none; box-shadow:0 0 0 2px rgba(0,123,255,.35);
-  border-color:#007bff;
-}
-
-/* Scale chip */
-#scaleCtrl{
-  display:inline-flex; align-items:center; gap:.5rem;
-  padding:6px 10px; background:#161616; border:1px solid #3a3a3a; border-radius:999px;
-  font-size:13px; line-height:1;
-}
-#scaleCtrl input[type="range"]{ width:140px; height:4px; }
-
-/* Responsief */
-@media (max-width: 1100px){
-  .group.scale{ grid-column: span 4; }
-  .group.camera{ grid-column: span 4; }
-  .group.sensor{ grid-column: span 4; }
-  .group.flare{ grid-column: span 12; align-items:center; }
-  .group.lens.left{ grid-column: 1 / span 6; }
-  .group.focal{ grid-column: 7 / span 2; }
-  .group.lens.right{ grid-column: 9 / span 4; }
-}
-@media (max-width: 900px){
-  .group.scale,.group.camera,.group.sensor,.group.flare{ grid-column: 1 / -1; }
-  .group.lens.left,.group.focal,.group.lens.right{ grid-column: 1 / -1; }
+/* Voor de eerste rij knoppen: compacter */
+.controls-row.top-buttons {
+  flex-wrap: nowrap;       /* altijd naast elkaar */
+  justify-content: center;
+  gap: 8px;
 }
