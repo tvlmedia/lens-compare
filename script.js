@@ -500,42 +500,51 @@ function setDownloadButton(buttonEl, key) {
   }
 }
 function updateImages() {
-  const leftLens  = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
-const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
-const tStop     = tStopSelect.value.replace(".", "_");
-const focalLength = focalLengthSelect.value;
+  const leftLens    = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
+  const rightLens   = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
+  const tStopRaw    = tStopSelect.value;                  // "2.8"
+  const tStop       = tStopRaw.replace(".", "_");         // "2_8"
+  const focalLength = focalLengthSelect.value;            // "35mm"
+  const flareMode   = flareToggle?.dataset.mode || "noflare"; // "flare" | "noflare"
 
-// nieuw: lees flare mode uit de knop
-const flareMode = flareToggle?.dataset.mode || "noflare"; // "flare" | "noflare"
+  // basis keys voor alias lookup
+  const leftBaseKey  = `${leftLens}_${focalLength}`;
+  const rightBaseKey = `${rightLens}_${focalLength}`;
 
-// basis keys (voor labels/notes)
-const leftBaseKey  = `${leftLens}_${focalLength}`;
-const rightBaseKey = `${rightLens}_${focalLength}`;
+  // gebruik alias-focal als die bestaat (bv. 35mm -> 32mm voor Cooke)
+  const leftFocalForFile  = notes[leftBaseKey]  || focalLength;
+  const rightFocalForFile = notes[rightBaseKey] || focalLength;
 
-// volledige keys voor de bestandsnamen
-const leftKey  = `${leftLens}_${focalLength}_t${tStop}_${flareMode}`;
-const rightKey = `${rightLens}_${focalLength}_t${tStop}_${flareMode}`;
+  // volledige keys voor JPG's (met flare/noflare)
+  const leftKeyJpg  = `${leftLens}_${leftFocalForFile}_t${tStop}_${flareMode}`;
+  const rightKeyJpg = `${rightLens}_${rightFocalForFile}_t${tStop}_${flareMode}`;
 
-// paden (met eventuele overrides via lensImageMap)
-const imgLeft  = `images/${lensImageMap[leftKey]  || leftKey  + ".jpg"}`;
-const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
+  // optioneel: fallback naar een expliciete map zonder flare-suffix
+  const leftNoFlareMap  = lensImageMap[`${leftLens}_${leftFocalForFile}_t${tStop}`];
+  const rightNoFlareMap = lensImageMap[`${rightLens}_${rightFocalForFile}_t${tStop}`];
 
-beforeImgTag.src = imgRight; // rechts
-afterImgTag.src  = imgLeft;  // links
+  // definitieve paden
+  const imgLeft  = `images/${lensImageMap[leftKeyJpg]  || leftNoFlareMap  || (leftKeyJpg  + ".jpg")}`;
+  const imgRight = `images/${lensImageMap[rightKeyJpg] || rightNoFlareMap || (rightKeyJpg + ".jpg")}`;
 
-// ... laat de rest van updateImages() staan (labels, RAW-buttons, resetSplitToMiddle, etc.)
+  // zet beelden (links = after, rechts = before)
+  beforeImgTag.src = imgRight;
+  afterImgTag.src  = imgLeft;
 
-  const tStopRaw = tStopSelect.value;
-  const tStopFormatted = `T${tStopRaw}`;
-
-  // Pak de URLs uit lensDescriptions (fallback "#")
+  // labels/links
   const leftUrl  = lensDescriptions[leftSelect.value]?.url  || "#";
   const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
+  leftLabel.innerHTML  = `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">${leftSelect.value} ${(notes[leftBaseKey]  || focalLength)} T${tStopRaw}</a>`;
+  rightLabel.innerHTML = `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">${rightSelect.value} ${(notes[rightBaseKey] || focalLength)} T${tStopRaw}</a>`;
 
+  // RAW-download keys (zonder flare-suffix); laat alias óók hier meetellen
+  const rawLeftKey  = `${leftLens}_${leftFocalForFile}_t${tStop}`;
+  const rawRightKey = `${rightLens}_${rightFocalForFile}_t${tStop}`;
+  setDownloadButton(downloadLeftRawButton,  rawLeftKey);
+  setDownloadButton(downloadRightRawButton, rawRightKey);
 
-
-  
-resetSplitToMiddle();
+  resetSplitToMiddle();
+}
 
   // RAW-download knoppen updaten
 setDownloadButton(downloadLeftRawButton,  leftKey);
