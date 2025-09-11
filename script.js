@@ -426,6 +426,9 @@ const rightLabel = document.getElementById("rightLabel");
 const downloadLeftRawButton  = document.getElementById("downloadLeftRawButton");
 const downloadRightRawButton = document.getElementById("downloadRightRawButton");
 const flareToggle = document.getElementById("flareToggle");
+// Waar staan je assets?
+const IMG_BASE = "https://tvlmedia.github.io/lens-compare/images/";
+const RAW_BASE = IMG_BASE + "raw/";
 
 // === Flare toggle (eenmalige setup) ===
 flareToggle.dataset.mode = flareToggle.dataset.mode || "noflare";
@@ -470,7 +473,7 @@ const rawFileMap = {
   "cooke_panchro_ff_50mm_t2_8": "images/raw/CookeFF_50mm_T2.8_RAW.tif"
 };
 function setDownloadButton(buttonEl, key) {
-  const file = rawFileMap[key];
+  + const file = rawFileMap[key] ? (RAW_BASE + rawFileMap[key].split("/").pop()) : null;
   if (file) {
     buttonEl.disabled = false;
     buttonEl.title = "Download RAW";
@@ -524,8 +527,8 @@ function updateImages() {
   const rightNoFlareMap = lensImageMap[`${rightLens}_${rightFocalForFile}_t${tStop}`];
 
   // definitieve paden
-  const imgLeft  = `images/${lensImageMap[leftKeyJpg]  || leftNoFlareMap  || (leftKeyJpg  + ".jpg")}`;
-  const imgRight = `images/${lensImageMap[rightKeyJpg] || rightNoFlareMap || (rightKeyJpg + ".jpg")}`;
+ + const imgLeft  = IMG_BASE + (lensImageMap[leftKeyJpg]  || leftNoFlareMap  || (leftKeyJpg  + ".jpg"));
++ const imgRight = IMG_BASE + (lensImageMap[rightKeyJpg] || rightNoFlareMap || (rightKeyJpg + ".jpg"));
 
   // zet beelden (links = after, rechts = before)
   beforeImgTag.src = imgRight;
