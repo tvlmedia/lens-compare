@@ -546,14 +546,7 @@ function updateImages() {
   resetSplitToMiddle();
 }
 
-  // RAW-download knoppen updaten
-setDownloadButton(downloadLeftRawButton,  leftKey);
-setDownloadButton(downloadRightRawButton, rightKey);
 
-  // Zet HTML met <a> links
-  leftLabel.innerHTML = `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">${leftSelect.value} ${notes[leftBaseKey] || focalLength} ${tStopFormatted}</a>`;
-rightLabel.innerHTML = `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">${rightSelect.value} ${notes[rightBaseKey] || focalLength} ${tStopFormatted}</a>`;
-} // ← BELANGRIJK: functie hier echt sluiten
 
 
 [leftSelect, rightSelect].forEach(el =>
