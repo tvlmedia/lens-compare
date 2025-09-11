@@ -656,13 +656,14 @@ focalLengthSelect.addEventListener("change", () => {
 
 leftSelect.value = "IronGlass Red P";
 rightSelect.value = "IronGlass Zeiss Jena";
-tStopSelect.value = "2.8";
+
 focalLengthSelect.value = "35mm";
+tStopLeftSelect.value  = "2.8";
+tStopRightSelect.value = "2.8";
 updateLensInfo();
 updateImages();
 
-tStopLeftSelect.value  = "2.8";
-tStopRightSelect.value = "2.8";
+
 
 // Init (optioneel: standaard op Venice 6K 3:2)
 cameraSelect.value = "Sony Venice";
