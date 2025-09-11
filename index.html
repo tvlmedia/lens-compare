@@ -9,47 +9,71 @@
 <body>
 
   <!-- === DESKTOP TOOL === -->
-  <div class="controls desktop-only">
-    <div class="controls-row">
-     <button id="toggleButton" class="control-button">↔ Flip</button>
-<button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
-<button id="detailViewToggle" class="control-button">🔍 Detail View</button>
-<button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
-      <label id="scaleCtrl" style="display:inline-flex;gap:.5rem;align-items:center">
-    Scale <span id="scaleVal">100%</span>
-    <input id="scaleSlider" type="range" min="100" max="120" value="100" step="1">
-  </label>
+ <div class="controls desktop-only">
+  <div class="controls-grid">
+    <!-- Row 1 -->
+    <div class="group actions">
+      <button id="toggleButton" class="control-button">↔ Flip</button>
+      <button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
+      <button id="detailViewToggle" class="control-button">🔍 Detail View</button>
+      <button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
+    </div>
+
+    <div class="group scale">
+      <span class="group-label">Scale</span>
+      <label id="scaleCtrl">
+        <span id="scaleVal">100%</span>
+        <input id="scaleSlider" type="range" min="100" max="120" value="100" step="1">
+      </label>
+    </div>
+
+    <div class="group camera">
+      <span class="group-label">Camera</span>
       <select id="cameraSelect"></select>
-<select id="sensorFormatSelect" disabled></select>
-      <button id="flareToggle" class="control-button" data-mode="noflare">Flare: OFF</button>
-   
-  
     </div>
 
-    <div class="controls-column">
-      <select id="leftLens"></select>
-      <select id="rightLens"></select>
+    <div class="group sensor">
+      <span class="group-label">Sensor mode</span>
+      <select id="sensorFormatSelect" disabled></select>
     </div>
 
-    <div class="controls-row">
-  <select id="focalLength" title="Focal length">
-    <option value="35mm">35mm</option>
-    <option value="75mm" selected>75mm</option>
-  </select>
-</div>
+    <div class="group flare">
+      <span class="group-label">Flare</span>
+      <button id="flareToggle" class="control-button" data-mode="noflare">✨ Flare: OFF</button>
+    </div>
 
-    <div class="controls-row">
-      <select id="tStopLeftSelect" title="Left T-stop">
-  <option value="2.8" selected>T2.8</option>
-  <option value="5.6">T5.6</option>
-</select>
+    <!-- Row 2 -->
+    <div class="group lens left">
+      <span class="group-label">Left lens</span>
+      <div class="inline">
+        <select id="leftLens"></select>
+        <select id="tStopLeftSelect" title="Left T-stop">
+          <option value="2.8" selected>T2.8</option>
+          <option value="5.6">T5.6</option>
+        </select>
+      </div>
+    </div>
 
-<select id="tStopRightSelect" title="Right T-stop">
-  <option value="2.8" selected>T2.8</option>
-  <option value="5.6">T5.6</option>
-</select>
+    <div class="group focal">
+      <span class="group-label">Focal length</span>
+      <select id="focalLength" title="Focal length">
+        <option value="35mm">35mm</option>
+        <option value="75mm" selected>75mm</option>
+      </select>
+    </div>
+
+    <div class="group lens right">
+      <span class="group-label">Right lens</span>
+      <div class="inline">
+        <select id="rightLens"></select>
+        <select id="tStopRightSelect" title="Right T-stop">
+          <option value="2.8" selected>T2.8</option>
+          <option value="5.6">T5.6</option>
+        </select>
+      </div>
     </div>
   </div>
+</div>
 
  <div id="comparisonWrapper" class="desktop-only" tabindex="0">
     <div id="beforeImage">
