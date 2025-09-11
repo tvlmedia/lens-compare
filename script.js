@@ -401,7 +401,7 @@ const lensImageMap = {
   "ironglass_mkii_35mm_t2_8": "red_p_37mm_t2_8.jpg",
   "ironglass_red_p_75mm_t2_8": "red_p_85mm_t2_8.jpg",
   "ironglass_mkii_75mm_t2_8": "mkii_85mm_t2_8.jpg",
-  "ironglass_jena_75mm_t2_8": "jena_80mm_t2_8.jpg",
+  "ironglass_zeiss_jena_75mm_t2_8": "jena_80mm_t2_8.jpg",
 };
 
 const lensDescriptions = {
