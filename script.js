@@ -438,14 +438,22 @@ const RAW_BASE = IMG_BASE + "raw/";
 const scaleSlider = document.getElementById("scaleSlider");
 const scaleVal    = document.getElementById("scaleVal");
 let userScale = 1; // 1 = 100%
+
 function setUserScaleFromPct(pct) {
-  userScale = Math.min(1.2, Math.max(0.8, pct / 100)); // 80–120%
+  // clamp 100–120%
+  userScale = Math.min(1.2, Math.max(1.0, pct / 100));
+  // voor de viewer (CSS)
   document.documentElement.style.setProperty("--viewer-scale", String(userScale));
+  // UI tekstje
   if (scaleVal) scaleVal.textContent = Math.round(userScale * 100) + "%";
+  // (optioneel) clip/slider nog even herpositioneren
+  updateFullscreenBars();
+  resetSplitToMiddle();
 }
+
 if (scaleSlider) {
   scaleSlider.addEventListener("input", e => setUserScaleFromPct(e.target.value));
-  setUserScaleFromPct(scaleSlider.value);
+  setUserScaleFromPct(scaleSlider.value || 100);
 }
 
 // === Flare toggle (eenmalige setup) ===
