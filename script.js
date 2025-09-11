@@ -396,13 +396,23 @@ const notes = {
 };
 
 const lensImageMap = {
-  "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
-  "ironglass_red_p_50mm_t2_8": "red_p_58mm_t2_8.jpg",
-  "ironglass_mkii_35mm_t2_8": "red_p_37mm_t2_8.jpg",
-  "ironglass_red_p_75mm_t2_8": "red_p_85mm_t2_8.jpg",
-  "ironglass_mkii_75mm_t2_8": "mkii_85mm_t2_8.jpg",
+  // RED P
+  "ironglass_red_p_35mm_t2_8":   "red_p_37mm_t2_8.jpg",
+  "ironglass_red_p_50mm_t2_8":   "red_p_58mm_t2_8.jpg",
+  "ironglass_red_p_75mm_t2_8":   "red_p_85mm_t2_8.jpg",
+
+  // MKII (eigen files, niet red_p)
+  "ironglass_mkii_35mm_t2_8":    "mkii_37mm_t2_8.jpg",
+  "ironglass_mkii_50mm_t2_8":    "mkii_50mm_t2_8.jpg",    // voeg toe als je 50 hebt
+  "ironglass_mkii_75mm_t2_8":    "mkii_85mm_t2_8.jpg",
+
+  // Zeiss Jena
+  "ironglass_zeiss_jena_35mm_t2_8": "jena_35mm_t2_8.jpg",  // ontbrak
+  "ironglass_zeiss_jena_50mm_t2_8": "jena_50mm_t2_8.jpg",  // ontbrak
   "ironglass_zeiss_jena_75mm_t2_8": "jena_80mm_t2_8.jpg",
 };
+
+
 
 const lensDescriptions = {
   "IronGlass Red P": {
@@ -546,46 +556,72 @@ function setDownloadButton(buttonEl, key) {
   }
 }
 function updateImages() {
-  const leftLens    = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
-  const rightLens   = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
-  const tStopRaw    = tStopSelect.value;                  // "2.8"
-  const tStop       = tStopRaw.replace(".", "_");         // "2_8"
-  const focalLength = focalLengthSelect.value;            // "35mm"
-  const flareMode   = flareToggle?.dataset.mode || "noflare"; // "flare" | "noflare"
+  const leftLens  = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
+  const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
+  const tStopRaw  = tStopSelect.value;              // "2.8"
+  const tStop     = tStopRaw.replace(".", "_");     // "2_8"
+  const focalNom  = focalLengthSelect.value;        // "35mm" | "50mm" | "75mm"
+  const flareMode = flareToggle?.dataset.mode || "noflare";
 
-  // basis keys voor alias lookup
-  const leftBaseKey  = `${leftLens}_${focalLength}`;
-  const rightBaseKey = `${rightLens}_${focalLength}`;
+  // helpers
+  const aliasFor = (lens, nominalFocal) =>
+    notes[`${lens}_${nominalFocal}`] || nominalFocal;
 
-  // gebruik alias-focal als die bestaat (bv. 35mm -> 32mm voor Cooke)
-  const leftFocalForFile  = notes[leftBaseKey]  || focalLength;
-  const rightFocalForFile = notes[rightBaseKey] || focalLength;
+  const resolveImagePath = (lens, nominalFocal, tStr, flare) => {
+    const aliasFocal = aliasFor(lens, nominalFocal);
+    const bases = [
+      `${lens}_${aliasFocal}_t${tStr}`,     // alias-basis
+      ...(aliasFocal !== nominalFocal ? [`${lens}_${nominalFocal}_t${tStr}`] : [])
+    ];
 
-  // volledige keys voor JPG's (met flare/noflare)
-  const leftKeyJpg  = `${leftLens}_${leftFocalForFile}_t${tStop}_${flareMode}`;
-  const rightKeyJpg = `${rightLens}_${rightFocalForFile}_t${tStop}_${flareMode}`;
+    // Maak kandidatenlijst (eerst lensImageMap, dan geconstrueerde pad)
+    const candidates = [];
+    bases.forEach(base => {
+      candidates.push(lensImageMap[`${base}_${flare}`]); // mapping met flare
+      candidates.push(lensImageMap[base]);               // mapping zonder flare
+      candidates.push(`${base}_${flare}.jpg`);           // geconstrueerd met flare
+      candidates.push(`${base}.jpg`);                    // geconstrueerd zonder flare
+    });
 
-  // optioneel: fallback naar een expliciete map zonder flare-suffix
-  const leftNoFlareMap  = lensImageMap[`${leftLens}_${leftFocalForFile}_t${tStop}`];
-  const rightNoFlareMap = lensImageMap[`${rightLens}_${rightFocalForFile}_t${tStop}`];
+    // Kies de eerste die bestaat in de mapping of als bestandsnaam
+    for (const cand of candidates) {
+      if (!cand) continue;
+      // lensImageMap geeft alleen de filename terug → prefix met IMG_BASE
+      const url = cand.endsWith(".jpg") ? `${IMG_BASE}${cand}` : `${IMG_BASE}${cand}`;
+      return url;
+    }
+    // als alles faalt, val terug op alias + flare constructed naam
+    return `${IMG_BASE}${bases[0]}_${flare}.jpg`;
+  };
 
-  // definitieve paden
-const imgLeft  = IMG_BASE + (lensImageMap[leftKeyJpg]  || leftNoFlareMap  || (leftKeyJpg  + ".jpg"));
-const imgRight = IMG_BASE + (lensImageMap[rightKeyJpg] || rightNoFlareMap || (rightKeyJpg + ".jpg"));
+  // URLs bepalen
+  const imgLeft  = resolveImagePath(leftLens,  focalNom, tStop, flareMode);
+  const imgRight = resolveImagePath(rightLens, focalNom, tStop, flareMode);
 
-  // zet beelden (links = after, rechts = before)
+  // beelden zetten (rechts = before, links = after)
   beforeImgTag.src = imgRight;
   afterImgTag.src  = imgLeft;
 
   // labels/links
+  const leftBaseKey  = `${leftLens}_${focalNom}`;
+  const rightBaseKey = `${rightLens}_${focalNom}`;
+  const leftFocalForLabel  = aliasFor(leftLens,  focalNom);
+  const rightFocalForLabel = aliasFor(rightLens, focalNom);
+
   const leftUrl  = lensDescriptions[leftSelect.value]?.url  || "#";
   const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
-  leftLabel.innerHTML  = `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">${leftSelect.value} ${(notes[leftBaseKey]  || focalLength)} T${tStopRaw}</a>`;
-  rightLabel.innerHTML = `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">${rightSelect.value} ${(notes[rightBaseKey] || focalLength)} T${tStopRaw}</a>`;
 
-  // RAW-download keys (zonder flare-suffix); laat alias óók hier meetellen
-  const rawLeftKey  = `${leftLens}_${leftFocalForFile}_t${tStop}`;
-  const rawRightKey = `${rightLens}_${rightFocalForFile}_t${tStop}`;
+  leftLabel.innerHTML  =
+    `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">` +
+    `${leftSelect.value} ${leftFocalForLabel} T${tStopRaw}</a>`;
+
+  rightLabel.innerHTML =
+    `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">` +
+    `${rightSelect.value} ${rightFocalForLabel} T${tStopRaw}</a>`;
+
+  // RAW-download keys (zonder flare-suffix); alias meenemen
+  const rawLeftKey  = `${leftLens}_${leftFocalForLabel}_t${tStop}`;
+  const rawRightKey = `${rightLens}_${rightFocalForLabel}_t${tStop}`;
   setDownloadButton(downloadLeftRawButton,  rawLeftKey);
   setDownloadButton(downloadRightRawButton, rawRightKey);
 
