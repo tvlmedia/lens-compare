@@ -1570,7 +1570,7 @@ function onGlobalKeydown(e) {
   if (["INPUT", "TEXTAREA"].includes(tag)) return; // SELECT laten we door
 
   const k = (e.key || "").toLowerCase();
-  if (k === "f") {
+  if (k === "p") {
     e.preventDefault();
     toggleFullscreen();
   }
@@ -1578,6 +1578,9 @@ function onGlobalKeydown(e) {
     e.preventDefault();
     document.getElementById("detailViewToggle")?.click();
   }
+  if (k === "l") {
+  e.preventDefault();
+  flareToggle.click(); // zelfde als handmatig op de knop drukken
 }
 window.addEventListener("keydown", onGlobalKeydown, { capture: true });
 (function enforceBlankTargets(){
