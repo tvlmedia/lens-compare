@@ -204,6 +204,7 @@ const BASE_SENSOR = cameras["Sony Venice"]["6K 3:2"]; // jouw referentie
 const sensorFormatSelect = document.getElementById("sensorFormatSelect");
 const comparisonWrapper = document.getElementById("comparisonWrapper"); // ← verplaatst naar boven
 
+
 function isWrapperFullscreen() {
   const fe = document.fullscreenElement || document.webkitFullscreenElement;
   return fe === comparisonWrapper;
@@ -433,6 +434,19 @@ const flareToggle = document.getElementById("flareToggle");
 // Waar staan je assets?
 const IMG_BASE = "https://tvlmedia.github.io/lens-compare/images/";
 const RAW_BASE = IMG_BASE + "raw/";
+
+const scaleSlider = document.getElementById("scaleSlider");
+const scaleVal    = document.getElementById("scaleVal");
+let userScale = 1; // 1 = 100%
+function setUserScaleFromPct(pct) {
+  userScale = Math.min(1.2, Math.max(0.8, pct / 100)); // 80–120%
+  document.documentElement.style.setProperty("--viewer-scale", String(userScale));
+  if (scaleVal) scaleVal.textContent = Math.round(userScale * 100) + "%";
+}
+if (scaleSlider) {
+  scaleSlider.addEventListener("input", e => setUserScaleFromPct(e.target.value));
+  setUserScaleFromPct(scaleSlider.value);
+}
 
 // === Flare toggle (eenmalige setup) ===
 flareToggle.dataset.mode = flareToggle.dataset.mode || "noflare";
