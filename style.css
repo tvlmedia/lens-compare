@@ -553,3 +553,8 @@ body.dragging * {
   will-change:left,top,height;
   pointer-events:auto;
 }
+:root { --viewer-scale: 1; }
+#beforeImgTag, #afterImgTag {
+  transform: scale(var(--viewer-scale));
+  transform-origin: center center;
+}
