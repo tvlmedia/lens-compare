@@ -379,6 +379,20 @@ const notes = {
   "ironglass_zeiss_jena_50mm": "50mm",
   "cooke_panchro_ff_35mm": "32mm",
   "cooke_panchro_ff_50mm": "50mm"
+  "dzo_vespid_80mm": "75mm",
+  "dzo_vespid_85mm": "75mm",
+  "dzo_arles_80mm": "75mm",
+  "dzo_arles_85mm": "75mm",
+  "lomo_standard_speed_80mm": "75mm",
+  "lomo_standard_speed_85mm": "75mm",
+  "cooke_panchro_ff_80mm": "75mm",
+  "cooke_panchro_ff_85mm": "75mm",
+  "ironglass_zeiss_jena_80mm": "75mm",
+  "ironglass_zeiss_jena_85mm": "75mm",
+  "ironglass_red_p_80mm": "75mm",
+  "ironglass_red_p_85mm": "75mm",
+  "ironglass_mkii_80mm": "75mm",
+  "ironglass_mkii_85mm": "75mm"
 };
 
 const lensImageMap = {
