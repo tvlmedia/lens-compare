@@ -626,3 +626,14 @@ body.dragging * {
 
 /* (optioneel) net iets compacter tussen de actieknoppen */
 .group.actions { gap: 6px; }
+/* baseline van inputs/labels gelijk trekken in elke groep */
+.group .inline { align-items: center; }
+
+/* actieknoppen nog iets compacter */
+.group.actions .control-button { padding: 6px 10px; }
+
+/* voorkom horizontaal scrollen als het net niet past */
+.group.actions { flex-wrap: nowrap; gap: 6px; }
+@media (max-width: 560px){
+  .group.actions { flex-wrap: wrap; }
+}
