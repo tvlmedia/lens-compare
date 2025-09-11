@@ -362,6 +362,7 @@ window.addEventListener('resize', () => {
 
 const lenses = [
   "IronGlass Red P",
+  "IronGlass MKII", 
   "IronGlass Zeiss Jena",
   "DZO Vespid",
   "DZO Arles",
