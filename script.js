@@ -374,7 +374,7 @@ const notes = {
   "ironglass_zeiss_jena_35mm": "35mm",
   "ironglass_red_p_50mm": "58mm",
   "ironglass_zeiss_jena_50mm": "50mm",
-  "cooke_panchro_ff_25mm": "32mm",
+  "cooke_panchro_ff_35mm": "32mm",
   "cooke_panchro_ff_50mm": "50mm"
 };
 
