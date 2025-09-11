@@ -558,3 +558,15 @@ body.dragging * {
   transform: scale(var(--viewer-scale));
   transform-origin: center center;
 }
+/* Zorg dat uit beeld uitstekende randen worden “afgesneden” */
+#comparisonWrapper,
+#afterWrapper { overflow: hidden; }
+
+/* Scale beide beelden synchroon */
+#beforeImgTag,
+#afterImgTag {
+  transform: scale(var(--viewer-scale, 1));
+  transform-origin: center center;
+  will-change: transform;
+  transition: transform .12s linear; /* optioneel, smooth */
+}
