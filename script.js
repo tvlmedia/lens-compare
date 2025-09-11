@@ -966,8 +966,8 @@ async function captureViewerWithUI() {
   const L   = await loadHTMLImage(origLeftSrc);
   const R   = await loadHTMLImage(origRightSrc);
 
- + const leftC  = await renderToSensorAR(L, targetAR, H, zoom * userScale);
-+ const rightC = await renderToSensorAR(R, targetAR, H, zoom * userScale);
+ const leftC  = await renderToSensorAR(L, targetAR, H, zoom * userScale);
+const rightC = await renderToSensorAR(R, targetAR, H, zoom * userScale);
 
   afterImgTag.src  = leftC.dataURL;
   beforeImgTag.src = rightC.dataURL;
@@ -1184,8 +1184,8 @@ const sensorText = getSensorText(); // bv. "Sony Venice – 6K 3:2"
 const li = await loadHTMLImage(afterImgTag.src);   // left = after
 const ri = await loadHTMLImage(beforeImgTag.src);  // right = before
 
-+ const leftSensor  = await renderToSensorAR(li, targetAR, exportH, zoom * userScale);
-+ const rightSensor = await renderToSensorAR(ri, targetAR, exportH, zoom * userScale);
+const leftSensor  = await renderToSensorAR(li, targetAR, exportH, zoom * userScale);
+const rightSensor = await renderToSensorAR(ri, targetAR, exportH, zoom * userScale);
 
 // Split canvas met dezelfde (W,H) als sensor-canvassen
 const splitData = await buildSplitFromSensor(leftSensor.dataURL, rightSensor.dataURL, leftSensor.W, leftSensor.H);
