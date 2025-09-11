@@ -637,3 +637,17 @@ body.dragging * {
 @media (max-width: 560px){
   .group.actions { flex-wrap: wrap; }
 }
+.group.actions {
+  grid-column: 1 / -1;     /* neemt de volle breedte van het grid */
+  display: flex;           /* flexbox activeren */
+  justify-content: center; /* centreren */
+  align-items: center;
+  flex-direction: row;     /* forceer horizontaal */
+  flex-wrap: nowrap;       /* niet breken naar een nieuwe regel */
+  gap: 10px;               /* ruimte tussen knoppen */
+}
+
+.group.actions .control-button {
+  flex: 0 0 auto;          /* knoppen behouden hun eigen breedte */
+  white-space: nowrap;     /* geen afbreken in tekst */
+}
