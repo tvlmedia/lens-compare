@@ -393,6 +393,10 @@ const lensDescriptions = {
     text: "De Zeiss Jena’s zijn een uitstekende keuze voor cinematografen die zoeken naar een zachte vintage signatuur zonder zware distortie of gekke flares. Ze voegen karakter toe, maar laten de huid spreken.",
     url: "https://tvlrental.nl/ironglasszeissjena/"
   },
+  "IronGlass MKII Sovjet": {
+  text: "De IronGlass MKII Sovjet set is na de RED P de heftigste variant: zwaar getweakte oude Sovjet-lenzen met extreem karakter, flare en vervorming. Ideaal voor een rauwe, experimentele look.",
+  url: "https://tvlrental.nl/ironglassmkii/"
+}
   "Cooke Panchro FF": {
     text: "Karakteristieke full frame lenzenset met een klassieke Cooke-look. Subtiele glow en zachte roll-off, perfect voor een romantische of authentieke sfeer.",
     url: "https://tvlrental.nl/cookepanchro/"
