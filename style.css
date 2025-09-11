@@ -570,3 +570,15 @@ body.dragging * {
   will-change: transform;
   transition: transform .12s linear; /* optioneel, smooth */
 }
+/* Eén bron van waarheid voor de schaal van beide beelden */
+#comparisonWrapper #beforeImage img,
+#comparisonWrapper #afterWrapper #afterImage img {
+  /* combineer sensor-scale × viewer-scale */
+  transform: scale(var(--sensor-scale, 1)) scale(var(--viewer-scale, 1)) !important;
+  transform-origin: center center;
+  will-change: transform;
+  transition: transform .12s linear;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
