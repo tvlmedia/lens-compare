@@ -548,7 +548,6 @@ body.dragging * {
   position:absolute;
   width:2px;
   background:#fff;
-  box-shadow:0 0 0 1px rgba(0,0,0,.4);
   z-index:5;
   will-change:left,top,height;
   pointer-events:auto;
