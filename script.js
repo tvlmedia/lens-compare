@@ -425,6 +425,7 @@ const leftLabel = document.getElementById("leftLabel");
 const rightLabel = document.getElementById("rightLabel");
 const downloadLeftRawButton  = document.getElementById("downloadLeftRawButton");
 const downloadRightRawButton = document.getElementById("downloadRightRawButton");
+const flareToggle = document.getElementById("flareToggle");
 
 // Direct bij pageload 1x runnen
 onFsChange();
@@ -488,21 +489,30 @@ function setDownloadButton(buttonEl, key) {
   }
 }
 function updateImages() {
-  const leftLens = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
-  const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
-  const tStop = tStopSelect.value.replace(".", "_");
-  const focalLength = focalLengthSelect.value;
+  const leftLens  = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
+const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
+const tStop     = tStopSelect.value.replace(".", "_");
+const focalLength = focalLengthSelect.value;
 
-  const leftBaseKey = `${leftLens}_${focalLength}`;
-  const rightBaseKey = `${rightLens}_${focalLength}`;
-  const leftKey = `${leftLens}_${focalLength}_t${tStop}`;
-  const rightKey = `${rightLens}_${focalLength}_t${tStop}`;
+// nieuw: lees flare mode uit de knop
+const flareMode = flareToggle?.dataset.mode || "noflare"; // "flare" | "noflare"
 
-  const imgLeft = `images/${lensImageMap[leftKey] || leftKey + ".jpg"}`;
-  const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
+// basis keys (voor labels/notes)
+const leftBaseKey  = `${leftLens}_${focalLength}`;
+const rightBaseKey = `${rightLens}_${focalLength}`;
 
-  beforeImgTag.src = imgRight;
-  afterImgTag.src = imgLeft;
+// volledige keys voor de bestandsnamen
+const leftKey  = `${leftLens}_${focalLength}_t${tStop}_${flareMode}`;
+const rightKey = `${rightLens}_${focalLength}_t${tStop}_${flareMode}`;
+
+// paden (met eventuele overrides via lensImageMap)
+const imgLeft  = `images/${lensImageMap[leftKey]  || leftKey  + ".jpg"}`;
+const imgRight = `images/${lensImageMap[rightKey] || rightKey + ".jpg"}`;
+
+beforeImgTag.src = imgRight; // rechts
+afterImgTag.src  = imgLeft;  // links
+
+// ... laat de rest van updateImages() staan (labels, RAW-buttons, resetSplitToMiddle, etc.)
 
   const tStopRaw = tStopSelect.value;
   const tStopFormatted = `T${tStopRaw}`;
@@ -510,6 +520,13 @@ function updateImages() {
   // Pak de URLs uit lensDescriptions (fallback "#")
   const leftUrl  = lensDescriptions[leftSelect.value]?.url  || "#";
   const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
+
+  flareToggle.addEventListener("click", () => {
+  const cur = flareToggle.dataset.mode === "flare" ? "noflare" : "flare";
+  flareToggle.dataset.mode = cur;
+  flareToggle.textContent = cur === "flare" ? "✨ Flare: ON" : "✨ Flare: OFF";
+  updateImages(); // herlaad de juiste beelden
+});
 
   
 resetSplitToMiddle();
