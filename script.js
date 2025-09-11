@@ -396,6 +396,7 @@ const notes = {
   "ironglass_red_p_75mm": "85mm",
   "ironglass_mkii_75mm": "85mm",
   "ironglass_zeiss_jena_75mm": "80mm",
+  "ironglass_zeiss_jena_35mm": "35mm",
 };
 
 const lensImageMap = {
