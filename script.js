@@ -447,7 +447,9 @@ const lensDescriptions = {
 
 const leftSelect = document.getElementById("leftLens");
 const rightSelect = document.getElementById("rightLens");
-const tStopSelect = document.getElementById("tStop");
+// NIEUW: twee T-stop selects
+const tStopLeftSelect  = document.getElementById("tStopLeftSelect");
+const tStopRightSelect = document.getElementById("tStopRightSelect");
 const focalLengthSelect = document.getElementById("focalLength");
 const beforeImgTag = document.getElementById("beforeImgTag");
 const afterImgTag = document.getElementById("afterImgTag");
@@ -558,53 +560,47 @@ function setDownloadButton(buttonEl, key) {
 function updateImages() {
   const leftLens  = leftSelect.value.toLowerCase().replace(/\s+/g, "_");
   const rightLens = rightSelect.value.toLowerCase().replace(/\s+/g, "_");
-  const tStopRaw  = tStopSelect.value;              // "2.8"
-  const tStop     = tStopRaw.replace(".", "_");     // "2_8"
-  const focalNom  = focalLengthSelect.value;        // "35mm" | "50mm" | "75mm"
+
+  // ⬇️ Links en rechts hebben eigen T-stop
+  const tStopLeftRaw  = tStopLeftSelect.value;          // "2.8"
+  const tStopRightRaw = tStopRightSelect.value;         // "2.8"
+  const tStopLeft     = tStopLeftRaw.replace(".", "_"); // "2_8"
+  const tStopRight    = tStopRightRaw.replace(".", "_");// "2_8"
+
+  const focalNom  = focalLengthSelect.value;            // "35mm" | "50mm" | ...
   const flareMode = flareToggle?.dataset.mode || "noflare";
 
-  // helpers
   const aliasFor = (lens, nominalFocal) =>
     notes[`${lens}_${nominalFocal}`] || nominalFocal;
 
   const resolveImagePath = (lens, nominalFocal, tStr, flare) => {
     const aliasFocal = aliasFor(lens, nominalFocal);
     const bases = [
-      `${lens}_${aliasFocal}_t${tStr}`,     // alias-basis
+      `${lens}_${aliasFocal}_t${tStr}`,
       ...(aliasFocal !== nominalFocal ? [`${lens}_${nominalFocal}_t${tStr}`] : [])
     ];
-
-    // Maak kandidatenlijst (eerst lensImageMap, dan geconstrueerde pad)
     const candidates = [];
     bases.forEach(base => {
-      candidates.push(lensImageMap[`${base}_${flare}`]); // mapping met flare
-      candidates.push(lensImageMap[base]);               // mapping zonder flare
-      candidates.push(`${base}_${flare}.jpg`);           // geconstrueerd met flare
-      candidates.push(`${base}.jpg`);                    // geconstrueerd zonder flare
+      candidates.push(lensImageMap[`${base}_${flare}`]);
+      candidates.push(lensImageMap[base]);
+      candidates.push(`${base}_${flare}.jpg`);
+      candidates.push(`${base}.jpg`);
     });
-
-    // Kies de eerste die bestaat in de mapping of als bestandsnaam
     for (const cand of candidates) {
       if (!cand) continue;
-      // lensImageMap geeft alleen de filename terug → prefix met IMG_BASE
-      const url = cand.endsWith(".jpg") ? `${IMG_BASE}${cand}` : `${IMG_BASE}${cand}`;
-      return url;
+      return `${IMG_BASE}${cand}`;
     }
-    // als alles faalt, val terug op alias + flare constructed naam
     return `${IMG_BASE}${bases[0]}_${flare}.jpg`;
   };
 
-  // URLs bepalen
-  const imgLeft  = resolveImagePath(leftLens,  focalNom, tStop, flareMode);
-  const imgRight = resolveImagePath(rightLens, focalNom, tStop, flareMode);
+  // ⬇️ Let op: links gebruikt tStopLeft, rechts tStopRight
+  const imgLeft  = resolveImagePath(leftLens,  focalNom, tStopLeft,  flareMode);
+  const imgRight = resolveImagePath(rightLens, focalNom, tStopRight, flareMode);
 
-  // beelden zetten (rechts = before, links = after)
-  beforeImgTag.src = imgRight;
-  afterImgTag.src  = imgLeft;
+  beforeImgTag.src = imgRight; // rechts = before
+  afterImgTag.src  = imgLeft;  // links  = after
 
-  // labels/links
-  const leftBaseKey  = `${leftLens}_${focalNom}`;
-  const rightBaseKey = `${rightLens}_${focalNom}`;
+  // Labels
   const leftFocalForLabel  = aliasFor(leftLens,  focalNom);
   const rightFocalForLabel = aliasFor(rightLens, focalNom);
 
@@ -613,15 +609,15 @@ function updateImages() {
 
   leftLabel.innerHTML  =
     `Lens: <a href="${leftUrl}" target="_blank" rel="noopener noreferrer">` +
-    `${leftSelect.value} ${leftFocalForLabel} T${tStopRaw}</a>`;
+    `${leftSelect.value} ${leftFocalForLabel} T${tStopLeftRaw}</a>`;
 
   rightLabel.innerHTML =
     `Lens: <a href="${rightUrl}" target="_blank" rel="noopener noreferrer">` +
-    `${rightSelect.value} ${rightFocalForLabel} T${tStopRaw}</a>`;
+    `${rightSelect.value} ${rightFocalForLabel} T${tStopRightRaw}</a>`;
 
-  // RAW-download keys (zonder flare-suffix); alias meenemen
-  const rawLeftKey  = `${leftLens}_${leftFocalForLabel}_t${tStop}`;
-  const rawRightKey = `${rightLens}_${rightFocalForLabel}_t${tStop}`;
+  // RAW-download keys per kant
+  const rawLeftKey  = `${leftLens}_${leftFocalForLabel}_t${tStopLeft}`;
+  const rawRightKey = `${rightLens}_${rightFocalForLabel}_t${tStopRight}`;
   setDownloadButton(downloadLeftRawButton,  rawLeftKey);
   setDownloadButton(downloadRightRawButton, rawRightKey);
 
