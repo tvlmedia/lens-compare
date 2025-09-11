@@ -1533,7 +1533,8 @@ function updateSliderPosition(clientX) {
   const leftInsetPx  = lbLeft;
   const rightInsetPx = lbRight + (usable - clamped);
 
-  const inset = `inset(0 ${rightInsetPx}px 0 ${leftInsetPx}px)`;
+ const OVERLAP = 1; // 1 CSS px overlap
+const inset = `inset(0 ${Math.max(0, rightInsetPx - OVERLAP)}px 0 ${leftInsetPx}px)`;
   afterWrapper.style.clipPath = inset;
   afterWrapper.style.webkitClipPath = inset;
 
