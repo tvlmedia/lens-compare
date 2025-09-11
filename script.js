@@ -528,7 +528,7 @@ function updateImages() {
 
   // definitieve paden
 const imgLeft  = IMG_BASE + (lensImageMap[leftKeyJpg]  || leftNoFlareMap  || (leftKeyJpg  + ".jpg"));
-const imgRight = IMG_BASE + (lensImageMap[rightKeyJpg] || rightNoFlareMap || (rightKeyJpg + ".jpg"));"));
+const imgRight = IMG_BASE + (lensImageMap[rightKeyJpg] || rightNoFlareMap || (rightKeyJpg + ".jpg"));
 
   // zet beelden (links = after, rechts = before)
   beforeImgTag.src = imgRight;
