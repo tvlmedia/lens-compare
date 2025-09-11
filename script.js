@@ -409,8 +409,6 @@ const lensImageMap = {
   "ironglass_mkii_75mm_t2_8":    "mkii_85mm_t2_8.jpg",
 
   // Zeiss Jena
-  "ironglass_zeiss_jena_35mm_t2_8": "jena_35mm_t2_8.jpg",  // ontbrak
-  "ironglass_zeiss_jena_50mm_t2_8": "jena_50mm_t2_8.jpg",  // ontbrak
   "ironglass_zeiss_jena_75mm_t2_8": "jena_80mm_t2_8.jpg",
 };
 
