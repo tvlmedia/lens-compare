@@ -1578,7 +1578,7 @@ function onGlobalKeydown(e) {
     e.preventDefault();
     document.getElementById("detailViewToggle")?.click();
   }
-  if (k === "l") {
+  if (k === "f") {
   e.preventDefault();
   flareToggle.click(); // zelfde als handmatig op de knop drukken
 }
