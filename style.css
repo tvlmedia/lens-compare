@@ -576,21 +576,7 @@ body.dragging * {
 }
 
 
-.group.actions{
-  grid-column: 1 / -1;
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  flex-wrap: nowrap;   /* <-- niet afbreken naar nieuwe regel */
-}
-.controls-grid{
-  display:grid;
-  gap:12px 16px;
-  grid-template-columns: repeat(12, minmax(0,1fr));
-  align-items:center;
-  max-width: 1100px;   /* nieuw */
-  margin: 0 auto;      /* nieuw: centreert het grid */
-}
+
 /* basis opmaak voor elke groep */
 .group{ display:flex; flex-direction:column; gap:6px; }
 .group .inline{ display:flex; gap:8px; }
@@ -628,3 +614,15 @@ body.dragging * {
   max-width:1100px;
   margin:0 auto;             /* center */
 }
+/* centreren van de inhoud in elke gridcel */
+.controls-grid {
+  justify-items: center;
+}
+
+/* knoppen compact naast elkaar houden */
+.control-button {
+  white-space: nowrap;
+}
+
+/* (optioneel) net iets compacter tussen de actieknoppen */
+.group.actions { gap: 6px; }
