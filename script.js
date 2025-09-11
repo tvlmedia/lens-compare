@@ -374,6 +374,7 @@ const notes = {
   "ironglass_red_p_35mm": "37mm",
   "ironglass_zeiss_jena_35mm": "35mm",
   "ironglass_red_p_50mm": "58mm",
+  "ironglass_mkii_35mm": "37mm",
   "ironglass_zeiss_jena_50mm": "50mm",
   "cooke_panchro_ff_35mm": "32mm",
   "cooke_panchro_ff_50mm": "50mm"
@@ -382,6 +383,7 @@ const notes = {
 const lensImageMap = {
   "ironglass_red_p_35mm_t2_8": "red_p_37mm_t2_8.jpg",
   "ironglass_red_p_50mm_t2_8": "red_p_58mm_t2_8.jpg",
+  "ironglass_mkii_35mm_t2_8": "red_p_37mm_t2_8.jpg",
 };
 
 const lensDescriptions = {
