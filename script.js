@@ -533,7 +533,6 @@ afterImgTag.src  = imgLeft;  // links
   const rightUrl = lensDescriptions[rightSelect.value]?.url || "#";
 
 
-});
 
   
 resetSplitToMiddle();
