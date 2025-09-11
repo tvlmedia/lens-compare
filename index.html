@@ -8,10 +8,11 @@
 </head>
 <body>
 
-  <!-- === DESKTOP TOOL === -->
- <div class="controls desktop-only">
+ <!-- === DESKTOP TOOL === -->
+<div class="controls desktop-only">
   <div class="controls-grid">
-    <!-- Row 1 -->
+
+    <!-- Actieknoppen (compact naast elkaar & gecentreerd) -->
     <div class="group actions">
       <button id="toggleButton" class="control-button">↔ Flip</button>
       <button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
@@ -19,32 +20,40 @@
       <button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
     </div>
 
+    <!-- Scale -->
     <div class="group scale">
-      <span class="group-label">Scale</span>
-      <label id="scaleCtrl">
+      <div class="group-label">Scale</div>
+      <label id="scaleCtrl" class="inline">
         <span id="scaleVal">100%</span>
         <input id="scaleSlider" type="range" min="100" max="120" value="100" step="1">
       </label>
     </div>
 
+    <!-- Camera -->
     <div class="group camera">
-      <span class="group-label">Camera</span>
-      <select id="cameraSelect"></select>
+      <div class="group-label">Camera</div>
+      <div class="inline">
+        <select id="cameraSelect"></select>
+      </div>
     </div>
 
+    <!-- Sensor Mode -->
     <div class="group sensor">
-      <span class="group-label">Sensor mode</span>
-      <select id="sensorFormatSelect" disabled></select>
+      <div class="group-label">Sensor Mode</div>
+      <div class="inline">
+        <select id="sensorFormatSelect" disabled></select>
+      </div>
     </div>
 
+    <!-- Flare -->
     <div class="group flare">
-      <span class="group-label">Flare</span>
+      <div class="group-label">Flare</div>
       <button id="flareToggle" class="control-button" data-mode="noflare">✨ Flare: OFF</button>
     </div>
 
-    <!-- Row 2 -->
+    <!-- Left lens + T-stop -->
     <div class="group lens left">
-      <span class="group-label">Left lens</span>
+      <div class="group-label">Left Lens</div>
       <div class="inline">
         <select id="leftLens"></select>
         <select id="tStopLeftSelect" title="Left T-stop">
@@ -54,16 +63,20 @@
       </div>
     </div>
 
+    <!-- Focal length -->
     <div class="group focal">
-      <span class="group-label">Focal length</span>
-      <select id="focalLength" title="Focal length">
-        <option value="35mm">35mm</option>
-        <option value="75mm" selected>75mm</option>
-      </select>
+      <div class="group-label">Focal Length</div>
+      <div class="inline">
+        <select id="focalLength" title="Focal length">
+          <option value="35mm">35mm</option>
+          <option value="75mm" selected>75mm</option>
+        </select>
+      </div>
     </div>
 
+    <!-- Right lens + T-stop -->
     <div class="group lens right">
-      <span class="group-label">Right lens</span>
+      <div class="group-label">Right Lens</div>
       <div class="inline">
         <select id="rightLens"></select>
         <select id="tStopRightSelect" title="Right T-stop">
@@ -72,9 +85,9 @@
         </select>
       </div>
     </div>
+
   </div>
 </div>
-
  <div id="comparisonWrapper" class="desktop-only" tabindex="0">
     <div id="beforeImage">
       <img id="beforeImgTag" alt="Right lens preview">
