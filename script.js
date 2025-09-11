@@ -1581,6 +1581,7 @@ function onGlobalKeydown(e) {
   if (k === "f") {
   e.preventDefault();
   flareToggle.click(); // zelfde als handmatig op de knop drukken
+    }
 }
 window.addEventListener("keydown", onGlobalKeydown, { capture: true });
 (function enforceBlankTargets(){
