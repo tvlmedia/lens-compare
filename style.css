@@ -697,3 +697,56 @@ body.dragging * {
     grid-column: span 12;  /* alles op rij 1 onder elkaar */
   }
 }
+/* Scale slider laten inblenden als button */
+#scaleCtrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 32px;
+  background: #161616;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1;
+  color: #ddd;
+}
+
+#scaleVal {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Slider zelf: minimalistisch, geen rare standaardstijl */
+#scaleCtrl input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+#scaleCtrl input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 0 2px rgba(0,123,255,.35);
+}
+
+#scaleCtrl input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 0 2px rgba(0,123,255,.35);
+}
