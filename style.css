@@ -796,3 +796,37 @@ body.dragging * {
 .sbs-mode #sbsWrapper{ display:flex; gap:2px; }
 .sbs-mode #afterWrapper, 
 .sbs-mode #slider{ display:none !important; }
+/* --- SBS = 2x zo breed (6:2), per pane = normale 3:2 breedte --- */
+.sbs-mode #comparisonWrapper{
+  overflow-x: auto;          /* horizontaal scrollen (of swipe) */
+  overflow-y: hidden;
+  scrollbar-gutter: stable both-edges; /* nette scrollbalkruimte */
+}
+
+.sbs-mode #sbsWrapper{
+  display: flex;
+  width: 200%;               /* 🔥 dubbele breedte */
+  height: 100%;
+  gap: 0;
+  padding: 0;                /* geen extra padding in de ‘bruikbare’ box */
+}
+
+.sbs-mode #sbsWrapper .pane{
+  width: 50%;                /* 50% van 200% = 100% van normale breedte */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* swipe/scroll fijn laten aanvoelen (optioneel) */
+.sbs-mode #comparisonWrapper{ scroll-snap-type: x mandatory; }
+.sbs-mode #sbsWrapper .pane{ scroll-snap-align: start; }
+
+/* Fullscreen: laat horizontale scroll in SBS toe */
+#comparisonWrapper:fullscreen,
+#comparisonWrapper:-webkit-full-screen{
+  overflow-x: auto;
+  overflow-y: hidden;
+}
