@@ -9,35 +9,33 @@
 <body>
 
 <div class="controls desktop-only">
-  <div class="row row-1">
-    <button id="toggleButton" class="control-button">↔ Flip</button>
-    <button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
-    <button id="detailViewToggle" class="control-button">🔍 Detail View</button>
-    <button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
+ <div class="row row-1">
+  <button id="toggleButton" class="control-button">↔ Flip</button>
+  <button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
+  <button id="detailViewToggle" class="control-button">🔍 Detail View</button>
+  <button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
 
-    <label id="scaleCtrl" class="chip">
-      <span id="scaleVal">100%</span>
-      <input id="scaleSlider" type="range" min="100" max="120" value="100" step="1">
-    </label>
+  <label id="scaleCtrl" class="chip">
+    <span id="scaleVal">100%</span>
+    <input id="scaleSlider" type="range" min="100" max="120" value="100" step="1">
+  </label>
 
-    <select id="cameraSelect"></select>
-    <select id="sensorFormatSelect" disabled></select>
-    <button id="flareToggle" class="control-button" data-mode="noflare">✨ Flare: OFF</button>
-    <select id="focalLength">
-      <option value="35mm">35mm</option>
-      <option value="75mm" selected>75mm</option>
-    </select>
-  </div>
+  <select id="cameraSelect"></select>
+  <select id="sensorFormatSelect" disabled></select>
+  <button id="flareToggle" class="control-button" data-mode="noflare">✨ Flare: OFF</button>
+</div>
 
-  <div class="row row-2">
-    <div class="inline">
-      <select id="leftLens"></select>
-      <select id="tStopLeftSelect"><option value="2.8" selected>T2.8</option><option value="5.6">T5.6</option></select>
-    </div>
-    <div class="inline">
-      <select id="rightLens"></select>
-      <select id="tStopRightSelect"><option value="2.8" selected>T2.8</option><option value="5.6">T5.6</option></select>
-    </div>
+<div class="row row-2">
+  <select id="leftLens"></select>
+  <select id="tStopLeftSelect"></select>
+  <select id="rightLens"></select>
+  <select id="tStopRightSelect"></select>
+  <!-- Goed → nu in row 2 -->
+  <select id="focalLength" title="Focal length">
+    <option value="35mm">35mm</option>
+    <option value="75mm" selected>75mm</option>
+  </select>
+</div>
   </div>
 </div>
 </div>
