@@ -681,3 +681,6 @@ body.dragging * {
 /* Hover/focus states */
 #scaleCtrl.chip input[type="range"]:hover::-webkit-slider-thumb{ background: #59a2ff; }
 #scaleCtrl.chip input[type="range"]:focus{ outline: none; }
+/* Houd select’s leesbaar bij wrap */
+#cameraSelect, #sensorFormatSelect { min-width: 170px; }
+#focalLength { min-width: 110px; }
