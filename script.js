@@ -475,7 +475,7 @@ function syncTStopsOnContextChange() {
 }
 
 // --- T-stops vullen ---
-const DEFAULT_T_STOPS = ["2", "2.8", "4", "5.6", "8", "11", "16"]; // voeg toe wat je hebt
+const DEFAULT_T_STOPS = ["2.8","5.6"]; // voeg toe wat je hebt
 
 function fillTStops(selectEl, options = DEFAULT_T_STOPS) {
   selectEl.innerHTML = "";
