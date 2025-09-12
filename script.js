@@ -803,9 +803,12 @@ function setSideBySide(on) {
     sbsLeftImg.src  = afterImgTag.src;   // links = after
     sbsRightImg.src = beforeImgTag.src;  // rechts = before
     comparisonWrapper.scrollLeft = 0;
+    slider.style.display = "none";
+  } else {
+    slider.style.display = ""; // reset naar default
   }
 
-  // ⇣ hoogte opnieuw op basis van (6:2 in SBS) of (3:2 normaal)
+  // hoogte opnieuw berekenen (3:2 normaal, 6:2 in SxS)
   const { w, h } = getCurrentWH();
   setWrapperSizeByAR(w, h);
   requestAnimationFrame(() => setWrapperSizeByAR(w, h));
