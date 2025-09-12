@@ -654,14 +654,17 @@ function updateImages() {
   const rawRightKey = `${rightLens}_${rightFocalForLabel}_t${tStopRight}`;
   setDownloadButton(downloadLeftRawButton,  rawLeftKey);
   setDownloadButton(downloadRightRawButton, rawRightKey);
+  // ← SBS-panelen up-to-date houden
+  if (sbsActive) {
+    sbsLeftImg.src  = afterImgTag.src;   // links = after
+    sbsRightImg.src = beforeImgTag.src;  // rechts = before
+  }
 
   resetSplitToMiddle();
 }
-// Zorg dat SBS altijd de actuele bronnen toont
-if (sbsActive) {
-  sbsLeftImg.src  = afterImgTag.src;   // links = after
-  sbsRightImg.src = beforeImgTag.src;  // rechts = before
+  resetSplitToMiddle();
 }
+
 
 
 
@@ -1110,9 +1113,16 @@ const rightC = await renderToSensorAR(R, targetAR, H, zoom * userScale);
     const shot = await screenshotTool();
     console.log("[captureViewerWithUI] got shot?", !!shot);
     return shot;
-  } finally {
+   } finally {
     afterImgTag.src  = origLeftSrc;
     beforeImgTag.src = origRightSrc;
+
+    // ← voeg deze 3 regels toe
+    if (sbsActive) {
+      sbsLeftImg.src  = afterImgTag.src;
+      sbsRightImg.src = beforeImgTag.src;
+    }
+
     if (sliderEl) sliderEl.style.visibility = prevVis || "";
   }
 }
