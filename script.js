@@ -1504,6 +1504,7 @@ document.addEventListener("keydown", (e) => {
 }
 });
 function updateFullscreenBars() {
+  // In SBS: geen letter/pillarbox en geen slider-clip
   if (sbsActive) {
     comparisonWrapper.style.setProperty('--lb-top','0px');
     comparisonWrapper.style.setProperty('--lb-bottom','0px');
@@ -1513,7 +1514,6 @@ function updateFullscreenBars() {
     comparisonWrapper._usableW = comparisonWrapper.getBoundingClientRect().width;
     return;
   }
-}
 
   const rect  = comparisonWrapper.getBoundingClientRect();
   const hostW = Math.max(1, Math.round(rect.width));
@@ -1543,11 +1543,11 @@ function updateFullscreenBars() {
   comparisonWrapper.style.setProperty('--lb-left',   lbLeft + 'px');
   comparisonWrapper.style.setProperty('--lb-right',  lbRight + 'px');
 
- comparisonWrapper._lbLeft  = lbLeft;
-comparisonWrapper._lbRight = lbRight;
-comparisonWrapper._lbTop    = lbTop;    // ✅ toevoegen
-comparisonWrapper._lbBottom = lbBottom; // ✅ toevoegen
-comparisonWrapper._usableW = usedW;
+  comparisonWrapper._lbLeft   = lbLeft;
+  comparisonWrapper._lbRight  = lbRight;
+  comparisonWrapper._lbTop    = lbTop;
+  comparisonWrapper._lbBottom = lbBottom;
+  comparisonWrapper._usableW  = usedW;
 }
 
 // VERVANGT resetSplitToMiddle()
