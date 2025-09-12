@@ -662,8 +662,6 @@ function updateImages() {
 
   resetSplitToMiddle();
 }
-  resetSplitToMiddle();
-}
 
 
 
@@ -1772,8 +1770,3 @@ function autoScaleNow() {
 /** Init: meteen 1x uitvoeren na jouw defaults */
 autoScaleNow();
 
-
-if (sbsActive) {
-  sbsLeftImg.src  = afterImgTag.src;
-  sbsRightImg.src = beforeImgTag.src;
-}
