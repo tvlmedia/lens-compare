@@ -1674,10 +1674,14 @@ function normalizeLensKey(label = "") {
   return "";
 }
 
-/** Grote sensor = ≥ 28.8 × 16.2 mm (anders 100%) */
-function isLargeSensorMM() {
-  const { w, h } = getCurrentWH(); // komt uit jouw code, in millimeters
-  return w >= 28.8 && h >= 16.2;
+/** Alleen boven S35-drempel schalen: > 30.720 × 16.200 mm */
+function isScaleAllowedBySensor() {
+  const { w, h } = getCurrentWH(); // mm
+  const EPS   = 0.001;   // float safety
+  const W_MIN = 30.720;  // RED 6K 17:9 breedte
+  const H_MIN = 16.200;  // RED 6K 17:9 hoogte
+  // Schaal alleen als de actieve sensor écht groter is dan S35
+  return (w > W_MIN + EPS) || (h > H_MIN + EPS);
 }
 
 /** Gewenste schaal in % voor 1 lens + huidige focal */
@@ -1697,19 +1701,22 @@ function applyScalePercent(pct) {
 
 /** Hoofd: kies hoogste van links/rechts óf 100% op kleine sensors */
 function autoScaleNow() {
-  if (!isLargeSensorMM()) {
+  // S35 (30.720 × 16.200) en kleiner → altijd 100%
+  if (!isScaleAllowedBySensor()) {
     applyScalePercent(100);
     return;
   }
-  const leftLabel  = leftSelect?.selectedOptions?.[0]?.textContent || leftSelect?.value || "";
-  const rightLabel = rightSelect?.selectedOptions?.[0]?.textContent || rightSelect?.value || "";
-  const focalStr   = focalLengthSelect?.selectedOptions?.[0]?.textContent || focalLengthSelect?.value || "35mm";
+
+  // Groter dan S35 → pak hoogste van links/rechts uit de tabel
+  const leftLabel  = leftSelect?.value || "";
+  const rightLabel = rightSelect?.value || "";
+  const focalStr   = focalLengthSelect?.value || "35mm";
 
   const leftPct  = scaleForLens(leftLabel,  focalStr);
   const rightPct = scaleForLens(rightLabel, focalStr);
+
   applyScalePercent(Math.max(leftPct, rightPct));
 }
-
 /** Triggers: elke contextwissel → autoscale */
 ["change", "input"].forEach(evt => {
   leftSelect?.addEventListener(evt,  autoScaleNow);
