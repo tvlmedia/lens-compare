@@ -634,3 +634,50 @@ body.dragging * {
 @media (max-width: 800px){
   #scaleCtrl input[type="range"]{ width: 100px; }
 }
+/* --- Scale slider skinning (blend met buttons) --- */
+#scaleCtrl.chip input[type="range"]{
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 140px;           /* iets ruimer op desktop */
+  height: 18px;           /* geeft ruimte voor de thumb */
+  margin: 0;
+  padding: 0;
+}
+
+/* Track */
+#scaleCtrl.chip input[type="range"]::-webkit-slider-runnable-track{
+  height: 4px;
+  background: #2a2a2a;
+  border-radius: 999px;
+}
+#scaleCtrl.chip input[type="range"]::-moz-range-track{
+  height: 4px;
+  background: #2a2a2a;
+  border-radius: 999px;
+}
+
+/* Thumb */
+#scaleCtrl.chip input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #3a8bfd;
+  border: 2px solid #0e1621; /* subtiele rand zodat hij ‘zit’ op de track */
+  margin-top: -5px;          /* centreert op 4px track */
+  cursor: pointer;
+}
+#scaleCtrl.chip input[type="range"]::-moz-range-thumb{
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #3a8bfd;
+  border: 2px solid #0e1621;
+  cursor: pointer;
+}
+
+/* Hover/focus states */
+#scaleCtrl.chip input[type="range"]:hover::-webkit-slider-thumb{ background: #59a2ff; }
+#scaleCtrl.chip input[type="range"]:focus{ outline: none; }
