@@ -657,7 +657,11 @@ function updateImages() {
 
   resetSplitToMiddle();
 }
-
+// Zorg dat SBS altijd de actuele bronnen toont
+if (sbsActive) {
+  sbsLeftImg.src  = afterImgTag.src;   // links = after
+  sbsRightImg.src = beforeImgTag.src;  // rechts = before
+}
 
 
 
