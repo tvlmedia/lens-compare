@@ -474,6 +474,22 @@ function syncTStopsOnContextChange() {
   tStopRightSelect.value = t;
 }
 
+// --- T-stops vullen ---
+const DEFAULT_T_STOPS = ["2", "2.8", "4", "5.6", "8", "11", "16"]; // voeg toe wat je hebt
+
+function fillTStops(selectEl, options = DEFAULT_T_STOPS) {
+  selectEl.innerHTML = "";
+  options.forEach(t => selectEl.add(new Option(`T${t}`, t)));
+}
+
+// eenmalig vullen bij load
+fillTStops(tStopLeftSelect);
+fillTStops(tStopRightSelect);
+
+// zet default waarde (moet NA het vullen)
+tStopLeftSelect.value  = "2.8";
+tStopRightSelect.value = "2.8";
+
 function setUserScaleFromPct(pct) {
   // clamp 100–120%
   userScale = Math.min(1.2, Math.max(1.0, pct / 100));
