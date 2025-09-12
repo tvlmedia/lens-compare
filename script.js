@@ -509,12 +509,12 @@ if (scaleSlider) {
 
 // === Flare toggle (eenmalige setup) ===
 flareToggle.dataset.mode = flareToggle.dataset.mode || "noflare";
-flareToggle.textContent  = flareToggle.dataset.mode === "flare" ? "✨ Flare: ON" : "✨ Flare: OFF";
+flareToggle.textContent  = flareToggle.dataset.mode === "flare" ? "Flare: ON" : "Flare: OFF";
 
 flareToggle.addEventListener("click", () => {
   const cur = flareToggle.dataset.mode === "flare" ? "noflare" : "flare";
   flareToggle.dataset.mode = cur;
-  flareToggle.textContent  = cur === "flare" ? "✨ Flare: ON" : "✨ Flare: OFF";
+  flareToggle.textContent  = cur === "flare" ? "Flare: ON" : "Flare: OFF";
   updateImages(); // herlaad de juiste beelden
 });
 
