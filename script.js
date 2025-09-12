@@ -1674,14 +1674,14 @@ function normalizeLensKey(label = "") {
   return "";
 }
 
-/** Alleen boven S35-drempel schalen: > 30.720 × 16.200 mm */
+/** Alleen boven S35-drempel schalen: strikt > 30.720 × 16.200 mm in beide richtingen */
 function isScaleAllowedBySensor() {
   const { w, h } = getCurrentWH(); // mm
-  const EPS   = 0.001;   // float safety
-  const W_MIN = 30.720;  // RED 6K 17:9 breedte
-  const H_MIN = 16.200;  // RED 6K 17:9 hoogte
-  // Schaal alleen als de actieve sensor écht groter is dan S35
-  return (w > W_MIN + EPS) || (h > H_MIN + EPS);
+  const EPS   = 0.001;     // float safety
+  const W_MIN = 30.720;    // S35 breedte (RED 6K 17:9)
+  const H_MIN = 16.200;    // S35 hoogte
+  // Schaal alleen als w én h groter zijn dan de drempels
+  return (w > W_MIN + EPS) && (h > H_MIN + EPS);
 }
 
 /** Gewenste schaal in % voor 1 lens + huidige focal */
