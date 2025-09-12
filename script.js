@@ -219,8 +219,13 @@ async function exitAnyFullscreen() {
 }
 function setWrapperSizeByAR(w, h) {
   if (isWrapperFullscreen()) return; // in fullscreen geen inline heights forceren
-  const width  = comparisonWrapper.getBoundingClientRect().width;
-  const height = Math.round(width * (h / w)); // puur AR
+
+  const width = comparisonWrapper.getBoundingClientRect().width;
+
+  // ← in SBS willen we 2× zo breed: 3:2 wordt 6:2
+  const arWidth = sbsActive ? (w * 2) : w;
+
+  const height = Math.round(width * (h / arWidth)); // puur AR
 
   comparisonWrapper.style.removeProperty('aspect-ratio');
   comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
@@ -356,6 +361,9 @@ window.addEventListener('resize', () => {
   if (isWrapperFullscreen()) {
     updateFullscreenBars();
     resetSplitToMiddle();
+  } else {
+    const { w, h } = getCurrentWH();
+    setWrapperSizeByAR(w, h);                 // 3:2 of 6:2, afhankelijk van SBS
   }
 });
 
@@ -794,9 +802,15 @@ function setSideBySide(on) {
   if (sbsActive) {
     sbsLeftImg.src  = afterImgTag.src;   // links = after
     sbsRightImg.src = beforeImgTag.src;  // rechts = before
-    // start links in beeld
     comparisonWrapper.scrollLeft = 0;
-  } else {
+  }
+
+  // ⇣ hoogte opnieuw op basis van (6:2 in SBS) of (3:2 normaal)
+  const { w, h } = getCurrentWH();
+  setWrapperSizeByAR(w, h);
+  requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+
+  if (!sbsActive) {
     updateFullscreenBars();
     resetSplitToMiddle();
   }
