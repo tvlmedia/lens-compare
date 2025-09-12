@@ -769,34 +769,28 @@ body.dragging * {
   #cameraSelect, #sensorFormatSelect, #focalLength { min-width: 120px; }
   #scaleCtrl input[type="range"]{ width: 100px; }
 }
-/* SBS wrapper bovenop, vult het bruikbare gebied */
-#sbsWrapper{
+/* === Side-by-Side (SxS) === */
+/* Wrapper bovenop, vult bruikbare gebied (rekening met letter/pillarbox vars) */
+#sbsWrapper {
   position: absolute;
   inset: 0;
-  z-index: 3;                                /* ← boven before/after */
-  display: none;                             /* standaard uit */
+  z-index: 3; /* boven before/after */
+  display: none; /* standaard uit */
   padding: var(--lb-top,0) var(--lb-right,0) var(--lb-bottom,0) var(--lb-left,0);
   box-sizing: border-box;
 }
 
-/* In SBS: toon 2 panelen naast elkaar, verberg single-view lagen */
-.sbs-mode #sbsWrapper{
+/* In SxS: twee panelen naast elkaar */
+.sbs-mode #sbsWrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2px;                                  /* subtiel lijntje ertussen */
+  gap: 2px;         /* subtiel lijntje ertussen */
   width: 100%;
   height: 100%;
 }
 
-.sbs-mode #afterWrapper,
-.sbs-mode #beforeImgTag,      /* ← ook de onderlaag verbergen */
-.sbs-mode #beforeImage,     /* ← deze extra regel */
-.sbs-mode #slider{
-  display: none !important;
-}
-
-/* Panelen + images vullen hun helft; zelfde zoom als viewer */
-#sbsWrapper .pane{
+/* Panelen + images vullen hun helft; 'contain' toont volledige frames */
+#sbsWrapper .pane {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -805,22 +799,18 @@ body.dragging * {
   justify-content: center;
 }
 
-#sbsWrapper .pane img{
+#sbsWrapper .pane img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;                 /* <<< volledige frame zichtbaar */
   transform: scale(var(--viewer-scale, 1));
   transform-origin: center;
 }
-/* SxS container vult wrapper, twee panelen naast elkaar */
-#sbsWrapper { display:none; position:absolute; inset:0; gap:0; }
-#sbsWrapper .pane { flex:1 1 50%; display:flex; align-items:center; justify-content:center; }
-#sbsWrapper img { width:100%; height:100%; object-fit:contain; }
 
-/* Als SxS aan staat: toon SxS, verberg slider/overlay */
-body.sbs-mode #sbsWrapper { display:flex; }
-body.sbs-mode #afterWrapper,
-body.sbs-mode #slider { display:none !important; }
-
-#comparisonWrapper { position:relative; }
-#afterWrapper { position:absolute; inset:0; } /* bestaande overlay */
+/* In SxS: verberg single-view lagen en slider */
+.sbs-mode #afterWrapper,
+.sbs-mode #beforeImage,
+.sbs-mode #beforeImgTag,
+.sbs-mode #slider {
+  display: none !important;
+}
