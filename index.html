@@ -8,85 +8,45 @@
 </head>
 <body>
 
- <!-- === DESKTOP TOOL === -->
+<!-- === DESKTOP TOOL === -->
 <div class="controls desktop-only">
-  <div class="controls-grid">
+  <div class="row row-1">
+    <button id="toggleButton" class="control-button">↔ Flip</button>
+    <button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
+    <button id="detailViewToggle" class="control-button">🔍 Detail View</button>
+    <button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
 
-    <!-- Actieknoppen (compact naast elkaar & gecentreerd) -->
-    <div class="group actions">
-      <button id="toggleButton" class="control-button">↔ Flip</button>
-      <button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
-      <button id="detailViewToggle" class="control-button">🔍 Detail View</button>
-      <button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
-    </div>
+    <label id="scaleCtrl" class="chip">
+      <span id="scaleVal">100%</span>
+      <input id="scaleSlider" type="range" min="100" max="120" value="100" step="1">
+    </label>
 
-    <!-- Scale -->
-    <div class="group scale">
-      <div class="group-label">Scale</div>
-      <label id="scaleCtrl" class="inline">
-        <span id="scaleVal">100%</span>
-        <input id="scaleSlider" type="range" min="100" max="120" value="100" step="1">
-      </label>
-    </div>
-
-    <!-- Camera -->
-    <div class="group camera">
-      <div class="group-label">Camera</div>
-      <div class="inline">
-        <select id="cameraSelect"></select>
-      </div>
-    </div>
-
-    <!-- Sensor Mode -->
-    <div class="group sensor">
-      <div class="group-label">Sensor Mode</div>
-      <div class="inline">
-        <select id="sensorFormatSelect" disabled></select>
-      </div>
-    </div>
-
-    <!-- Flare -->
-    <div class="group flare">
-      <div class="group-label">Flare</div>
-      <button id="flareToggle" class="control-button" data-mode="noflare">✨ Flare: OFF</button>
-    </div>
-
-    <!-- Left lens + T-stop -->
-    <div class="group lens left">
-      <div class="group-label">Left Lens</div>
-      <div class="inline">
-        <select id="leftLens"></select>
-        <select id="tStopLeftSelect" title="Left T-stop">
-          <option value="2.8" selected>T2.8</option>
-          <option value="5.6">T5.6</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Focal length -->
-    <div class="group focal">
-      <div class="group-label">Focal Length</div>
-      <div class="inline">
-        <select id="focalLength" title="Focal length">
-          <option value="35mm">35mm</option>
-          <option value="75mm" selected>75mm</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Right lens + T-stop -->
-    <div class="group lens right">
-      <div class="group-label">Right Lens</div>
-      <div class="inline">
-        <select id="rightLens"></select>
-        <select id="tStopRightSelect" title="Right T-stop">
-          <option value="2.8" selected>T2.8</option>
-          <option value="5.6">T5.6</option>
-        </select>
-      </div>
-    </div>
-
+    <select id="cameraSelect"></select>
+    <select id="sensorFormatSelect" disabled></select>
+    <button id="flareToggle" class="control-button" data-mode="noflare">✨ Flare: OFF</button>
+    <select id="focalLength" title="Focal length">
+      <option value="35mm">35mm</option>
+      <option value="75mm" selected>75mm</option>
+    </select>
   </div>
+
+  <div class="row row-2">
+    <div class="inline">
+      <select id="leftLens"></select>
+      <select id="tStopLeftSelect" title="Left T-stop">
+        <option value="2.8" selected>T2.8</option>
+        <option value="5.6">T5.6</option>
+      </select>
+    </div>
+    <div class="inline">
+      <select id="rightLens"></select>
+      <select id="tStopRightSelect" title="Right T-stop">
+        <option value="2.8" selected>T2.8</option>
+        <option value="5.6">T5.6</option>
+      </select>
+    </div>
+  </div>
+</div>
 </div>
  <div id="comparisonWrapper" class="desktop-only" tabindex="0">
     <div id="beforeImage">
