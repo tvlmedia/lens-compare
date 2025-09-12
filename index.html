@@ -8,7 +8,6 @@
 </head>
 <body>
 
-<!-- === DESKTOP TOOL === -->
 <div class="controls desktop-only">
   <div class="row row-1">
     <button id="toggleButton" class="control-button">↔ Flip</button>
@@ -24,7 +23,7 @@
     <select id="cameraSelect"></select>
     <select id="sensorFormatSelect" disabled></select>
     <button id="flareToggle" class="control-button" data-mode="noflare">✨ Flare: OFF</button>
-    <select id="focalLength" title="Focal length">
+    <select id="focalLength">
       <option value="35mm">35mm</option>
       <option value="75mm" selected>75mm</option>
     </select>
@@ -33,17 +32,11 @@
   <div class="row row-2">
     <div class="inline">
       <select id="leftLens"></select>
-      <select id="tStopLeftSelect" title="Left T-stop">
-        <option value="2.8" selected>T2.8</option>
-        <option value="5.6">T5.6</option>
-      </select>
+      <select id="tStopLeftSelect"><option value="2.8" selected>T2.8</option><option value="5.6">T5.6</option></select>
     </div>
     <div class="inline">
       <select id="rightLens"></select>
-      <select id="tStopRightSelect" title="Right T-stop">
-        <option value="2.8" selected>T2.8</option>
-        <option value="5.6">T5.6</option>
-      </select>
+      <select id="tStopRightSelect"><option value="2.8" selected>T2.8</option><option value="5.6">T5.6</option></select>
     </div>
   </div>
 </div>
