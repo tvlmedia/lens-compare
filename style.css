@@ -830,3 +830,4 @@ body.dragging * {
   overflow-x: auto;
   overflow-y: hidden;
 }
+#comparisonWrapper { contain: layout paint; }
