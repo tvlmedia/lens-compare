@@ -1099,8 +1099,7 @@ async function captureViewerWithUI() {
   const viewerEl = document.getElementById("comparisonWrapper");
   if (!viewerEl) return null;
 
-  const { w: sW, h: sH } = getCurrentWH();
-  const targetAR = sW / sH;
+  const targetAR = getTargetAR();
   const zoom = Math.max(1, BASE_SENSOR.w / sW);
 
   const origLeftSrc  = afterImgTag.src;
@@ -1306,8 +1305,7 @@ pdf.text(ctaLabel, btnX + btnW / 2, btnY + btnH / 2 + 6, {
   const box   = getContentBox(pageW, pageH);
 
 // Sensor‑AR uit de huidige selectie (exact zoals de viewer)
-const { w: sW, h: sH } = getCurrentWH();
-const targetAR = sW / sH;
+const targetAR = getTargetAR();
 
 // Export-resolutie (scherpte).  ~300 DPI benadering op A4 landscape content-box
 const exportScale = 8; // 2.5–3 is meestal top; 3 geeft veel detail
@@ -1548,8 +1546,7 @@ function updateFullscreenBars() {
   const hostW = Math.max(1, Math.round(rect.width));
   const hostH = Math.max(1, Math.round(rect.height));
 
-  const { w, h } = getCurrentWH();
-  const targetAR = w / h;
+  const targetAR = getTargetAR();
   const hostAR   = hostW / hostH;
 
   let usedW, usedH;
@@ -1566,7 +1563,11 @@ function updateFullscreenBars() {
     const bar = Math.floor((hostH - usedH) / 2);
     lbTop = lbBottom = bar;
   }
-
+// Doel-AR van de layout: normaal w/h, in SxS dubbel zo breed (6:2)
+function getTargetAR() {
+  const { w, h } = getCurrentWH();
+  return sbsActive ? (2 * w) / h : w / h;
+}
   comparisonWrapper.style.setProperty('--lb-top',    lbTop + 'px');
   comparisonWrapper.style.setProperty('--lb-bottom', lbBottom + 'px');
   comparisonWrapper.style.setProperty('--lb-left',   lbLeft + 'px');
