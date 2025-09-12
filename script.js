@@ -492,7 +492,7 @@ tStopRightSelect.value = "2.8";
 
 function setUserScaleFromPct(pct) {
   // clamp 100–120%
-  userScale = Math.min(1.2, Math.max(1.0, pct / 100));
+  userScale = Math.min(1.3, Math.max(1.0, pct / 100));
   // voor de viewer (CSS)
   document.documentElement.style.setProperty("--viewer-scale", String(userScale));
   // UI tekstje
@@ -1694,7 +1694,7 @@ function scaleForLens(lensLabel, focalStr) {
 
 /** Slider + viewer-scale netjes samen updaten */
 function applyScalePercent(pct) {
-  const p = Math.max(100, Math.min(120, Math.round(pct))); // clamp 100–120
+  const p = Math.max(100, Math.min(130, Math.round(pct))); // clamp 100–120
   if (scaleSlider) scaleSlider.value = String(p);
   setUserScaleFromPct(p); // zet --viewer-scale, label en bars/clip via jouw functie
 }
