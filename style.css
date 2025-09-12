@@ -812,3 +812,15 @@ body.dragging * {
   transform: scale(var(--viewer-scale, 1));
   transform-origin: center;
 }
+/* SxS container vult wrapper, twee panelen naast elkaar */
+#sbsWrapper { display:none; position:absolute; inset:0; gap:0; }
+#sbsWrapper .pane { flex:1 1 50%; display:flex; align-items:center; justify-content:center; }
+#sbsWrapper img { width:100%; height:100%; object-fit:contain; }
+
+/* Als SxS aan staat: toon SxS, verberg slider/overlay */
+body.sbs-mode #sbsWrapper { display:flex; }
+body.sbs-mode #afterWrapper,
+body.sbs-mode #slider { display:none !important; }
+
+#comparisonWrapper { position:relative; }
+#afterWrapper { position:absolute; inset:0; } /* bestaande overlay */
