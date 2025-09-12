@@ -556,13 +556,13 @@ body.dragging * {
   object-fit: cover !important;
 }
 /* Container: compact, gecentreerd, niet te dik */
-.controls.desktop-only{
+.controls.desktop-only {
   position: sticky;
   top: 0;
   z-index: 50;
   width: min(1100px, calc(100% - 32px));
   margin: 16px auto 20px;
-  padding: 12px 14px;
+  padding: 16px 18px;   /* was 12px 14px → iets groter */
   border: 1px solid #2a2a2a;
   border-radius: 10px;
   background: rgba(15,15,15,.9);
@@ -571,7 +571,6 @@ body.dragging * {
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
   box-sizing: border-box;
 }
-
 /* Twee rijen */
 .controls.desktop-only .row{
   display: flex;
