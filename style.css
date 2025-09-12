@@ -684,3 +684,89 @@ body.dragging * {
 /* Houd select’s leesbaar bij wrap */
 #cameraSelect, #sensorFormatSelect { min-width: 170px; }
 #focalLength { min-width: 110px; }
+
+/* ---- Controls container ---- */
+.controls.desktop-only{
+  position: sticky; top: 0; z-index: 50;
+  width: min(1100px, calc(100% - 32px));
+  margin: 16px auto 20px; padding: 12px 14px;
+  border: 1px solid #2a2a2a; border-radius: 10px;
+  background: rgba(15,15,15,.9);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.35);
+  box-sizing: border-box;
+}
+
+/* Two rows */
+.controls.desktop-only .row{
+  display:flex; align-items:center; justify-content:center;
+  gap: 8px 10px;
+}
+
+/* Row-1: single line on desktop; may wrap only on small screens */
+.controls.desktop-only .row-1{
+  flex-wrap: wrap;              /* allows wrap on small widths */
+  row-gap: 10px;
+}
+@media (min-width: 1100px){
+  .controls.desktop-only .row-1{ flex-wrap: nowrap; }  /* keep 1 line */
+}
+
+/* Row-2: lenses + T-stops, always one line on desktop */
+.controls.desktop-only .row-2{
+  margin-top: 8px;
+  flex-wrap: nowrap;
+}
+@media (max-width: 900px){
+  .controls.desktop-only .row-2{ flex-wrap: wrap; }    /* allow wrap on small screens */
+}
+
+/* Inline pair for lens + t-stop */
+.controls.desktop-only .inline{ display:flex; gap:8px; }
+
+/* Make all controls the same height & compact */
+.controls.desktop-only select,
+.controls.desktop-only .control-button,
+#scaleCtrl.chip{
+  height: 36px; line-height: 34px;
+  padding: 0 10px;
+  background: #161616; border: 1px solid #3a3a3a; border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Icon alignment fix for buttons */
+.control-button{
+  display: inline-flex;              /* centers icons */
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;                        /* space between icon & text (if any) */
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Make selects a bit narrower so row-1 fits on one line */
+#cameraSelect, #sensorFormatSelect, #focalLength { min-width: 130px; }
+#leftLens, #rightLens { min-width: 200px; }
+#tStopLeftSelect, #tStopRightSelect { min-width: 90px; }
+
+/* Scale chip styled like a button */
+#scaleCtrl.chip{
+  display:inline-flex; align-items:center; gap:.5rem;
+  white-space:nowrap;
+}
+#scaleCtrl #scaleVal{ min-width: 44px; text-align:right; }
+#scaleCtrl input[type="range"]{ width: 120px; height: 4px; accent-color: #3a8bfd; }
+
+/* Focus ring consistent */
+.controls.desktop-only select:focus,
+.controls.desktop-only .control-button:focus{
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,123,255,.35);
+  border-color: #007bff;
+}
+
+/* Small screens: allow row-1 to break early */
+@media (max-width: 1000px){
+  #cameraSelect, #sensorFormatSelect, #focalLength { min-width: 120px; }
+  #scaleCtrl input[type="range"]{ width: 100px; }
+}
