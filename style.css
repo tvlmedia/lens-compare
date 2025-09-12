@@ -555,198 +555,82 @@ body.dragging * {
   height: 100% !important;
   object-fit: cover !important;
 }
-/* Controls container */
-.controls.desktop-only {
-  display: flex;
-  flex-direction: column;
-  align-items: center;     /* centreren */
-  gap: 12px;
+/* Container: compact, gecentreerd, niet te dik */
+.controls.desktop-only{
   position: sticky;
   top: 0;
   z-index: 50;
+  width: min(1100px, calc(100% - 32px));
+  margin: 16px auto 20px;
+  padding: 12px 14px;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
   background: rgba(15,15,15,.9);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border: 1px solid #2a2a2a;
-  border-radius: 10px;
-  padding: 12px 16px;
-  margin: 16px auto 20px;
-  width: min(1100px, calc(100% - 32px));
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
+  box-sizing: border-box;
 }
 
-
-
-/* basis opmaak voor elke groep */
-.group{ display:flex; flex-direction:column; gap:6px; }
-.group .inline{ display:flex; gap:8px; }
-
-/* maak de actieknoppen altijd naast elkaar */
-.group.actions{
-  grid-column: 1 / -1;
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  flex-wrap: nowrap;           /* compact naast elkaar */
-}
-@media (max-width: 560px){
-  .group.actions{ flex-wrap: wrap; }  /* mag breken op heel klein scherm */
-}
-
-/* grid indeling op desktop */
-@media (min-width: 900px){
-  .group.scale  { grid-column: span 3; align-items:center; }
-  .group.camera { grid-column: span 4; }
-  .group.sensor { grid-column: span 3; }
-  .group.flare  { grid-column: span 2; align-items:center; }
-
-  .group.lens.left  { grid-column: 1 / span 5; }
-  .group.focal      { grid-column: 6 / span 2; align-items:center; }
-  .group.lens.right { grid-column: 8 / span 5; }
-}
-
-/* centreer het grid zelf */
-.controls-grid{
-  display:grid;
-  gap:12px 16px;
-  grid-template-columns: repeat(12, minmax(0,1fr));
-  align-items:center;
-  max-width:1100px;
-  margin:0 auto;             /* center */
-}
-/* centreren van de inhoud in elke gridcel */
-.controls-grid {
-  justify-items: center;
-}
-
-/* knoppen compact naast elkaar houden */
-.control-button {
-  white-space: nowrap;
-}
-
-/* (optioneel) net iets compacter tussen de actieknoppen */
-.group.actions { gap: 6px; }
-/* baseline van inputs/labels gelijk trekken in elke groep */
-.group .inline { align-items: center; }
-
-/* actieknoppen nog iets compacter */
-.group.actions .control-button { padding: 6px 10px; }
-
-/* voorkom horizontaal scrollen als het net niet past */
-.group.actions { flex-wrap: nowrap; gap: 6px; }
-@media (max-width: 560px){
-  .group.actions { flex-wrap: wrap; }
-}
-.group.actions {
-  grid-column: 1 / -1;     /* neemt de volle breedte van het grid */
-  display: flex;           /* flexbox activeren */
-  justify-content: center; /* centreren */
+/* Twee rijen */
+.controls.desktop-only .row{
+  display: flex;
+  flex-wrap: wrap;            /* breekt netjes i.p.v. uit het vak vallen */
   align-items: center;
-  flex-direction: row;     /* forceer horizontaal */
-  flex-wrap: nowrap;       /* niet breken naar een nieuwe regel */
-  gap: 10px;               /* ruimte tussen knoppen */
+  justify-content: center;
+  gap: 8px 10px;
 }
 
-.group.actions .control-button {
-  flex: 0 0 auto;          /* knoppen behouden hun eigen breedte */
-  white-space: nowrap;     /* geen afbreken in tekst */
-}
-/* --- Controls in 2 lagen --- */
-.controls-grid{
-  display:grid;
-  grid-template-columns: repeat(12, minmax(0,1fr));
-  gap:12px 16px;
-  align-items:center;
-  max-width:1100px;
-  margin:0 auto;
-  grid-auto-flow:dense;   /* vult netjes 1 rij */
+.controls.desktop-only .row-1{ row-gap: 10px; }
+.controls.desktop-only .row-2{ margin-top: 8px; }
+
+/* Lens/T-stop duo’s */
+.controls.desktop-only .inline{
+  display: flex;
+  gap: 8px;
 }
 
-/* Laag 1 = actions, scale, camera, sensor, flare, focal */
-.group.actions{ grid-row:1; grid-column: span 4; display:flex; gap:8px; flex-wrap:nowrap; justify-content:center; }
-.group.scale  { grid-row:1; grid-column: span 2; align-items:center; }
-.group.camera { grid-row:1; grid-column: span 2; }
-.group.sensor { grid-row:1; grid-column: span 2; }
-.group.flare  { grid-row:1; grid-column: span 1; align-items:center; }
-.group.focal  { grid-row:1; grid-column: span 1; }
-
-/* Laag 2 = alleen lens + T-stop (links/rechts) */
-.group.lens.left  { grid-row:2; grid-column: 1 / span 6; }
-.group.lens.right { grid-row:2; grid-column: 7 / span 6; }
-
-/* Compactere look (optioneel maar helpt hoogte) */
-.group { gap:4px; }
-.group-label { font-size:10px; color:#aaa; margin-bottom:2px; }
-.control-button, .controls select, #scaleCtrl { height:32px; font-size:13px; padding:0 10px; }
-#scaleCtrl input[type="range"]{ width:110px; }
-.control-button{ white-space:nowrap; }
-
-/* Breakpoints: houd 2 lagen, maar geef meer ruimte op small screens */
-@media (max-width: 1050px){
-  .group.actions{ grid-column: span 12; justify-content:center; }
-  .group.scale, .group.camera, .group.sensor, .group.flare, .group.focal{
-    grid-column: span 6;   /* nog steeds laag 1 */
-  }
-  .group.lens.left, .group.lens.right{
-    grid-column: span 12;  /* laag 2 onder elkaar */
-  }
+/* Eén hoogte voor alles */
+.controls.desktop-only select,
+.controls.desktop-only .control-button,
+#scaleCtrl{
+  height: 36px;
+  line-height: 34px;
 }
 
-@media (max-width: 680px){
-  .group.scale, .group.camera, .group.sensor, .group.flare, .group.focal{
-    grid-column: span 12;  /* alles op rij 1 onder elkaar */
-  }
-}
-/* Scale slider laten inblenden als button */
-#scaleCtrl {
+/* Slider-chip (scale) in de stijl van de knoppen */
+#scaleCtrl.chip{
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 12px;
-  height: 32px;
+  gap: .5rem;
+  padding: 0 10px;
   background: #161616;
   border: 1px solid #3a3a3a;
   border-radius: 8px;
-  font-size: 13px;
-  line-height: 1;
-  color: #ddd;
-}
-
-#scaleVal {
-  font-size: 13px;
   white-space: nowrap;
 }
-
-/* Slider zelf: minimalistisch, geen rare standaardstijl */
-#scaleCtrl input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100px;
+#scaleCtrl input[type="range"]{
+  width: 120px;
   height: 4px;
-  background: #333;
-  border-radius: 2px;
+  accent-color: #3a8bfd;   /* moderne browsers */
+}
+
+/* Buttons/selects consistent */
+.controls.desktop-only select,
+.controls.desktop-only .control-button{
+  padding: 0 12px;
+  background: #161616;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+}
+.controls.desktop-only select:focus,
+.controls.desktop-only .control-button:focus{
   outline: none;
-  cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(0,123,255,.35);
+  border-color: #007bff;
 }
 
-#scaleCtrl input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #007bff;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 0 0 2px rgba(0,123,255,.35);
-}
-
-#scaleCtrl input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #007bff;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 0 0 2px rgba(0,123,255,.35);
+/* Klein scherm: laat rij 1 netjes doorbreken */
+@media (max-width: 800px){
+  #scaleCtrl input[type="range"]{ width: 100px; }
 }
