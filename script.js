@@ -1621,3 +1621,120 @@ window.addEventListener("keydown", onGlobalKeydown, { capture: true });
     });
   })).observe(document.documentElement, { childList: true, subtree: true });
 })();
+/* ---------- AUTO SCALE PER LENS & FOCAL ---------- */
+
+/** 1) Tabellen met gewenste schaal in % **/
+const LENS_SCALE_TABLE = {
+  "35mm": {
+    // normaliseer op keywords (zie normalizeLensKey)
+    panchro: 100,
+    "red p": 116,
+    mkii: 117,
+    jena: 112,
+    vespid: 109,
+    arles: 110,
+    "lomo standard speed": 110,
+  },
+  "75mm": {
+    panchro: 100,
+    "red p": 118,
+    mkii: 117,
+    jena: 110,
+    vespid: 100,
+    arles: 100,
+    "lomo standard speed": 100,
+  },
+};
+
+/** 2) Welke elementen gebruiken we? (pas id's aan als nodig) */
+const elLeftLens   = document.getElementById("leftLens");
+const elRightLens  = document.getElementById("rightLens");
+const elFocal      = document.getElementById("focalLength");
+const elSensorMode = document.getElementById("sensorFormatSelect");
+const elScaleSlider= document.getElementById("scaleSlider");
+const elScaleVal   = document.getElementById("scaleVal");
+
+/** Helper: lensnaam → compacte sleutel voor tabel */
+function normalizeLensKey(label = "") {
+  const s = label.toLowerCase();
+  if (s.includes("panchro")) return "panchro";
+  if (s.includes("red p")) return "red p";
+  if (s.includes("mk ii") || s.includes("mkii") || s.includes("mk2")) return "mkii";
+  if (s.includes("jena") || s.includes("zeiss jena")) return "jena";
+  if (s.includes("vespid")) return "vespid";
+  if (s.includes("arles")) return "arles";
+  if (s.includes("lomo") && s.includes("standard")) return "lomo standard speed";
+  return ""; // onbekend -> geen autoscale
+}
+
+/** 3) Sensor-grootte check.
+ *  Verwacht data-w / data-h op de geselecteerde <option>,
+ *  of vul hieronder een fallback-map als je dat prettiger vindt.
+ */
+const SENSOR_DIMENSIONS = {
+  // voorval: "6K 3:2": { w: 6048, h: 4032 }, etc.
+  // voeg jouw modes hier toe als je geen data-attributes gebruikt
+};
+
+function getSelectedSensorDims() {
+  const opt = elSensorMode?.selectedOptions?.[0];
+  if (opt) {
+    const w = Number(opt.dataset.w || SENSOR_DIMENSIONS[opt.value]?.w || 0);
+    const h = Number(opt.dataset.h || SENSOR_DIMENSIONS[opt.value]?.h || 0);
+    return { w, h };
+  }
+  return { w: 0, h: 0 };
+}
+
+function isLargeSensor() {
+  const { w, h } = getSelectedSensorDims();
+  return w > 28800 || h > 16200;
+}
+
+/** 4) Bepaal gewenste schaal (in %) voor 1 lens + huidige focal */
+function scaleForLens(lensLabel, focalStr) {
+  const key = normalizeLensKey(lensLabel);
+  const focalKey = (focalStr || "").toLowerCase().includes("75") ? "75mm" : "35mm";
+  const table = LENS_SCALE_TABLE[focalKey] || {};
+  return table[key] || 100; // default 100%
+}
+
+/** 5) Pas schaal toe (synct slider, label en CSS var --viewer-scale) */
+function applyScalePercent(percent) {
+  // slider is 100..120 in jouw UI → clampen en invullen
+  const p = Math.max(100, Math.min(120, Math.round(percent)));
+  if (elScaleSlider) elScaleSlider.value = String(p);
+  if (elScaleVal)    elScaleVal.textContent = `${p}%`;
+  // viewer-scale = procent / 100
+  const scale = p / 100;
+  document.documentElement.style.setProperty("--viewer-scale", scale);
+}
+
+/** 6) Hoofdlogica: kies hoogste schaal van links/rechts (alleen bij grote sensor) */
+function maybeAutoScale() {
+  if (!isLargeSensor()) return; // niet nodig bij kleinere sensor
+
+  const leftLabel  = elLeftLens?.selectedOptions?.[0]?.textContent || "";
+  const rightLabel = elRightLens?.selectedOptions?.[0]?.textContent || "";
+  const focalStr   = elFocal?.selectedOptions?.[0]?.textContent || elFocal?.value || "35mm";
+
+  const leftPct  = scaleForLens(leftLabel,  focalStr);
+  const rightPct = scaleForLens(rightLabel, focalStr);
+  const target   = Math.max(leftPct, rightPct);
+
+  applyScalePercent(target);
+}
+
+/** 7) Event listeners: elke wijziging → check autoscale */
+["change", "input"].forEach(evt => {
+  elLeftLens?.addEventListener(evt,  maybeAutoScale);
+  elRightLens?.addEventListener(evt, maybeAutoScale);
+  elFocal?.addEventListener(evt,     maybeAutoScale);
+  elSensorMode?.addEventListener(evt,maybeAutoScale);
+});
+
+/** 8) Optioneel: init bij load */
+window.addEventListener("DOMContentLoaded", () => {
+  // eerste keer proberen — zet alleen iets als sensor groot genoeg is
+  maybeAutoScale();
+});
