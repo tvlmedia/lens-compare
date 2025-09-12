@@ -789,7 +789,8 @@ body.dragging * {
 }
 
 .sbs-mode #afterWrapper,
-.sbs-mode #beforeImgTag,                      /* ← ook de onderlaag verbergen */
+.sbs-mode #beforeImgTag,      /* ← ook de onderlaag verbergen */
+.sbs-mode #beforeImage,     /* ← deze extra regel */
 .sbs-mode #slider{
   display: none !important;
 }
