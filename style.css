@@ -769,3 +769,30 @@ body.dragging * {
   #cameraSelect, #sensorFormatSelect, #focalLength { min-width: 120px; }
   #scaleCtrl input[type="range"]{ width: 100px; }
 }
+/* SBS wrapper vult het bruikbare (letter/pillarboxed) gebied */
+#sbsWrapper{
+  position:absolute; inset:0;
+  display:none;            /* standaard uit */
+  padding-top:    var(--lb-top, 0);
+  padding-bottom: var(--lb-bottom, 0);
+  padding-left:   var(--lb-left, 0);
+  padding-right:  var(--lb-right, 0);
+  box-sizing:border-box;
+}
+
+#sbsWrapper .pane{
+  display:flex; align-items:center; justify-content:center;
+  width:50%; height:100%;
+  overflow:hidden;
+}
+
+#sbsWrapper .pane img{
+  max-width:100%; max-height:100%;
+  transform: scale(var(--viewer-scale, 1)); /* zelfde zoom als slider */
+  transform-origin:center center;
+}
+
+/* Wanneer SBS actief is: grid met twee panelen en slider verbergen */
+.sbs-mode #sbsWrapper{ display:flex; gap:2px; }
+.sbs-mode #afterWrapper, 
+.sbs-mode #slider{ display:none !important; }
