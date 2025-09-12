@@ -787,11 +787,11 @@ function setSideBySide(on) {
   document.body.classList.toggle("sbs-mode", sbsActive);
 
   if (sbsActive) {
-    // sync bronnen naar SBS-img tags
-    sbsLeftImg.src  = afterImgTag.src;   // links = after (left lens)
-    sbsRightImg.src = beforeImgTag.src;  // rechts = before (right lens)
+    sbsLeftImg.src  = afterImgTag.src;   // links = after
+    sbsRightImg.src = beforeImgTag.src;  // rechts = before
+    // start links in beeld
+    comparisonWrapper.scrollLeft = 0;
   } else {
-    // terug naar slider: reset clip/slider zodat midden klopt
     updateFullscreenBars();
     resetSplitToMiddle();
   }
@@ -1503,22 +1503,17 @@ document.addEventListener("keydown", (e) => {
   rightDetail.style.display = "none";
 }
 });
-// VERVANGT updateFullscreenBars()
 function updateFullscreenBars() {
-  // ✅ Alleen letter/pillarbox berekenen in fullscreen
-  if (!isWrapperFullscreen()) {
-    comparisonWrapper.style.setProperty('--lb-top', '0px');
-    comparisonWrapper.style.setProperty('--lb-bottom', '0px');
-    comparisonWrapper.style.setProperty('--lb-left', '0px');
-    comparisonWrapper.style.setProperty('--lb-right', '0px');
-    // Zorg dat interne helpers niet met oude waarden werken:
-   comparisonWrapper._lbLeft  = 0;
-comparisonWrapper._lbRight = 0;
-comparisonWrapper._lbTop    = 0; // ✅ toevoegen
-comparisonWrapper._lbBottom = 0; // ✅ toevoegen
-comparisonWrapper._usableW = comparisonWrapper.getBoundingClientRect().width;
-return;
+  if (sbsActive) {
+    comparisonWrapper.style.setProperty('--lb-top','0px');
+    comparisonWrapper.style.setProperty('--lb-bottom','0px');
+    comparisonWrapper.style.setProperty('--lb-left','0px');
+    comparisonWrapper.style.setProperty('--lb-right','0px');
+    comparisonWrapper._lbLeft = comparisonWrapper._lbRight = comparisonWrapper._lbTop = comparisonWrapper._lbBottom = 0;
+    comparisonWrapper._usableW = comparisonWrapper.getBoundingClientRect().width;
+    return;
   }
+}
 
   const rect  = comparisonWrapper.getBoundingClientRect();
   const hostW = Math.max(1, Math.round(rect.width));
@@ -1557,6 +1552,7 @@ comparisonWrapper._usableW = usedW;
 
 // VERVANGT resetSplitToMiddle()
 function resetSplitToMiddle() {
+  if (sbsActive) return;  // geen slider in SBS
   const rect    = comparisonWrapper.getBoundingClientRect();
   const lbLeft  = comparisonWrapper._lbLeft  || 0;
   const lbRight = comparisonWrapper._lbRight || 0;
