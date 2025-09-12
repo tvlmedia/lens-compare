@@ -455,6 +455,18 @@ const beforeImgTag = document.getElementById("beforeImgTag");
 const afterImgTag = document.getElementById("afterImgTag");
 const afterWrapper = document.getElementById("afterWrapper");
 const slider = document.getElementById("slider");
+// --- SBS DOM ---
+const sbsWrapper = document.createElement("div");
+sbsWrapper.id = "sbsWrapper";
+sbsWrapper.innerHTML = `
+  <div class="pane"><img id="sbsLeftImg"  alt=""></div>
+  <div class="pane"><img id="sbsRightImg" alt=""></div>
+`;
+comparisonWrapper.appendChild(sbsWrapper);
+
+const sbsLeftImg  = sbsWrapper.querySelector("#sbsLeftImg");
+const sbsRightImg = sbsWrapper.querySelector("#sbsRightImg");
+let sbsActive = false;
 const leftLabel = document.getElementById("leftLabel");
 const rightLabel = document.getElementById("rightLabel");
 const downloadLeftRawButton  = document.getElementById("downloadLeftRawButton");
@@ -769,6 +781,20 @@ document.getElementById("toggleButton").addEventListener("click", () => {
       resetSplitToMiddle();
     });
   })();
+}
+function setSideBySide(on) {
+  sbsActive = !!on;
+  document.body.classList.toggle("sbs-mode", sbsActive);
+
+  if (sbsActive) {
+    // sync bronnen naar SBS-img tags
+    sbsLeftImg.src  = afterImgTag.src;   // links = after (left lens)
+    sbsRightImg.src = beforeImgTag.src;  // rechts = before (right lens)
+  } else {
+    // terug naar slider: reset clip/slider zodat midden klopt
+    updateFullscreenBars();
+    resetSplitToMiddle();
+  }
 }
 function whenImagesReadyThenReset() {
   const wait = (im) => (im.complete && im.naturalWidth > 0)
@@ -1404,6 +1430,9 @@ detailToggleButton.addEventListener("click", () => {
     rightDetail.style.display = "none";
   }
 });
+document.getElementById("sbsToggle")?.addEventListener("click", () => {
+  setSideBySide(!sbsActive);
+});
 document.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
@@ -1614,6 +1643,10 @@ function onGlobalKeydown(e) {
     e.preventDefault();
     document.getElementById("detailViewToggle")?.click();
   }
+  if (k === "s") {
+  e.preventDefault();
+  setSideBySide(!sbsActive);
+}
   if (k === "f") {
   e.preventDefault();
   flareToggle.click(); // zelfde als handmatig op de knop drukken
@@ -1728,3 +1761,9 @@ function autoScaleNow() {
 
 /** Init: meteen 1x uitvoeren na jouw defaults */
 autoScaleNow();
+
+
+if (sbsActive) {
+  sbsLeftImg.src  = afterImgTag.src;
+  sbsRightImg.src = beforeImgTag.src;
+}
