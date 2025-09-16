@@ -4,460 +4,256 @@
 * { -webkit-user-drag: none; user-select: none; }
 :root { --sensor-scale: 1; --viewer-scale: 1; }
 
-body {
-  margin: 0;
-  background: #0f0f0f;
-  color: #fff;
-  font-family: "Inter","Helvetica Neue",sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+body{
+  margin:0; background:#0f0f0f; color:#fff;
+  font-family:"Inter","Helvetica Neue",sans-serif;
+  font-size:14px; line-height:1.6;
+  display:flex; flex-direction:column; align-items:center;
 }
-
-/* Buttons & selects – compacter */
-select,
-.control-button,
-#toggleButton,
-#fullscreenButton,
-#downloadPdfButton {
-  height: 32px;
-  line-height: 30px;
-  padding: 0 10px;
-  background: #161616;
-  color: #fff;
-  border: 1px solid #3a3a3a;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-}
-select:hover,
-.control-button:hover,
-#toggleButton:hover,
-#fullscreenButton:hover,
-#downloadPdfButton:hover {
-  background: #666; border-color: #666;
-}
-.control-button:focus,
-select:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0,123,255,.35);
-  border-color: #007bff;
-}
-.control-button:disabled { opacity: .5; cursor: not-allowed; }
 
 /* ===========================
-   TOOL LAYOUT
+   CONTROLS (los van viewer)
    =========================== */
-#toolRoot {
-  width: min(1200px, 96vw);
-  margin: 0 auto;
+.controls.desktop-only{
+  position:sticky; top:0; z-index:50;
+  width:min(1400px,96vw);                /* breder vlak */
+  margin:12px auto 16px;                 /* los van de viewer */
+  padding:10px 12px;
+  border:1px solid #2a2a2a; border-radius:10px;
+  background:rgba(15,15,15,.9);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  box-shadow:0 6px 16px rgba(0,0,0,.35);
+  box-sizing:border-box;
+}
+.controls.desktop-only .row{
+  display:flex; align-items:center; justify-content:center;
+  flex-wrap:wrap; gap:8px 10px;
+}
+.controls.desktop-only .row-2{ margin-top:6px; }
+
+select,
+.control-button,
+#toggleButton,#fullscreenButton,#downloadPdfButton{
+  height:32px; line-height:30px; padding:0 10px;
+  background:#161616; color:#fff; border:1px solid #3a3a3a;
+  border-radius:8px; font-size:14px; cursor:pointer;
+}
+select:hover,.control-button:hover,
+#toggleButton:hover,#fullscreenButton:hover,#downloadPdfButton:hover{
+  background:#666; border-color:#666;
+}
+.control-button:focus, select:focus{
+  outline:none; box-shadow:0 0 0 2px rgba(0,123,255,.35); border-color:#007bff;
+}
+.control-button:disabled{ opacity:.5; cursor:not-allowed; }
+
+/* Scale chip + slider baseline (wit lijntje) */
+#scaleCtrl.chip{
+  display:inline-flex; align-items:center; gap:.5rem;
+  height:32px; padding:0 10px; white-space:nowrap;
+  background:#161616; border:1px solid #3a3a3a; border-radius:8px;
+}
+#scaleCtrl #scaleVal{ min-width:44px; text-align:right; }
+#scaleCtrl input[type="range"]{
+  -webkit-appearance:none; appearance:none;
+  width:120px; height:18px; margin:0; padding:0; background:transparent;
+}
+#scaleCtrl input[type="range"]::-webkit-slider-runnable-track{
+  height:4px; background:#2a2a2a; border-radius:999px;
+  border-bottom:1px solid #fff;                 /* witte baseline */
+}
+#scaleCtrl input[type="range"]::-moz-range-track{
+  height:4px; background:#2a2a2a; border-radius:999px;
+  border-bottom:1px solid #fff;                 /* witte baseline */
+}
+#scaleCtrl input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:14px; height:14px; border-radius:50%;
+  background:#3a8bfd; border:2px solid #0e1621; margin-top:-5px; cursor:pointer;
+}
+#scaleCtrl input[type="range"]::-moz-range-thumb{
+  width:14px; height:14px; border-radius:50%;
+  background:#3a8bfd; border:2px solid #0e1621; cursor:pointer;
+}
+#cameraSelect,#sensorFormatSelect,#focalLength{ min-width:130px; }
+#leftLens,#rightLens{ min-width:200px; }
+#tStopLeftSelect,#tStopRightSelect{ min-width:90px; }
+
+/* ===========================
+   VIEWER
+   =========================== */
+#toolRoot{ width:min(1200px,96vw); margin:0 auto; }
+
+#comparisonWrapper{
+  position:relative; width:100%; max-width:1200px;
+  min-height:clamp(360px,56vw,900px);
+  margin:0 auto; background:#000; overflow:hidden;
+  --lb-top:0px; --lb-bottom:0px; --lb-left:0px; --lb-right:0px;
 }
 
-/* === Viewer === */
-#comparisonWrapper {
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  min-height: clamp(360px, 56vw, 900px);
-  margin: 0 auto;
-  background: #000;
-  overflow: hidden;
-
-  /* letter/pillarbox vars die JS zet */
-  --lb-top: 0px; --lb-bottom: 0px; --lb-left: 0px; --lb-right: 0px;
+/* buitenrand van de viewer */
+#comparisonWrapper::after{
+  content:""; position:absolute; inset:0;
+  border:1px solid rgba(255,255,255,.6);
+  pointer-events:none;
 }
 
-/* Border overlay – beeld loopt nu door tot de rand */
-#comparisonWrapper::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgba(255,255,255,0.6);
-  pointer-events: none;
+/* Rechter laag (before) + Linker laag (after) */
+#beforeImage{ position:absolute; inset:0; }
+#beforeImgTag{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; display:block;
+  transform:scale(calc(var(--sensor-scale)*var(--viewer-scale)));
+  transform-origin:center; will-change:transform;
 }
 
-/* Onderlaag (rechts/before) */
-#beforeImgTag {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  transform: scale(calc(var(--sensor-scale) * var(--viewer-scale)));
-  transform-origin: center;
-  will-change: transform;
+#afterWrapper{
+  position:absolute; inset:0; overflow:hidden; z-index:2;
+  clip-path:inset(0 50% 0 0); -webkit-clip-path:inset(0 50% 0 0);
+  will-change:clip-path;
 }
-
-/* Bovenlaag (links/after) */
-#afterWrapper {
-  position: absolute; inset: 0;
-  overflow: hidden;
-  z-index: 2;
-  clip-path: inset(0 50% 0 0);
-  -webkit-clip-path: inset(0 50% 0 0);
-  will-change: clip-path;
-}
-#afterImgTag {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  transform: scale(calc(var(--sensor-scale) * var(--viewer-scale)));
-  transform-origin: center;
-  will-change: transform;
+#afterImgTag{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; display:block;
+  transform:scale(calc(var(--sensor-scale)*var(--viewer-scale)));
+  transform-origin:center; will-change:transform;
 }
 
 /* Slider-lijn */
-#slider {
-  position: absolute;
-  top: 0; bottom: 0;
-  left: 50%; transform: translateX(-50%);
-  width: 2px;
-  background: #fff;
-  cursor: ew-resize;
-  z-index: 10;
-  touch-action: none;
+#slider{
+  position:absolute; top:0; bottom:0; left:50%; transform:translateX(-50%);
+  width:2px; background:#fff; cursor:ew-resize; z-index:10; touch-action:none;
 }
 
-/* ===========================
-   SIDE-BY-SIDE (SxS)
-   =========================== */
-#sbsWrapper {
-  position: absolute; inset: 0;
-  z-index: 3;
-  display: none;
-  padding: var(--lb-top,0) var(--lb-right,0) var(--lb-bottom,0) var(--lb-left,0);
-  box-sizing: border-box;
+/* ==== Outlines per helft (slider-mode) ====
+   borders op de WRAPPERS zodat clip-path niets afknipt */
+#beforeImage,
+#afterWrapper{
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.3);
 }
-.sbs-mode #sbsWrapper {
-  display: flex;
-  width: 100%; height: 100%;
-}
-#sbsWrapper .pane {
-  flex: 1 1 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-#sbsWrapper .pane img {
-  width: 100%; height: 100%;
-  object-fit: contain;
-  transform: scale(calc(var(--sensor-scale) * var(--viewer-scale)));
-  transform-origin: center;
-}
-
-/* Verberg single-view lagen + slider in SxS */
-.sbs-mode #afterWrapper,
-.sbs-mode #beforeImgTag,
-.sbs-mode #slider { display: none !important; }
-
-body.sbs-mode #comparisonWrapper { max-width: 1600px; }
+#beforeImage{ border-left:none; }   /* top, right, bottom */
+#afterWrapper{ border-right:none; } /* top, left,  bottom */
 
 /* ===========================
    FULLSCREEN
    =========================== */
 #comparisonWrapper:fullscreen,
-#comparisonWrapper:-webkit-full-screen {
-  width: 100vw; height: 100vh; margin: 0;
-  background: #000; box-sizing: border-box;
-  padding: var(--lb-top,0) var(--lb-right,0) var(--lb-bottom,0) var(--lb-left,0);
-  overflow: hidden;
+#comparisonWrapper:-webkit-full-screen{
+  width:100vw; height:100vh; margin:0; background:#000; box-sizing:border-box;
+  padding:var(--lb-top,0) var(--lb-right,0) var(--lb-bottom,0) var(--lb-left,0);
+  overflow:hidden;
 }
 #comparisonWrapper:fullscreen #beforeImgTag,
 #comparisonWrapper:-webkit-full-screen #beforeImgTag,
 #comparisonWrapper:fullscreen #afterWrapper,
-#comparisonWrapper:-webkit-full-screen #afterWrapper {
-  position: absolute; inset: 0;
-}
+#comparisonWrapper:-webkit-full-screen #afterWrapper{ position:absolute; inset:0; }
 #comparisonWrapper:fullscreen #beforeImgTag,
 #comparisonWrapper:-webkit-full-screen #beforeImgTag,
 #comparisonWrapper:fullscreen #afterImgTag,
-#comparisonWrapper:-webkit-full-screen #afterImgTag {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center;
+#comparisonWrapper:-webkit-full-screen #afterImgTag{
+  width:100%; height:100%; object-fit:cover; object-position:center;
 }
 #comparisonWrapper:fullscreen #slider,
-#comparisonWrapper:-webkit-full-screen #slider {
-  top: 0; bottom: 0;
-}
+#comparisonWrapper:-webkit-full-screen #slider{ top:0; bottom:0; }
 
-/* Zwarte balken overlay */
-#fsBars { position: absolute; inset: 0; pointer-events: none; z-index: 9; }
-#fsBars .bar { position: absolute; background: #000; }
-#fsBars .top    { top:0;    left:var(--lb-left,0); right:var(--lb-right,0); height:var(--lb-top,0); }
-#fsBars .bottom { bottom:0; left:var(--lb-left,0); right:var(--lb-right,0); height:var(--lb-bottom,0); }
-#fsBars .left   { top:var(--lb-top,0); bottom:var(--lb-bottom,0); left:0;  width:var(--lb-left,0); }
-#fsBars .right  { top:var(--lb-top,0); bottom:var(--lb-bottom,0); right:0; width:var(--lb-right,0); }
+#fsBars{ position:absolute; inset:0; pointer-events:none; z-index:9; }
+#fsBars .bar{ position:absolute; background:#000; }
+#fsBars .top{    top:0; left:var(--lb-left,0); right:var(--lb-right,0); height:var(--lb-top,0); }
+#fsBars .bottom{ bottom:0; left:var(--lb-left,0); right:var(--lb-right,0); height:var(--lb-bottom,0); }
+#fsBars .left{   top:var(--lb-top,0); bottom:var(--lb-bottom,0); left:0;  width:var(--lb-left,0); }
+#fsBars .right{  top:var(--lb-top,0); bottom:var(--lb-bottom,0); right:0; width:var(--lb-right,0); }
 
 /* ===========================
-   CONTROLS
+   SIDE-BY-SIDE (SxS)
    =========================== */
-.controls.desktop-only {
-  position: sticky; top: 0; z-index: 50;
-  width: min(1400px, calc(100% - 32px));
-  margin: 12px auto 16px;
-  padding: 10px 12px;
-  border: 1px solid #2a2a2a;
-  border-radius: 10px;
-  background: rgba(15,15,15,.9);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 6px 16px rgba(0,0,0,.35);
-  box-sizing: border-box;
-}
-.controls.desktop-only .row {
-  display: flex; align-items: center; justify-content: center;
-  gap: 8px 10px; flex-wrap: wrap;
-}
-.controls.desktop-only .row-2 { margin-top: 6px; }
-.controls.desktop-only .inline { display: flex; gap: 8px; }
+#sbsWrapper{ position:absolute; inset:0; z-index:3; display:none; padding:0; box-sizing:border-box; }
+.sbs-mode #sbsWrapper{ display:flex; width:100%; height:100%; }
 
-/* Scale slider chip */
-#scaleCtrl.chip {
-  display: inline-flex; align-items: center; gap: .5rem;
-  height: 32px; padding: 0 10px;
-  background: #161616; border: 1px solid #3a3a3a; border-radius: 8px;
-  white-space: nowrap;
+/* Per pane outline */
+.sbs-mode #sbsWrapper .pane{
+  position:relative; flex:1 1 50%; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid rgba(255,255,255,.3);
 }
-#scaleCtrl #scaleVal { min-width: 44px; text-align: right; }
-#scaleCtrl input[type="range"] {
-  -webkit-appearance: none; appearance: none;
-  width: 120px; height: 18px; margin: 0; padding: 0; background: transparent;
-}
-#scaleCtrl input[type="range"]::-webkit-slider-runnable-track,
-#scaleCtrl input[type="range"]::-moz-range-track {
-  height: 4px; background: #2a2a2a; border-radius: 999px;
-}
-#scaleCtrl input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 14px; height: 14px; border-radius: 50%;
-  background: #3a8bfd; border: 2px solid #0e1621; margin-top: -5px; cursor: pointer;
-}
-#scaleCtrl input[type="range"]::-moz-range-thumb {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: #3a8bfd; border: 2px solid #0e1621; cursor: pointer;
-}
-/* Witte baseline achter de slider, zodat bolletje altijd 'lijntje' heeft */
-#scaleCtrl input[type="range"]::-webkit-slider-runnable-track {
-  height: 4px;
-  background: #2a2a2a;
-  border-radius: 999px;
-  border-bottom: 1px solid #fff;   /* ← wit lijntje */
-}
-#scaleCtrl input[type="range"]::-moz-range-track {
-  height: 4px;
-  background: #2a2a2a;
-  border-radius: 999px;
-  border-bottom: 1px solid #fff;   /* ← wit lijntje */
+.sbs-mode #sbsWrapper .pane:first-child{ border-right:0; }
+.sbs-mode #sbsWrapper .pane:last-child { border-left:0; }
+
+/* 1px middenlijn in SxS */
+.sbs-mode #sbsWrapper::before{
+  content:""; position:absolute; top:0; bottom:0; left:50%; width:1px;
+  background:rgba(255,255,255,.35); z-index:4;
 }
 
-/* Select-breedtes */
-#cameraSelect, #sensorFormatSelect, #focalLength { min-width: 130px; }
-#leftLens, #rightLens { min-width: 200px; }
-#tStopLeftSelect, #tStopRightSelect { min-width: 90px; }
-
-/* PDF-compact (tijdelijk tijdens export) */
-body.pdf-compact .controls { padding: 6px 8px; gap: 6px; }
-body.pdf-compact .controls .btn,
-body.pdf-compact .controls button {
-  padding: 4px 10px; height: 28px; font-size: 12px; line-height: 1; border-radius: 6px;
+.sbs-mode #sbsWrapper .pane img{
+  width:100%; height:100%; object-fit:contain;
+  transform:scale(calc(var(--sensor-scale)*var(--viewer-scale)));
+  transform-origin:center;
 }
+
+/* geen dubbele buitenrand in SxS: viewer-rand uit */
+.sbs-mode #comparisonWrapper::after{ display:none; }
 
 /* ===========================
-   LABELS + RAW-KNOPEN
+   LABELS + RAW buttons
    =========================== */
-#infoContainer {
-  width: 100%;
-  max-width: 1400px;
-  margin: 10px auto 16px;
-  padding: 0 40px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 48px;
+#infoContainer{
+  width:100%; max-width:1400px; margin:10px auto 16px; padding:0 40px;
+  box-sizing:border-box; display:flex; justify-content:space-between; align-items:center; gap:48px;
 }
-.infoCol {
-  flex: 1 1 0; min-width: 0;
-  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
-}
-#leftLabel, #rightLabel { white-space: nowrap; }
-#infoContainer a { color: inherit; text-decoration: none; }
-#infoContainer a:hover { text-decoration: underline; }
+.infoCol{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; }
+#leftLabel,#rightLabel{ white-space:nowrap; }
+#infoContainer a{ color:inherit; text-decoration:none; }
+#infoContainer a:hover{ text-decoration:underline; }
 
 /* ===========================
    DETAIL VIEWER
    =========================== */
-body.dragging, body.dragging * {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -ms-user-select: none !important;
+body.dragging, body.dragging *{ user-select:none !important; -webkit-user-select:none !important; -ms-user-select:none !important; }
+#detailOverlay{ position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:9999; overflow:visible; display:none; }
+#detailOverlay.active{ display:block; }
+.detail-view-square{
+  position:absolute; width:260px; height:260px; overflow:hidden;
+  border:2px solid #fff; background:#000; pointer-events:none;
+  will-change:transform; -webkit-backface-visibility:hidden; backface-visibility:hidden;
 }
-#detailOverlay {
-  position: fixed; inset: 0;
-  width: 100vw; height: 100vh;
-  pointer-events: none;
-  z-index: 9999;
-  overflow: visible;
-  display: none;
-}
-#detailOverlay.active { display: block; }
-.detail-view-square {
-  position: absolute; width: 260px; height: 260px;
-  overflow: hidden; border: 2px solid #fff; background: #000; pointer-events: none;
-  will-change: transform; -webkit-backface-visibility: hidden; backface-visibility: hidden;
-}
-.detail-view-square img {
-  position: absolute; width: 300%; height: auto; object-fit: cover; transform-origin: top left;
-}
-#leftDetail  { margin-left: -130px; }
-#rightDetail { margin-left: 130px; }
+.detail-view-square img{ position:absolute; width:300%; height:auto; object-fit:cover; transform-origin:top left; }
+#leftDetail{ margin-left:-130px; } #rightDetail{ margin-left:130px; }
 
 /* ===========================
    RESPONSIVE
    =========================== */
-@media (max-width: 1000px) {
-  #cameraSelect, #sensorFormatSelect, #focalLength { min-width: 120px; }
-  #scaleCtrl input[type="range"] { width: 100px; }
+@media (max-width:1000px){
+  #cameraSelect,#sensorFormatSelect,#focalLength{ min-width:120px; }
+  #scaleCtrl input[type="range"]{ width:100px; }
 }
-@media (max-width: 767px) {
-  #fullscreenButton, #detailViewToggle { display: none !important; }
-  .mobile-mode #comparisonWrapper { width: 100vw; }
-  #infoContainer { max-width: 100%; padding: 0 16px; gap: 16px; font-size: 13px; }
-  #lensInfo { font-size: 12px; line-height: 1.4; padding: 10px 12px; }
+@media (max-width:767px){
+  #fullscreenButton,#detailViewToggle{ display:none !important; }
+  .mobile-mode #comparisonWrapper{ width:100vw; }
+  #infoContainer{ max-width:100%; padding:0 16px; gap:16px; font-size:13px; }
+  #lensInfo{ font-size:12px; line-height:1.4; padding:10px 12px; }
+  .controls.mobile-only{ display:block !important; }
 }
+.controls.mobile-only{ display:none !important; }
+
+/* duplicaat-vangnet */
+.controls.desktop-only:not(:first-of-type),
+.controls.mobile-only:not(:first-of-type){ display:none !important; }
 
 /* ===========================
    PRINT
    =========================== */
-@media print {
-  body { background: #fff !important; color: #000 !important; }
-  .controls, #explanationBox { display: none !important; }
-  #comparisonWrapper { width: 100% !important; height: auto !important; aspect-ratio: auto !important; }
-  #infoContainer { color: #000 !important; }
-  #comparisonWrapper img { object-fit: contain !important; }
+@media print{
+  body{ background:#fff !important; color:#000 !important; }
+  .controls,#explanationBox{ display:none !important; }
+  #comparisonWrapper{ width:100% !important; height:auto !important; aspect-ratio:auto !important; }
+  #infoContainer{ color:#000 !important; }
+  #comparisonWrapper img{ object-fit:contain !important; }
 }
 
 /* ===========================
    OPTIONAL / MISC
    =========================== */
-#explanationBox {
-  margin-top: 12px; max-width: 960px; font-size: 13px; color: #aaa;
-  padding: 12px 16px; background: #1a1a1a; border-left: 4px solid orange; border-radius: 6px; line-height: 1.5;
+#explanationBox{
+  margin-top:12px; max-width:960px; font-size:13px; color:#aaa;
+  padding:12px 16px; background:#1a1a1a; border-left:4px solid orange; border-radius:6px; line-height:1.5;
 }
-
-/* Mobiel controls */
-.controls.mobile-only { display: none !important; }
-@media (max-width: 767px){
-  .controls.mobile-only { display: block !important; }
-}
-
-/* Extra vangnet tegen duplicaten */
-.controls.desktop-only:not(:first-of-type),
-.controls.mobile-only:not(:first-of-type) {
-  display: none !important;
-}
-
-/* Verberg alles met .mobile-only op desktop */
-.mobile-only { display: none !important; }
-@media (max-width: 767px){ .mobile-only { display: block !important; } }
-/* Controls los van viewer + zelfde breedte */
-.controls.desktop-only {
-  width: min(1200px, 96vw);   /* matcht #comparisonWrapper */
-  margin: 12px auto 16px;     /* ondermarge om ‘los’ te staan */
-  top: 0;                     /* sticky mag, blijft los staan */
-}
-
-/* Viewer direct eronder, geen extra top-gap nodig */
-#comparisonWrapper {
-  margin: 0 auto;
-  max-width: 1200px;
-}
-
-/* Border van viewer blijft binnen de viewer (doet al zo),
-   maar beïnvloedt niets erbuiten */
-#comparisonWrapper::after {
-  pointer-events: none;
-}
-/* === Outlines voor beide beelden === */
-#beforeImgTag,
-#afterImgTag {
-  border: 1px solid rgba(255,255,255,0.3);
-  box-sizing: border-box;
-}
-
-/* In slider mode → geen dubbele lijn in het midden */
-#beforeImgTag { border-right: none; }
-#afterImgTag  { border-left: none; }
-
-/* In Side-by-Side mode → wel lijntje in het midden */
-.sbs-mode #sbsWrapper .pane img {
-  border: 1px solid rgba(255,255,255,0.3);
-  box-sizing: border-box;
-}
-
-/* Middenlijn apart voor SxS */
-.sbs-mode #sbsWrapper .pane:first-child {
-  border-right: 1px solid rgba(255,255,255,0.3);
-}
-.sbs-mode #sbsWrapper .pane:last-child {
-  border-left: 1px solid rgba(255,255,255,0.3);
-}
-.controls.desktop-only {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  width: min(1400px, calc(100% - 32px));  /* nu breder: max 1400px */
-  margin: 12px auto 16px;
-  padding: 10px 12px;
-  border: 1px solid #2a2a2a;
-  border-radius: 10px;
-  background: rgba(15,15,15,.9);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 6px 16px rgba(0,0,0,.35);
-  box-sizing: border-box;
-}
-/* Dunne outlines als achtergrond-stroken (werkt ook met clip-path & fullscreen) */
-#beforeImgTag,
-#afterImgTag {
-  background-repeat: no-repeat;
-  /* zorg dat de stroken netjes op de rand zitten */
-  background-origin: border-box;
-}
-
-/* LEFT/AFTER-beeld: top, bottom, en LINKS — geen lijn in het midden */
-#afterImgTag {
-  background-image:
-    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)), /* top */
-    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)), /* bottom */
-    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)); /* left */
-  background-size:
-    100% 1px,   /* top */
-    100% 1px,   /* bottom */
-    1px 100%;   /* left */
-  background-position:
-    top left,
-    bottom left,
-    left top;
-}
-
-/* RIGHT/BEFORE-beeld: top, bottom, en RECHTS — geen lijn in het midden */
-#beforeImgTag {
-  background-image:
-    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)), /* top */
-    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)), /* bottom */
-    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)); /* right */
-  background-size:
-    100% 1px,
-    100% 1px,
-    1px 100%;
-  background-position:
-    top left,
-    bottom left,
-    right top;
-}
-.sbs-mode #sbsWrapper .pane { position: relative; }
-.sbs-mode #sbsWrapper .pane:first-child { border-right: 1px solid rgba(255,255,255,.3); }
-.sbs-mode #sbsWrapper .pane:last-child  { border-left:  1px solid rgba(255,255,255,.3); }
