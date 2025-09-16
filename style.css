@@ -367,8 +367,27 @@ body.dragging, body.dragging * {
 #comparisonWrapper::after {
   pointer-events: none;
 }
+/* === Outlines voor beide beelden === */
 #beforeImgTag,
 #afterImgTag {
-  border: 1px solid rgba(255,255,255,0.3); /* lichte outline om beide beelden */
+  border: 1px solid rgba(255,255,255,0.3);
   box-sizing: border-box;
+}
+
+/* In slider mode → geen dubbele lijn in het midden */
+#beforeImgTag { border-right: none; }
+#afterImgTag  { border-left: none; }
+
+/* In Side-by-Side mode → wel lijntje in het midden */
+.sbs-mode #sbsWrapper .pane img {
+  border: 1px solid rgba(255,255,255,0.3);
+  box-sizing: border-box;
+}
+
+/* Middenlijn apart voor SxS */
+.sbs-mode #sbsWrapper .pane:first-child {
+  border-right: 1px solid rgba(255,255,255,0.3);
+}
+.sbs-mode #sbsWrapper .pane:last-child {
+  border-left: 1px solid rgba(255,255,255,0.3);
 }
