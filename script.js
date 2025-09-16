@@ -1425,17 +1425,25 @@ const maxW  = pageW - PAGE_MARGIN * 2;
 const controlsEl = document.querySelector('#toolRoot .controls') || document.querySelector('.controls');
 const infoEl     = document.getElementById('infoContainer');
 
-const controlsShot = await screenshotEl(controlsEl);   // boven
-const infoShot     = await screenshotEl(infoEl);       // onder
+// Activeer compact-styling tijdens screenshot
+document.body.classList.add('pdf-compact');
+
+const controlsShot = await screenshotEl(controlsEl);
+const infoShot     = await screenshotEl(infoEl);
+
+// Zet styling terug
+document.body.classList.remove('pdf-compact');
 
 let curY = TOP_BAR + PAGE_MARGIN;
 
 // 1) Controls-balk plaatsen (volledige breedte van content)
 let controlsH = 0;
 if (controlsShot) {
-  const placed = await placeToWidth(pdf, controlsShot, x, curY, maxW);
+  const w = Math.round(maxW * 0.7);                 // 🔽 kleiner
+  const cx = x + Math.round((maxW - w) / 2);        // centreer
+  const placed = await placeToWidth(pdf, controlsShot, cx, curY, w);
   controlsH = placed.h;
-  curY += controlsH + 12; // kleine gap
+  curY += controlsH + 8;                             // kleinere gap
 }
 
 // 2) Split-beeld (zelfde asset als p1), “contain” in de resterende hoogte
