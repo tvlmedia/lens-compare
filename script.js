@@ -515,7 +515,7 @@ tStopRightSelect.value = "2.8";
 
 function setUserScaleFromPct(pct) {
   // clamp 100–120%
-  userScale = Math.min(1.1, Math.max(1.0, pct / 100));
+  userScale = Math.min(1.3, Math.max(1.0, pct / 100));
   // voor de viewer (CSS)
   document.documentElement.style.setProperty("--viewer-scale", String(userScale));
   // UI tekstje
