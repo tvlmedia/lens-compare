@@ -959,3 +959,16 @@ body { background:#000; }
   width: min(1200px, 96vw);
   margin: 0 auto;
 }
+/* compact controls */
+body.pdf-compact .controls {
+  padding: 6px 8px;
+  gap: 6px;
+}
+body.pdf-compact .controls .btn,
+body.pdf-compact .controls button {
+  padding: 4px 10px;
+  height: 28px;
+  font-size: 12px;
+  line-height: 1;
+  border-radius: 6px;
+}
