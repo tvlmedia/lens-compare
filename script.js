@@ -270,12 +270,7 @@ function applyCurrentFormat() {
   updateFullscreenBars();
   resetSplitToMiddle();
 }
-if (sbsActive) {
-  // zorg dat SxS-panelen meteen de nieuwe scale en AR gebruiken
-  sbsLeftImg.style.transform = '';
-  sbsRightImg.style.transform = '';
-  updateFullscreenBars();
-}
+
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
   cameraSelect.add(new Option(cam, cam));
@@ -817,6 +812,9 @@ function setSideBySide(on, { force = false } = {}) {
   if (sbsActive) {
     sbsLeftImg.src  = afterImgTag.src;   // links = after
     sbsRightImg.src = beforeImgTag.src;  // rechts = before
+    // reset eventuele transformaties in SxS
+    sbsLeftImg.style.transform  = '';
+    sbsRightImg.style.transform = '';
     comparisonWrapper.scrollLeft = 0;
     slider.style.display = "none";
     // SxS: geen letter/pillarbox of slider
