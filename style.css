@@ -38,9 +38,10 @@ select:hover,
 /* ========== Wrapper en sliderstructuur ========== */
 #comparisonWrapper {
   width: 100%;
-  max-width: 1400px;   /* breder */
+  max-width: 1400px;         /* maak 1500–1600px als je 'm groter wilt */
+  min-height: clamp(360px, 56vw, 860px); /* fallback hoogte */
   position: relative;
-  background: black;
+  background: #000;
   overflow: hidden;
 }
 
