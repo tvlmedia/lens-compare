@@ -479,12 +479,7 @@ sbsWrapper.style.display = 'none';   // ⬅️ hier toevoegen
 
 const sbsLeftImg  = sbsWrapper.querySelector("#sbsLeftImg");
 const sbsRightImg = sbsWrapper.querySelector("#sbsRightImg");
-// Enforce 'contain' in SxS
-[sbsLeftImg, sbsRightImg].forEach(im => {
-  im.style.setProperty('width', '100%', 'important');
-  im.style.setProperty('height', '100%', 'important');
-  im.style.setProperty('object-fit', 'contain', 'important');
-});
+
 let sbsActive = false;
 let isExportingPdf = false; // blokkeer UI-toggles terwijl er geëxporteerd wordt
 const leftLabel = document.getElementById("leftLabel");
