@@ -349,3 +349,21 @@ body.dragging, body.dragging * {
 /* Verberg alles met .mobile-only op desktop */
 .mobile-only { display: none !important; }
 @media (max-width: 767px){ .mobile-only { display: block !important; } }
+/* Controls los van viewer + zelfde breedte */
+.controls.desktop-only {
+  width: min(1200px, 96vw);   /* matcht #comparisonWrapper */
+  margin: 12px auto 16px;     /* ondermarge om ‘los’ te staan */
+  top: 0;                     /* sticky mag, blijft los staan */
+}
+
+/* Viewer direct eronder, geen extra top-gap nodig */
+#comparisonWrapper {
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+/* Border van viewer blijft binnen de viewer (doet al zo),
+   maar beïnvloedt niets erbuiten */
+#comparisonWrapper::after {
+  pointer-events: none;
+}
