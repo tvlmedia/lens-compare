@@ -938,3 +938,19 @@ body.sbs-mode #comparisonWrapper {
 
 /* Maak viewer breder in SxS (optioneel) */
 body.sbs-mode #comparisonWrapper{ max-width:1600px; }
+/* SxS layout */
+#sbsWrapper { display: none; width:100%; height:100%; gap:0; }
+#sbsWrapper .pane { flex:1 1 50%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+#sbsWrapper img { width:100% !important; height:100% !important; object-fit:contain !important; }
+
+/* Wanneer SxS actief is, niet met slider interfereren */
+.sbs-mode #slider { display:none !important; }
+.sbs-mode #afterWrapper,
+.sbs-mode #beforeImgTag { display:none !important; }
+
+/* Letter/pillarbox via custom properties (worden door JS gezet) */
+#comparisonWrapper {
+  --lb-top:0px; --lb-bottom:0px; --lb-left:0px; --lb-right:0px;
+  position:relative;
+}
+#slider { position:absolute; top:0; bottom:0; width:2px; background:#fff; }
