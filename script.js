@@ -617,24 +617,25 @@ function updateImages() {
     notes[`${lens}_${nominalFocal}`] || nominalFocal;
 
   const resolveImagePath = (lens, nominalFocal, tStr, flare) => {
-    const aliasFocal = aliasFor(lens, nominalFocal);
-   const bases = [
-  `${lens}_${nominalFocal}_t${tStr}`,      // ← eerst nominale key (die in lensImageMap staat)
-  ...(aliasFocal !== nominalFocal ? [`${lens}_${aliasFocal}_t${tStr}`] : [])
-];
-    const candidates = [];
-    bases.forEach(base => {
-      candidates.push(lensImageMap[`${base}_${flare}`]);
-      candidates.push(lensImageMap[base]);
-      candidates.push(`${base}_${flare}.jpg`);
-      candidates.push(`${base}.jpg`);
-    });
-    for (const cand of candidates) {
-      if (!cand) continue;
-      return `${IMG_BASE}${cand}`;
-    }
-    return `${IMG_BASE}${bases[0]}_${flare}.jpg`;
-  };
+  const aliasFocal = aliasFor(lens, nominalFocal);
+  // 1) Probeer eerst de alias (bijv. 32mm / 37mm), daarna pas de nominale 35mm
+  const bases = (aliasFocal !== nominalFocal)
+    ? [ `${lens}_${aliasFocal}_t${tStr}`, `${lens}_${nominalFocal}_t${tStr}` ]
+    : [ `${lens}_${nominalFocal}_t${tStr}` ];
+
+  const candidates = [];
+  bases.forEach(base => {
+    // Alleen toevoegen als de mapping echt bestaat
+    if (lensImageMap[`${base}_${flare}`]) candidates.push(lensImageMap[`${base}_${flare}`]);
+    if (lensImageMap[base])               candidates.push(lensImageMap[base]);
+    // Standaard bestandsnamen (vallen terug op jouw repo-naamgeving)
+    candidates.push(`${base}_${flare}.jpg`);
+    candidates.push(`${base}.jpg`);
+  });
+
+  // Neem de eerste kandidaat (alias komt nu eerst)
+  return `${IMG_BASE}${candidates[0]}`;
+};
 
   // ⬇️ Let op: links gebruikt tStopLeft, rechts tStopRight
   const imgLeft  = resolveImagePath(leftLens,  focalNom, tStopLeft,  flareMode);
