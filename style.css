@@ -305,3 +305,8 @@ body.sbs-mode #sbsWrapper .pane img {
   object-fit: cover;
   object-position: center;
 }
+/* === SxS viewer mag breder zijn === */
+body.sbs-mode #comparisonWrapper {
+  max-width: 1600px !important;
+  width: min(1600px, 96vw) !important;
+}
