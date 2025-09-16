@@ -1027,40 +1027,26 @@ function drawCtaButton({ pdf, x, y, w, h, label, url }) {
   pdfLinkRect(pdf, x, y, w, h, url);
 }
 
+// Screenshot van één container die alles bevat, zonder croppen of resamplen
 async function screenshotTool() {
-  const DPR   = window.devicePixelRatio || 1;
-  const SCALE = DPR; // hou canvas en crop 1:1 met device pixels
+  // Kies een wrapper die AL je UI bevat (controls + viewer + info).
+  // Pas het id hieronder aan naar jouw echte outer container.
+  const el =
+    document.getElementById("toolRoot") ||        // ← maak dit div-je desnoods
+    document.getElementById("comparisonWrapper")  // fallback: alleen viewer
+      ?.parentElement;                             // (vaak de container rond controls+viewer)
 
-  const big = await html2canvas(document.body, {
-    scale: SCALE,
+  if (!el) return null;
+
+  const canvas = await html2canvas(el, {
     useCORS: true,
-    backgroundColor: "#000"
+    backgroundColor: "#000",
+    scale: window.devicePixelRatio || 1, // geen extra schalen die AR veranderen
+    windowWidth: document.documentElement.clientWidth,
+    windowHeight: document.documentElement.clientHeight
   });
 
-  const parts = [".controls", "#comparisonWrapper", "#infoContainer"]
-    .map(s => document.querySelector(s))
-    .filter(Boolean);
-
-  if (!parts.length) {
-    const r = document.getElementById("comparisonWrapper").getBoundingClientRect();
-    return cropFromCanvas(big, r.left + window.scrollX, r.top + window.scrollY, r.width, r.height, SCALE);
-  }
-
-  const rects  = parts.map(el => el.getBoundingClientRect());
-  const left   = Math.min(...rects.map(r => r.left));
-  const right  = Math.max(...rects.map(r => r.right));
-  const top    = Math.min(...rects.map(r => r.top));
-  const bottom = Math.max(...rects.map(r => r.bottom));
-
-  const PAD = 12;
-  return cropFromCanvas(
-    big,
-    Math.max(0, left   - PAD) + window.scrollX,
-    Math.max(0, top    - PAD) + window.scrollY,
-    (right - left) + PAD * 2,
-    (bottom - top) + PAD * 2,
-    SCALE
-  );
+  return canvas.toDataURL("image/jpeg", 1.0);
 }
 
 // helper: crop uit html2canvas resultaat (rekening houdend met scale:2)
