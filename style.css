@@ -184,11 +184,6 @@ select:hover,.control-button:hover,
   background:rgba(255,255,255,.35); z-index:4;
 }
 
-.sbs-mode #sbsWrapper .pane img{
-  width:100%; height:100%; object-fit:contain;
-  transform:scale(calc(var(--sensor-scale)*var(--viewer-scale)));
-  transform-origin:center;
-}
 
 /* geen dubbele buitenrand in SxS: viewer-rand uit */
 .sbs-mode #comparisonWrapper::after{ display:none; }
