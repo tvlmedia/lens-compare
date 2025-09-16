@@ -844,3 +844,19 @@ body.dragging * {
 .comparison-wrapper.sbs-mode {
   width: 1600px;   /* bredere variant bij Side-by-Side */
 }
+/* Default breedtes */
+#comparisonWrapper { max-width: 1200px; }          /* of 1200px als je dat wilt */
+#infoContainer     { max-width: 1400px; }
+.controls.desktop-only { width: min(1400px, calc(100% - 32px)); }
+
+/* SxS breder maken wanneer de class op wrapper of body staat */
+#comparisonWrapper.sbs-mode,
+body.sbs-mode #comparisonWrapper { 
+  max-width: 1600px;
+}
+body.sbs-mode #infoContainer {
+  max-width: 1600px;
+}
+body.sbs-mode .controls.desktop-only {
+  width: min(1600px, calc(100% - 32px));
+}
