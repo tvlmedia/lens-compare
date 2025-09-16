@@ -313,14 +313,14 @@ body.sbs-mode #sbsWrapper .pane img {
 
 /* voor de zekerheid: mobiele embed blijft desktop uit */
 .lens-frame-outer.mobile-only { display: none !important; }
-/* ========== HARD FIX: Side-by-Side moet fullscreen in de viewer vullen ========== */
+/* ===================== SXS: FORCE FULL COVER, NO LETTERBOX ===================== */
 
-/* SxS aan → laat alleen de SxS laag zien, geen slider/clip-lagen */
+/* Show only the SxS layer; hide single-view layers + slider */
 body.sbs-mode #afterWrapper,
 body.sbs-mode #beforeImage,
 body.sbs-mode #slider { display: none !important; }
 
-/* SxS container: geen letter/pillarbox, 100% van de viewer */
+/* SxS container fills the viewer completely */
 body.sbs-mode #sbsWrapper {
   display: flex !important;
   position: absolute; inset: 0;
@@ -328,7 +328,7 @@ body.sbs-mode #sbsWrapper {
   z-index: 3;
 }
 
-/* Pane vult 50%, snijdt netjes af, heeft outline */
+/* Each pane = half of the viewer, hard crop, with a thin outline */
 body.sbs-mode #sbsWrapper .pane {
   position: relative;
   flex: 1 1 50%;
@@ -338,29 +338,44 @@ body.sbs-mode #sbsWrapper .pane {
 body.sbs-mode #sbsWrapper .pane:first-child { border-right: 0; }
 body.sbs-mode #sbsWrapper .pane:last-child  { border-left:  0; }
 
-/* Afbeelding in pane: absolute cover, geen transforms */
-body.sbs-mode #sbsWrapper .pane > img,
+/* Center the image and FORCE it to cover regardless of previous rules */
 body.sbs-mode #sbsWrapper .pane img {
-  position: absolute; inset: 0;
-  width: 100% !important;
-  height: 100% !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+
+  /* cover trick */
+  min-width: 100% !important;
+  min-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
   object-fit: cover !important;
   object-position: center center !important;
-  transform: none !important;
 }
 
-/* Dun middenlijntje in SxS */
+/* 1px center divider in SxS */
 body.sbs-mode #sbsWrapper::before {
   content: "";
   position: absolute; top: 0; bottom: 0; left: 50%;
   width: 1px; background: rgba(255,255,255,.35); z-index: 4;
 }
 
-/* voorkom dat een andere style dit stuk alsnog letterboxt */
-body.sbs-mode #comparisonWrapper { padding: 0 !important; }
+/* Avoid double outer border when in SxS */
+body.sbs-mode #comparisonWrapper::after { display: none !important; }
 
-/* ========== Kill die ‘mini tool’/mobile embed op desktop compleet ========== */
-.lens-frame-outer,
-.lens-frame-outer.mobile-only,
+/* ===================== KILL DUPLICATE/MINI CONTROLS ===================== */
+
+/* Hide all controls by default… */
+.controls { display: none !important; }
+/* …then show ONLY the very first desktop bar */
+.controls.desktop-only:first-of-type { display: block !important; }
+
+/* Extra safety: if anything injects another controls block later, nuke it */
 #infoContainer ~ .controls,
-#explanationBox .controls { display: none !important; }
+#explanationBox ~ .controls,
+.lens-frame-outer .controls { display: none !important; }
+
+/* If you use the mobile iframe embed, keep it hidden on desktop */
+.lens-frame-outer,
+.lens-frame-outer.mobile-only { display: none !important; }
