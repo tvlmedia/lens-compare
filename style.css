@@ -406,3 +406,45 @@ body.dragging, body.dragging * {
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
   box-sizing: border-box;
 }
+/* Dunne outlines als achtergrond-stroken (werkt ook met clip-path & fullscreen) */
+#beforeImgTag,
+#afterImgTag {
+  background-repeat: no-repeat;
+  /* zorg dat de stroken netjes op de rand zitten */
+  background-origin: border-box;
+}
+
+/* LEFT/AFTER-beeld: top, bottom, en LINKS — geen lijn in het midden */
+#afterImgTag {
+  background-image:
+    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)), /* top */
+    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)), /* bottom */
+    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)); /* left */
+  background-size:
+    100% 1px,   /* top */
+    100% 1px,   /* bottom */
+    1px 100%;   /* left */
+  background-position:
+    top left,
+    bottom left,
+    left top;
+}
+
+/* RIGHT/BEFORE-beeld: top, bottom, en RECHTS — geen lijn in het midden */
+#beforeImgTag {
+  background-image:
+    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)), /* top */
+    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)), /* bottom */
+    linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,.35)); /* right */
+  background-size:
+    100% 1px,
+    100% 1px,
+    1px 100%;
+  background-position:
+    top left,
+    bottom left,
+    right top;
+}
+.sbs-mode #sbsWrapper .pane { position: relative; }
+.sbs-mode #sbsWrapper .pane:first-child { border-right: 1px solid rgba(255,255,255,.3); }
+.sbs-mode #sbsWrapper .pane:last-child  { border-left:  1px solid rgba(255,255,255,.3); }
