@@ -256,7 +256,7 @@ function applyCurrentFormat() {
 
   // Altijd exact naar gekozen formaat schalen
   setWrapperSizeByAR(w, h);
-  requestAnimationFrame(() => setWrapperSizeByAR(w, h));
+  requestAnimationFrame(() => (w, h));
 
   document.body.classList.add("sensor-mode");
 
