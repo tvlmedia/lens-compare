@@ -860,3 +860,12 @@ body.sbs-mode #infoContainer {
 body.sbs-mode .controls.desktop-only {
   width: min(1600px, calc(100% - 32px));
 }
+/* Viewer */
+#comparisonWrapper.sbs-mode,
+body.sbs-mode #comparisonWrapper {
+  max-width: 1600px;
+}
+
+/* Info + controls blijven 1400px, óók in SxS */
+#infoContainer { max-width: 1400px !important; }
+.controls.desktop-only { width: min(1400px, calc(100% - 32px)) !important; }
