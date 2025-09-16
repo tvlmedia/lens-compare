@@ -342,3 +342,10 @@ body.dragging, body.dragging * {
 .controls.mobile-only:not(:first-of-type) {
   display: none !important;
 }
+/* Verberg ALLES met .mobile-only op desktop */
+.mobile-only { display: none !important; }
+
+@media (max-width: 767px){
+  .mobile-only { display: block !important; }
+}
+
