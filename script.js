@@ -1541,11 +1541,19 @@ document.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
   const r = comparisonWrapper.getBoundingClientRect();
+  const lbLeft   = comparisonWrapper._lbLeft   || 0;
+  const lbRight  = comparisonWrapper._lbRight  || 0;
+  const lbTop    = comparisonWrapper._lbTop    || 0;
+  const lbBottom = comparisonWrapper._lbBottom || 0;
 
-  // Alleen tonen wanneer je muis boven het beeld hangt
+  const usableW = Math.max(1, Math.round(r.width  - lbLeft - lbRight));
+  const usableH = Math.max(1, Math.round(r.height - lbTop  - lbBottom));
+  const xIn = e.clientX - r.left - lbLeft;
+  const yIn = e.clientY - r.top  - lbTop;
+
   const inside =
-    e.clientX >= r.left && e.clientX <= r.right &&
-    e.clientY >= r.top  && e.clientY <= r.bottom;
+    xIn >= 0 && xIn <= usableW &&
+    yIn >= 0 && yIn <= usableH;
 
   if (!inside) {
     leftDetail.style.display = "none";
@@ -1553,34 +1561,32 @@ document.addEventListener("mousemove", (e) => {
     return;
   }
 
-  // Kies de juiste bron <img> elementen
+  // Genormaliseerde cursorpositie 0..1 binnen het bruikbare vlak
+  const relX = Math.min(1, Math.max(0, xIn / usableW));
+  const relY = Math.min(1, Math.max(0, yIn / usableH));
+
+  // Kies juiste bron <img>’s (SxS of slider)
   const srcLeftEl  = sbsActive ? sbsLeftImg  : afterImgTag;   // links
   const srcRightEl = sbsActive ? sbsRightImg : beforeImgTag;  // rechts
 
-  // Vierkantjes op muispositie (overlay is fullscreen)
-  const xOut = e.clientX;
+  const xOut = e.clientX;  // overlay volgt de muis (fullscreen)
   const yOut = e.clientY;
 
   const zoom = 3.2;
   const size = 260;
 
   const updateZoomViewer = (detailBox, detailImg, sourceEl) => {
-    // zorg dat we de zichtbare <img> sample'n
     const imageRect = sourceEl.getBoundingClientRect();
     if (imageRect.width <= 0 || imageRect.height <= 0) {
       detailBox.style.display = "none";
       return;
     }
-
     if (detailImg.src !== sourceEl.src) detailImg.src = sourceEl.src;
-
-    const relX = (e.clientX - imageRect.left) / imageRect.width;
-    const relY = (e.clientY - imageRect.top)  / imageRect.height;
 
     const zoomedW = imageRect.width  * zoom;
     const zoomedH = imageRect.height * zoom;
-    const offsetX = -relX * zoomedW  + size / 2;
-    const offsetY = -relY * zoomedH  + size / 2;
+    const offsetX = -relX * zoomedW + size / 2;
+    const offsetY = -relY * zoomedH + size / 2;
 
     detailBox.style.left = `${xOut - size / 2}px`;
     detailBox.style.top  = `${yOut - size / 2}px`;
