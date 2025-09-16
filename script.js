@@ -1537,68 +1537,87 @@ detailToggleButton.addEventListener("click", () => {
 document.getElementById("sbsToggle")?.addEventListener("click", () => {
   setSideBySide(!sbsActive);
 });
+// --- vervangt je huidige updateZoomViewer helper ---
+function updateZoomViewerAt(e, detailBox, detailImg, srcImgOrRect, opts = {}) {
+  const ZOOM = opts.zoom || 3.2;
+  const SIZE = opts.size || 260;
+
+  // bron-rect: mag een DOM img zijn of direct een rect
+  const rect = srcImgOrRect.getBoundingClientRect
+    ? srcImgOrRect.getBoundingClientRect()
+    : srcImgOrRect;
+
+  // muis t.o.v. de bron-rect
+  const relX = (e.clientX - rect.left) / rect.width;
+  const relY = (e.clientY - rect.top)  / rect.height;
+
+  // buiten de bron? verberg en stop
+  if (relX < 0 || relX > 1 || relY < 0 || relY > 1) {
+    detailBox.style.display = "none";
+    return false;
+  }
+
+  // koppel juiste beeldbron
+  if (detailImg.src !== (srcImgOrRect.src || detailImg.src)) {
+    // als srcImgOrRect een <img> is, pak zijn src
+    if (srcImgOrRect.src) detailImg.src = srcImgOrRect.src;
+  }
+
+  // zoomed afbeeldingsafmetingen gebaseerd op de getoonde rect
+  const zoomW = rect.width  * ZOOM;
+  const zoomH = rect.height * ZOOM;
+
+  // offset zodat het aangeklikte punt in het midden van het vierkant zit
+  const offX = -(relX * zoomW) + (SIZE / 2);
+  const offY = -(relY * zoomH) + (SIZE / 2);
+
+  // positioneer het vierkant op de muis
+  detailBox.style.left   = `${e.clientX - SIZE / 2}px`;
+  detailBox.style.top    = `${e.clientY - SIZE / 2}px`;
+  detailBox.style.width  = `${SIZE}px`;
+  detailBox.style.height = `${SIZE}px`;
+  detailBox.style.display = "block";
+
+  // zet de grote afbeelding binnen het vierkant
+  detailImg.style.width  = `${zoomW}px`;
+  detailImg.style.height = `${zoomH}px`;
+  detailImg.style.transform = `translate(${offX}px, ${offY}px)`;
+
+  return true;
+}
+
+// --- vervangt je huidige mousemove handler ---
 document.addEventListener("mousemove", (e) => {
   if (!detailActive) return;
 
-  const r = comparisonWrapper.getBoundingClientRect();
-  const lbLeft   = comparisonWrapper._lbLeft   || 0;
-  const lbRight  = comparisonWrapper._lbRight  || 0;
-  const lbTop    = comparisonWrapper._lbTop    || 0;
-  const lbBottom = comparisonWrapper._lbBottom || 0;
+  // Als SxS actief is, sample per pane; anders je bestaande before/after.
+  if (sbsActive) {
+    // pak de twee SxS <img>’s
+    const leftRect  = sbsLeftImg.getBoundingClientRect();
+    const rightRect = sbsRightImg.getBoundingClientRect();
 
-  const usableW = Math.max(1, Math.round(r.width  - lbLeft - lbRight));
-  const usableH = Math.max(1, Math.round(r.height - lbTop  - lbBottom));
-  const xIn = e.clientX - r.left - lbLeft;
-  const yIn = e.clientY - r.top  - lbTop;
+    // We tonen ALTIJD beide vierkantjes, gevoed door hun eigen pane.
+    // (Als je ze alleen wilt tonen wanneer de muis in die helft hangt,
+    //  wrap dan onderstaand in een if(hit) met de returnwaarde.)
+    const hitL = updateZoomViewerAt(e, leftDetail,  leftDetailImg,  leftRect);
+    const hitR = updateZoomViewerAt(e, rightDetail, rightDetailImg, rightRect);
 
-  const inside =
-    xIn >= 0 && xIn <= usableW &&
-    yIn >= 0 && yIn <= usableH;
-
-  if (!inside) {
-    leftDetail.style.display = "none";
-    rightDetail.style.display = "none";
+    // Verberg boxen als muis buiten beide panelen is
+    if (!hitL && !hitR) {
+      leftDetail.style.display  = "none";
+      rightDetail.style.display = "none";
+    }
     return;
   }
 
-  // Genormaliseerde cursorpositie 0..1 binnen het bruikbare vlak
-  const relX = Math.min(1, Math.max(0, xIn / usableW));
-  const relY = Math.min(1, Math.max(0, yIn / usableH));
+  // Single-view (slider): gebruik je bestaande after/before beelden.
+  const showL = updateZoomViewerAt(e, leftDetail,  leftDetailImg,  afterImgTag);
+  const showR = updateZoomViewerAt(e, rightDetail, rightDetailImg, beforeImgTag);
 
-  // Kies juiste bron <img>’s (SxS of slider)
-  const srcLeftEl  = sbsActive ? sbsLeftImg  : afterImgTag;   // links
-  const srcRightEl = sbsActive ? sbsRightImg : beforeImgTag;  // rechts
-
-  const xOut = e.clientX;  // overlay volgt de muis (fullscreen)
-  const yOut = e.clientY;
-
-  const zoom = 3.2;
-  const size = 260;
-
-  const updateZoomViewer = (detailBox, detailImg, sourceEl) => {
-    const imageRect = sourceEl.getBoundingClientRect();
-    if (imageRect.width <= 0 || imageRect.height <= 0) {
-      detailBox.style.display = "none";
-      return;
-    }
-    if (detailImg.src !== sourceEl.src) detailImg.src = sourceEl.src;
-
-    const zoomedW = imageRect.width  * zoom;
-    const zoomedH = imageRect.height * zoom;
-    const offsetX = -relX * zoomedW + size / 2;
-    const offsetY = -relY * zoomedH + size / 2;
-
-    detailBox.style.left = `${xOut - size / 2}px`;
-    detailBox.style.top  = `${yOut - size / 2}px`;
-    detailBox.style.display = "block";
-
-    detailImg.style.width  = `${zoomedW}px`;
-    detailImg.style.height = `${zoomedH}px`;
-    detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-  };
-
-  updateZoomViewer(leftDetail,  leftDetailImg,  srcLeftEl);
-  updateZoomViewer(rightDetail, rightDetailImg, srcRightEl);
+  if (!showL && !showR) {
+    leftDetail.style.display  = "none";
+    rightDetail.style.display = "none";
+  }
 });
 
 
