@@ -301,3 +301,9 @@ body.sbs-mode #comparisonWrapper::after{ display:none !important; }
 /* mobiele embed uit op desktop */
 .lens-frame-outer, .lens-frame-outer.mobile-only { display:none !important; }
 @media (max-width:767px){ .lens-frame-outer { display:block !important; } }
+body.sbs-mode #sbsWrapper .pane img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
