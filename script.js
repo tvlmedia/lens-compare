@@ -1195,6 +1195,10 @@ updateFullscreenBars();
       baseline: "middle"
     });
   }
+  function getTargetAR() {
+  const { w, h } = getCurrentWH();
+  return sbsActive ? (2 * w) / h : w / h; // 6:2 in SxS, anders normaal
+}
   function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -1563,11 +1567,7 @@ function updateFullscreenBars() {
     const bar = Math.floor((hostH - usedH) / 2);
     lbTop = lbBottom = bar;
   }
-// Doel-AR van de layout: normaal w/h, in SxS dubbel zo breed (6:2)
-function getTargetAR() {
-  const { w, h } = getCurrentWH();
-  return sbsActive ? (2 * w) / h : w / h;
-}
+
   comparisonWrapper.style.setProperty('--lb-top',    lbTop + 'px');
   comparisonWrapper.style.setProperty('--lb-bottom', lbBottom + 'px');
   comparisonWrapper.style.setProperty('--lb-left',   lbLeft + 'px');
