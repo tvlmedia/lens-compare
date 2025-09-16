@@ -283,3 +283,33 @@ body.dragging, body.dragging *{ user-select:none !important; -webkit-user-select
 /* Middenlijntje en outlines blijven zoals eerder ingesteld */
 .sbs-mode #sbsWrapper .pane:first-child { border-right: 1px solid rgba(255,255,255,.3); }
 .sbs-mode #sbsWrapper .pane:last-child  { border-left:  1px solid rgba(255,255,255,.3); }
+/* SxS: geen letter/pillarbox, altijd 'cover' */
+body.sbs-mode #sbsWrapper { padding: 0 !important; }
+
+body.sbs-mode #sbsWrapper .pane {
+  overflow: hidden;
+}
+
+/* pak elke img in de panes, ongeacht class/id */
+body.sbs-mode #sbsWrapper .pane > img,
+body.sbs-mode #sbsWrapper .pane img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;   /* vulling tot de randen */
+  object-position: center center !important;
+  /* als je toch zwarte balken ziet, haal dan de schaal weg: */
+  transform: none !important;
+}
+
+/* Fullscreen SxS ook 'cover' */
+#comparisonWrapper:fullscreen  #sbsWrapper .pane img,
+#comparisonWrapper:-webkit-full-screen #sbsWrapper .pane img {
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+/* verberg eventuele extra controls onder de viewer of in de uitlegbox */
+#infoContainer ~ .controls { display: none !important; }
+#explanationBox .controls { display: none !important; }
+
+/* voor de zekerheid: mobiele embed blijft desktop uit */
+.lens-frame-outer.mobile-only { display: none !important; }
