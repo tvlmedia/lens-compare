@@ -869,3 +869,9 @@ body.sbs-mode #comparisonWrapper {
 /* Info + controls blijven 1400px, óók in SxS */
 #infoContainer { max-width: 1400px !important; }
 .controls.desktop-only { width: min(1400px, calc(100% - 32px)) !important; }
+/* In SxS dezelfde schaal als single view: sensor-scale × viewer-scale */
+.sbs-mode #sbsWrapper img {
+  transform: scale(calc(var(--sensor-scale, 1) * var(--viewer-scale, 1)));
+  transform-origin: center;
+  object-fit: cover;   /* i.p.v. contain, zodat 'ie net als single view cropt */
+}
