@@ -898,7 +898,29 @@ function loadHTMLImage(src) {
     im.src = src;
   });
 }
+// === Helpers voor UI-screenshots (gebruikt op PDF pag. 4) ===
+async function screenshotEl(el) {
+  if (!el) return null;
+  const cvs = await html2canvas(el, {
+    useCORS: true,
+    backgroundColor: null,             // transparant over zwart
+    scale: window.devicePixelRatio || 1
+  });
+  return cvs.toDataURL("image/png");   // PNG behoudt transparantie
+}
 
+async function placeToWidth(pdf, dataURL, x, y, maxW) {
+  const im = await loadHTMLImage(dataURL); // gebruikt je bestaande loader
+  const naturalW = im.naturalWidth || im.width;
+  const naturalH = im.naturalHeight || im.height;
+  const ratio = naturalH / naturalW;
+
+  const w = Math.min(maxW, naturalW);
+  const h = Math.round(w * ratio);
+
+  pdf.addImage(dataURL, "PNG", x, y, w, h);
+  return { w, h };
+}
 function fitContain(srcW, srcH, boxW, boxH) {
   const srcAR = srcW / srcH, boxAR = boxW / boxH;
   let w, h;
@@ -1395,8 +1417,7 @@ pdf.addPage();
 fillBlack();
 drawTopBar(`${leftText} vs ${rightText}`);
 
-const pageW = pdf.internal.pageSize.getWidth();
-const pageH = pdf.internal.pageSize.getHeight();
+
 const x     = PAGE_MARGIN;
 const maxW  = pageW - PAGE_MARGIN * 2;
 
