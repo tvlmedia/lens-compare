@@ -1165,39 +1165,43 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   else pdf.text(text, x, y, opts);
 }
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
-  
-  const { jsPDF } = window.jspdf; // ← belangrijk
-  // Zorg dat de cache (pillar/letterbox + slider) up-to-date is
-updateFullscreenBars();
-
-  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
-
-  // Layout constants
-  const TOP_BAR = 40;
-  const BOTTOM_BAR = 80;
-  const PAGE_MARGIN = 24;
-
-  function getContentBox(pageW, pageH) {
-    const x = PAGE_MARGIN;
-    const y = TOP_BAR + PAGE_MARGIN;
-    const w = pageW - PAGE_MARGIN * 2;
-    const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
-    return { x, y, w, h };
+  // ——— SxS tijdelijk uitzetten ———
+  const wasSbs = sbsActive;
+  if (wasSbs) {
+    setSideBySide(false);
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   }
 
-  
-  function drawTopBar(text) {
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const barHeight = TOP_BAR;
-    pdf.setFillColor(0, 0, 0);
-    pdf.rect(0, 0, pageWidth, barHeight, "F");
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(16);
-    pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, {
-      align: "center",
-      baseline: "middle"
-    });
-  }
+  try {
+    const { jsPDF } = window.jspdf;
+    updateFullscreenBars();
+
+    const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+
+    // Layout constants
+    const TOP_BAR = 40;
+    const BOTTOM_BAR = 80;
+    const PAGE_MARGIN = 24;
+
+    function getContentBox(pageW, pageH) {
+      const x = PAGE_MARGIN;
+      const y = TOP_BAR + PAGE_MARGIN;
+      const w = pageW - PAGE_MARGIN * 2;
+      const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
+      return { x, y, w, h };
+    }
+    function drawTopBar(text) {
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const barHeight = TOP_BAR;
+      pdf.setFillColor(0, 0, 0);
+      pdf.rect(0, 0, pageWidth, barHeight, "F");
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(16);
+      pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, {
+        align: "center",
+        baseline: "middle"
+      });
+    }
   
   function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
