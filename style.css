@@ -898,3 +898,43 @@ body.sbs-mode #comparisonWrapper {
 #comparisonWrapper.sbs-mode {
   aspect-ratio: auto !important;
 }
+/* === Side-by-Side (SxS) — clean === */
+#sbsWrapper{
+  position:absolute; inset:0;
+  z-index:3;
+  display:none;              /* standaard uit */
+  padding: var(--lb-top,0) var(--lb-right,0) var(--lb-bottom,0) var(--lb-left,0);
+  box-sizing:border-box;
+}
+
+.sbs-mode #sbsWrapper{
+  display:flex;
+  width:100%; height:100%;
+}
+
+#sbsWrapper .pane{
+  flex:1 1 50%;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#sbsWrapper .pane img{
+  width:100%; height:100%;
+  object-fit:cover;          /* of 'contain' als je HELE frames wil zien */
+  transform: scale(calc(var(--sensor-scale,1) * var(--viewer-scale,1)));
+  transform-origin:center;
+}
+
+/* Verberg single-view lagen + slider in SxS */
+.sbs-mode #afterWrapper,
+.sbs-mode #beforeImage,
+.sbs-mode #beforeImgTag,
+.sbs-mode #slider{
+  display:none !important;
+}
+
+/* Maak viewer breder in SxS (optioneel) */
+body.sbs-mode #comparisonWrapper{ max-width:1600px; }
