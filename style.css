@@ -257,217 +257,52 @@ body.dragging, body.dragging *{ user-select:none !important; -webkit-user-select
   margin-top:12px; max-width:960px; font-size:13px; color:#aaa;
   padding:12px 16px; background:#1a1a1a; border-left:4px solid orange; border-radius:6px; line-height:1.5;
 }
-/* === FIX: Side-by-Side moet 'cover' croppen en geen letterbox padding === */
-.sbs-mode #sbsWrapper {
-  padding: 0 !important;                 /* geen extra letter/pillarbox in SxS */
-}
+/* ====== SxS: echte cover-crop, geen letterbox, 1px middenlijn ====== */
 
-.sbs-mode #sbsWrapper .pane {
-  overflow: hidden;                       /* netjes afsnijden */
-}
-
-.sbs-mode #sbsWrapper .pane img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;           /* i.p.v. contain */
-  transform: scale(calc(var(--sensor-scale) * var(--viewer-scale)));
-  transform-origin: center;
-}
-
-/* Ook zo in fullscreen */
-#comparisonWrapper:fullscreen .sbs-mode #sbsWrapper .pane img,
-#comparisonWrapper:-webkit-full-screen .sbs-mode #sbsWrapper .pane img {
-  object-fit: cover !important;
-}
-
-/* Middenlijntje en outlines blijven zoals eerder ingesteld */
-.sbs-mode #sbsWrapper .pane:first-child { border-right: 1px solid rgba(255,255,255,.3); }
-.sbs-mode #sbsWrapper .pane:last-child  { border-left:  1px solid rgba(255,255,255,.3); }
-/* SxS: geen letter/pillarbox, altijd 'cover' */
-body.sbs-mode #sbsWrapper { padding: 0 !important; }
-
-body.sbs-mode #sbsWrapper .pane {
-  overflow: hidden;
-}
-
-/* pak elke img in de panes, ongeacht class/id */
-body.sbs-mode #sbsWrapper .pane > img,
-body.sbs-mode #sbsWrapper .pane img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;   /* vulling tot de randen */
-  object-position: center center !important;
-  /* als je toch zwarte balken ziet, haal dan de schaal weg: */
-  transform: none !important;
-}
-
-/* Fullscreen SxS ook 'cover' */
-#comparisonWrapper:fullscreen  #sbsWrapper .pane img,
-#comparisonWrapper:-webkit-full-screen #sbsWrapper .pane img {
-  object-fit: cover !important;
-  object-position: center center !important;
-}
-/* verberg eventuele extra controls onder de viewer of in de uitlegbox */
-#infoContainer ~ .controls { display: none !important; }
-#explanationBox .controls { display: none !important; }
-
-/* voor de zekerheid: mobiele embed blijft desktop uit */
-.lens-frame-outer.mobile-only { display: none !important; }
-/* ===================== SXS: FORCE FULL COVER, NO LETTERBOX ===================== */
-
-/* Show only the SxS layer; hide single-view layers + slider */
+/* verberg single-view lagen in SxS */
 body.sbs-mode #afterWrapper,
 body.sbs-mode #beforeImage,
 body.sbs-mode #slider { display: none !important; }
+body.sbs-mode #fsBars { display: none !important; }
 
-/* SxS container fills the viewer completely */
-body.sbs-mode #sbsWrapper {
-  display: flex !important;
-  position: absolute; inset: 0;
-  padding: 0 !important;
-  z-index: 3;
-}
-
-/* Each pane = half of the viewer, hard crop, with a thin outline */
-body.sbs-mode #sbsWrapper .pane {
-  position: relative;
-  flex: 1 1 50%;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.3);
-}
-body.sbs-mode #sbsWrapper .pane:first-child { border-right: 0; }
-body.sbs-mode #sbsWrapper .pane:last-child  { border-left:  0; }
-
-/* Center the image and FORCE it to cover regardless of previous rules */
-body.sbs-mode #sbsWrapper .pane img {
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-
-  /* cover trick */
-  min-width: 100% !important;
-  min-height: 100% !important;
-  width: auto !important;
-  height: auto !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-}
-
-/* 1px center divider in SxS */
-body.sbs-mode #sbsWrapper::before {
-  content: "";
-  position: absolute; top: 0; bottom: 0; left: 50%;
-  width: 1px; background: rgba(255,255,255,.35); z-index: 4;
-}
-
-/* Avoid double outer border when in SxS */
-body.sbs-mode #comparisonWrapper::after { display: none !important; }
-
-/* ===================== KILL DUPLICATE/MINI CONTROLS ===================== */
-
-/* Hide all controls by default… */
-.controls { display: none !important; }
-/* …then show ONLY the very first desktop bar */
-.controls.desktop-only:first-of-type { display: block !important; }
-
-/* Extra safety: if anything injects another controls block later, nuke it */
-#infoContainer ~ .controls,
-#explanationBox ~ .controls,
-.lens-frame-outer .controls { display: none !important; }
-
-/* If you use the mobile iframe embed, keep it hidden on desktop */
-.lens-frame-outer,
-.lens-frame-outer.mobile-only { display: none !important; }
-/* --- SxS: hard reset so each half truly fills & crops --- */
-body.sbs-mode #fsBars { display: none !important; }  /* no letterbox overlay */
-body.sbs-mode #afterWrapper,
-body.sbs-mode #beforeImage,
-body.sbs-mode #slider { display: none !important; }  /* hide single-view layers */
-
-body.sbs-mode #sbsWrapper {
-  display: flex !important;
-  position: absolute; inset: 0;
-  padding: 0 !important;
-  z-index: 3;
-}
-
-body.sbs-mode #sbsWrapper .pane {
-  position: relative;
-  flex: 1 1 50%;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.3);
-}
-body.sbs-mode #sbsWrapper .pane:first-child { border-right: 0; }
-body.sbs-mode #sbsWrapper .pane:last-child  { border-left:  0; }
-
-/* ⬇️ The fix: remove all transforms and force true cover */
-body.sbs-mode #sbsWrapper .pane img {
-  position: absolute !important;
-  top: 50% !important; left: 50% !important;
-  transform: translate(-50%, -50%) !important;   /* reset any scale(...) */
-  width: 100% !important; height: 100% !important;
-  min-width: 100% !important; min-height: 100% !important;
-  max-width: none !important; max-height: none !important;
-  object-fit: cover !important; object-position: center center !important;
-}
-
-/* 1px middenlijntje */
-body.sbs-mode #sbsWrapper::before {
-  content: ""; position: absolute; top: 0; bottom: 0; left: 50%;
-  width: 1px; background: rgba(255,255,255,.35); z-index: 4;
-}
-
-/* voorkom dubbele buitenrand in SxS */
-body.sbs-mode #comparisonWrapper::after { display: none !important; }
-
-/* Hide the embedded mobile tool on desktop (if it crept back in) */
-.lens-frame-outer { display: none !important; }
-@media (max-width: 767px) { .lens-frame-outer { display: block !important; } }
-/* --- SxS: echte cover-crop & geen letterbox --- */
-body.sbs-mode #fsBars { display: none !important; }          /* geen zwarte balk overlay */
-body.sbs-mode #afterWrapper,
-body.sbs-mode #beforeImage,
-body.sbs-mode #slider { display: none !important; }          /* single-view lagen uit */
-
+/* SxS-container vult de viewer */
 body.sbs-mode #sbsWrapper{
   display:flex !important;
   position:absolute; inset:0;
-  padding:0 !important;                                      /* geen extra padding */
+  padding:0 !important;            /* geen letter/pillarbox-padding */
   z-index:3;
 }
 
-/* per halfvlak */
+/* elke helft */
 body.sbs-mode #sbsWrapper .pane{
   position:relative;
   flex:1 1 50%;
-  overflow:hidden;                                           /* netjes afsnijden */
+  overflow:hidden;                  /* netjes afsnijden */
   border:1px solid rgba(255,255,255,.3);
 }
 body.sbs-mode #sbsWrapper .pane:first-child{ border-right:0; }
 body.sbs-mode #sbsWrapper .pane:last-child { border-left:0; }
 
-/* 1px middenlijntje */
-body.sbs-mode #sbsWrapper::before{
-  content:"";
-  position:absolute; top:0; bottom:0; left:50%;
-  width:1px; background:rgba(255,255,255,.35); z-index:4;
-}
-
-/* 🔥 De echte fix: alle transforms killen en cover forceren */
+/* ⬇️ De fix: alle eerdere transforms killen en echte cover forceren */
 body.sbs-mode #sbsWrapper .pane img{
   position:absolute !important;
   top:50% !important; left:50% !important;
-  transform:translate(-50%,-50%) !important;                 /* overschrijft scale(...) */
+  transform:translate(-50%,-50%) !important;  /* overschrijft scale(...) */
   width:100% !important; height:100% !important;
   min-width:100% !important; min-height:100% !important;
   max-width:none !important; max-height:none !important;
   object-fit:cover !important; object-position:center center !important;
 }
 
+/* 1px middenlijntje */
+body.sbs-mode #sbsWrapper::before{
+  content:""; position:absolute; top:0; bottom:0; left:50%;
+  width:1px; background:rgba(255,255,255,.35); z-index:4;
+}
+
 /* geen dubbele buitenrand in SxS */
 body.sbs-mode #comparisonWrapper::after{ display:none !important; }
 
-/* Zorg dat de mobiele embed niet op desktop verschijnt */
-.lens-frame-outer{ display:none !important; }
-@media (max-width:767px){ .lens-frame-outer{ display:block !important; } }
+/* mobiele embed uit op desktop */
+.lens-frame-outer, .lens-frame-outer.mobile-only { display:none !important; }
+@media (max-width:767px){ .lens-frame-outer { display:block !important; } }
