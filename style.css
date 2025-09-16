@@ -821,3 +821,22 @@ body.dragging * {
 @media (min-width: 1240px){
   .controls.desktop-only .row-1{ flex-wrap: nowrap; } /* rij 1 op één lijn houden */
 }
+/* Globale defaults */
+:root {
+  --sensor-scale: 1;
+  --viewer-scale: 1;
+}
+
+/* Zelfde schaal toepassen op alle viewer images */
+#comparisonWrapper img {
+  transform: scale(calc(var(--sensor-scale) * var(--viewer-scale)));
+  transform-origin: center center;
+}
+
+/* SxS layout netjes contain + geen clipping door scale */
+.sbs-mode #sbsWrapper .pane { overflow: hidden; }
+.sbs-mode #sbsWrapper img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
