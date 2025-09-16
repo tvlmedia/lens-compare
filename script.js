@@ -225,7 +225,7 @@ function setWrapperSizeByAR(w, h) {
   // ← in SBS willen we 2× zo breed: 3:2 wordt 6:2
   const arWidth = sbsActive ? (w * 2) : w;
 
- const height = Math.round(width * (h / arWidth) * 1.35); // +35% hoger
+const height = Math.round(width * (h / arWidth)); // ← geen * 1.35
 
   comparisonWrapper.style.removeProperty('aspect-ratio');
   comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
@@ -342,6 +342,13 @@ function onFsChange() {
     }
   });
 }
+function getCurrentWH() {
+  const cam = cameraSelect.value;
+  const fmt = sensorFormatSelect.value;
+  if (!cam || !fmt) return { w: BASE_SENSOR.w, h: BASE_SENSOR.h };
+  return cameras[cam][fmt];
+}
+
 // 1) Helper: doel-AR van de layout (rekening met SxS)
 function getTargetAR() {
   const { w, h } = getCurrentWH();      // mm van gekozen sensor
