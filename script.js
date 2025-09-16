@@ -270,6 +270,12 @@ function applyCurrentFormat() {
   updateFullscreenBars();
   resetSplitToMiddle();
 }
+if (sbsActive) {
+  // zorg dat SxS-panelen meteen de nieuwe scale en AR gebruiken
+  sbsLeftImg.style.transform = '';
+  sbsRightImg.style.transform = '';
+  updateFullscreenBars();
+}
 // Vul camera dropdown
 Object.keys(cameras).forEach(cam => {
   cameraSelect.add(new Option(cam, cam));
