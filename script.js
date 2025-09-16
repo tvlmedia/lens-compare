@@ -477,6 +477,7 @@ comparisonWrapper.appendChild(sbsWrapper);
 const sbsLeftImg  = sbsWrapper.querySelector("#sbsLeftImg");
 const sbsRightImg = sbsWrapper.querySelector("#sbsRightImg");
 let sbsActive = false;
+let isExportingPdf = false; // blokkeer UI-toggles terwijl er geëxporteerd wordt
 const leftLabel = document.getElementById("leftLabel");
 const rightLabel = document.getElementById("rightLabel");
 const downloadLeftRawButton  = document.getElementById("downloadLeftRawButton");
@@ -798,7 +799,8 @@ document.getElementById("toggleButton").addEventListener("click", () => {
     });
   })();
 }
-function setSideBySide(on) {
+function setSideBySide(on, { force = false } = {}) {
+  if (isExportingPdf && !force) return;   // externe toggles blokkeren tijdens export
   sbsActive = !!on;
   document.body.classList.toggle("sbs-mode", sbsActive);
 
@@ -807,6 +809,13 @@ function setSideBySide(on) {
     sbsRightImg.src = beforeImgTag.src;  // rechts = before
     comparisonWrapper.scrollLeft = 0;
     slider.style.display = "none";
+    // SxS: geen letter/pillarbox of slider
+    comparisonWrapper.style.setProperty('--lb-top','0px');
+    comparisonWrapper.style.setProperty('--lb-bottom','0px');
+    comparisonWrapper.style.setProperty('--lb-left','0px');
+    comparisonWrapper.style.setProperty('--lb-right','0px');
+    comparisonWrapper._lbLeft = comparisonWrapper._lbRight = comparisonWrapper._lbTop = comparisonWrapper._lbBottom = 0;
+    comparisonWrapper._usableW = comparisonWrapper.getBoundingClientRect().width;
   } else {
     slider.style.display = ""; // reset naar default
   }
@@ -1166,19 +1175,22 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   else pdf.text(text, x, y, opts);
 }
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
-  // --- NIEUW: SxS tijdelijk uit tijdens PDF ---
   const wasSBS = sbsActive;
   const sbsBtn = document.getElementById("sbsToggle");
+  isExportingPdf = true;
   try {
-    if (sbsBtn) sbsBtn.disabled = true;    // voorkom togglen middenin export
+    if (sbsBtn) sbsBtn.disabled = true;    // UI toggle blokkeren
+
     if (wasSBS) {
-      setSideBySide(false);                // ← schakel SxS uit
+      setSideBySide(false, { force: true }); // ← BELANGRIJK: force tijdens export
       // 1–2 frames wachten zodat layout/AR klopt vóór we maten pakken
-      await new Promise(r => requestAnimationFrame(() => r()));
-      await new Promise(r => requestAnimationFrame(() => r()));
+      await new Promise(r => requestAnimationFrame(r));
+      await new Promise(r => requestAnimationFrame(r));
       updateFullscreenBars();
       resetSplitToMiddle();
     }
+
+    // ====== JE BESTAANDE PDF-CODE HIERONDER (ongewijzigd) ======
 
     // ====== JE BESTAANDE PDF-CODE HIERONDER (ongewijzigd) ======
     const { jsPDF } = window.jspdf;
@@ -1453,8 +1465,17 @@ const safeFocal       = makeSafe(focal); // "35mm" blijft "35mm"
 const filename = `TVLRENTAL_${safeLeft}_${safeRight}_${safeFocal}_T${tLeft}vsT${tRight}_${safeCamera}_${safeSensorMode}.pdf`;
   
 // Opslaan
-pdf.save(filename);
-}); // ← sluit de addEventListener("click", async () => { ... })
+    pdf.save(filename);
+  } finally {
+    if (wasSBS) {
+      setSideBySide(true, { force: true });  // herstel vorige SxS-staat
+    }
+    updateFullscreenBars();
+    resetSplitToMiddle();
+    if (sbsBtn) sbsBtn.disabled = false;
+    isExportingPdf = false;
+  }
+});
  
 
 
@@ -1676,6 +1697,8 @@ function onGlobalKeydown(e) {
   const tag = (document.activeElement?.tagName || "").toUpperCase();
   if (["INPUT", "TEXTAREA"].includes(tag)) return; // SELECT laten we door
 
+  if (isExportingPdf) return; // geen sneltoetsen tijdens export
+  
   const k = (e.key || "").toLowerCase();
   if (k === "p") {
     e.preventDefault();
