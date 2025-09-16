@@ -841,3 +841,6 @@ body.dragging * {
   height: auto;
   object-fit: contain;
 }
+.comparison-wrapper.sbs-mode {
+  width: 1600px;   /* bredere variant bij Side-by-Side */
+}
