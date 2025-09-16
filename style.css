@@ -367,3 +367,8 @@ body.dragging, body.dragging * {
 #comparisonWrapper::after {
   pointer-events: none;
 }
+#beforeImgTag,
+#afterImgTag {
+  border: 1px solid rgba(255,255,255,0.3); /* lichte outline om beide beelden */
+  box-sizing: border-box;
+}
