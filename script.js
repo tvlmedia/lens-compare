@@ -475,6 +475,8 @@ sbsWrapper.innerHTML = `
 `;
 comparisonWrapper.appendChild(sbsWrapper);
 
+sbsWrapper.style.display = 'none';   // ⬅️ hier toevoegen
+
 const sbsLeftImg  = sbsWrapper.querySelector("#sbsLeftImg");
 const sbsRightImg = sbsWrapper.querySelector("#sbsRightImg");
 // Enforce 'contain' in SxS
@@ -814,6 +816,21 @@ function setSideBySide(on, { force = false } = {}) {
   sbsActive = next;
   document.body.classList.toggle("sbs-mode", sbsActive);
   comparisonWrapper.classList.toggle("sbs-mode", sbsActive);
+
+  // Pak de wrappers (before = parent van beforeImgTag)
+const beforeWrapper = beforeImgTag.parentElement;
+
+if (sbsActive) {
+  // SxS AAN: toon SxS, verberg slider-versie
+  sbsWrapper.style.display = 'flex';
+  beforeWrapper.style.display = 'none';
+  afterWrapper.style.display  = 'none';
+} else {
+  // SxS UIT: verberg SxS, toon slider-versie
+  sbsWrapper.style.display = 'none';
+  beforeWrapper.style.display = '';
+  afterWrapper.style.display  = '';
+}
 
   if (sbsActive) {
     // in SxS: reset en toon hele foto’s
