@@ -1390,15 +1390,47 @@ drawBottomBar({
 
  
 
-// --- Pagina 4: hetzelfde beeld als pagina 1 (split), geen UI-screenshot ---
+// --- Pagina 4: p1 + UI erboven/onder ---
 pdf.addPage();
 fillBlack();
 drawTopBar(`${leftText} vs ${rightText}`);
 
-// gebruik exact dezelfde data als pagina 1
-await placeContain(pdf, splitData, fullBox);
+const pageW = pdf.internal.pageSize.getWidth();
+const pageH = pdf.internal.pageSize.getHeight();
+const x     = PAGE_MARGIN;
+const maxW  = pageW - PAGE_MARGIN * 2;
 
-// CTA onderin
+// Screenshots van UI-stroken
+const controlsEl = document.querySelector('#toolRoot .controls') || document.querySelector('.controls');
+const infoEl     = document.getElementById('infoContainer');
+
+const controlsShot = await screenshotEl(controlsEl);   // boven
+const infoShot     = await screenshotEl(infoEl);       // onder
+
+let curY = TOP_BAR + PAGE_MARGIN;
+
+// 1) Controls-balk plaatsen (volledige breedte van content)
+let controlsH = 0;
+if (controlsShot) {
+  const placed = await placeToWidth(pdf, controlsShot, x, curY, maxW);
+  controlsH = placed.h;
+  curY += controlsH + 12; // kleine gap
+}
+
+// 2) Split-beeld (zelfde asset als p1), “contain” in de resterende hoogte
+const bottomReserved = (infoShot ? 12 : 0) + (infoShot ? 1 : 0); // gap + straks info
+const availH = (pageH - BOTTOM_BAR - PAGE_MARGIN) - curY - (infoShot ? 1200 : 0); // ruimschoots buffer
+const fullBoxP4 = { x, y: curY, w: maxW, h: (pageH - BOTTOM_BAR - PAGE_MARGIN) - curY - (infoShot ?  (bottomReserved + 1) : 0) };
+await placeContain(pdf, splitData, fullBoxP4);
+
+// 3) Info/labels/RAW-buttons onder het beeld
+if (infoShot) {
+  // plaats strak tegen onderkant van de image-box, met 12px marge
+  const infoY = fullBoxP4.y + fullBoxP4.h + 12;
+  await placeToWidth(pdf, infoShot, x, infoY, maxW);
+}
+
+// CTA-balk onderin blijft hetzelfde
 drawBottomBar({
   text: "",
   link: "",
