@@ -814,3 +814,10 @@ body.dragging * {
 .sbs-mode #slider {
   display: none !important;
 }
+/* OVERRIDE — iets breder vak achter de knoppen */
+.controls.desktop-only{
+  width: min(1240px, calc(100% - 32px)); /* bv. 1240px, of 1280px als je meer ruimte wilt */
+}
+@media (min-width: 1240px){
+  .controls.desktop-only .row-1{ flex-wrap: nowrap; } /* rij 1 op één lijn houden */
+}
