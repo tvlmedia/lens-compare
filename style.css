@@ -954,3 +954,8 @@ body.sbs-mode #comparisonWrapper{ max-width:1600px; }
   position:relative;
 }
 #slider { position:absolute; top:0; bottom:0; width:2px; background:#fff; }
+body { background:#000; }
+#toolRoot {
+  width: min(1200px, 96vw);
+  margin: 0 auto;
+}
