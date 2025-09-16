@@ -1593,14 +1593,8 @@ document.addEventListener("mousemove", (e) => {
   // Als SxS actief is, sample per pane; anders je bestaande before/after.
   if (sbsActive) {
     // pak de twee SxS <img>’s
-    const leftRect  = sbsLeftImg.getBoundingClientRect();
-    const rightRect = sbsRightImg.getBoundingClientRect();
-
-    // We tonen ALTIJD beide vierkantjes, gevoed door hun eigen pane.
-    // (Als je ze alleen wilt tonen wanneer de muis in die helft hangt,
-    //  wrap dan onderstaand in een if(hit) met de returnwaarde.)
-    const hitL = updateZoomViewerAt(e, leftDetail,  leftDetailImg,  leftRect);
-    const hitR = updateZoomViewerAt(e, rightDetail, rightDetailImg, rightRect);
+   const hitL = updateZoomViewerAt(e, leftDetail,  leftDetailImg,  sbsLeftImg);
+const hitR = updateZoomViewerAt(e, rightDetail, rightDetailImg, sbsRightImg);
 
     // Verberg boxen als muis buiten beide panelen is
     if (!hitL && !hitR) {
