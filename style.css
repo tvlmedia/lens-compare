@@ -870,8 +870,11 @@ body.sbs-mode #comparisonWrapper {
 #infoContainer { max-width: 1400px !important; }
 .controls.desktop-only { width: min(1400px, calc(100% - 32px)) !important; }
 /* In SxS dezelfde schaal als single view: sensor-scale × viewer-scale */
-.sbs-mode #sbsWrapper img {
+ view */
+.sbs-mode #sbsWrapper .pane img {
+  width: 100% !important;
+  height: 100% !important;     /* overschrijft je eerdere height:auto */
+  object-fit: cover !important;/* i.p.v. contain, dus cropt mee */
   transform: scale(calc(var(--sensor-scale, 1) * var(--viewer-scale, 1)));
   transform-origin: center;
-  object-fit: cover;   /* i.p.v. contain, zodat 'ie net als single view cropt */
 }
