@@ -238,20 +238,7 @@ function clearInlineHeights() {
   comparisonWrapper.style.removeProperty('max-height');
 }
 
- // Geeft de width/height van het huidige sensor-formaat terug
-function getCurrentWH() {
-  const cam = cameraSelect.value;
-  const fmt = sensorFormatSelect.value;
-  if (!cam || !fmt) return { w: BASE_SENSOR.w, h: BASE_SENSOR.h };
-  return cameras[cam][fmt];
-}
 
-
-function getTargetAR() {
-  const { w, h } = getCurrentWH();
-  return sbsActive ? (2 * w) / h : w / h; // 6:2 in SxS, anders normaal
-}
-  
 
 
 
@@ -355,7 +342,11 @@ function onFsChange() {
     }
   });
 }
-
+// 1) Helper: doel-AR van de layout (rekening met SxS)
+function getTargetAR() {
+  const { w, h } = getCurrentWH();      // mm van gekozen sensor
+  return sbsActive ? (2 * w) / h : w / h; // 6:2 in SxS, anders normaal
+}
 // Luister naar fullscreen wissels (buiten de functie!)
 document.addEventListener('fullscreenchange', onFsChange);
 document.addEventListener('webkitfullscreenchange', onFsChange); // Safari
