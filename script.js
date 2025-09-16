@@ -800,9 +800,13 @@ document.getElementById("toggleButton").addEventListener("click", () => {
   })();
 }
 function setSideBySide(on, { force = false } = {}) {
-  if (isExportingPdf && !force) return;   // externe toggles blokkeren tijdens export
-  sbsActive = !!on;
+  if (isExportingPdf && !force) return;
+  const next = !!on;
+  if (!force && sbsActive === next) return;
+
+  sbsActive = next;
   document.body.classList.toggle("sbs-mode", sbsActive);
+  comparisonWrapper.classList.toggle("sbs-mode", sbsActive); // << nieuw
 
   if (sbsActive) {
     sbsLeftImg.src  = afterImgTag.src;   // links = after
