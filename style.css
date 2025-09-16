@@ -59,7 +59,7 @@ select:focus {
 #comparisonWrapper {
   position: relative;
   width: 100%;
-  max-width: 1400px;                 /* ← groter dan 1200px */
+  max-width: 1200px;                 /* ← groter dan 1200px */
   min-height: clamp(360px, 56vw, 900px);
   background: #000;
   border: 1px solid rgba(255,255,255,.6);
