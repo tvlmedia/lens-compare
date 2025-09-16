@@ -379,3 +379,48 @@ body.sbs-mode #comparisonWrapper::after { display: none !important; }
 /* If you use the mobile iframe embed, keep it hidden on desktop */
 .lens-frame-outer,
 .lens-frame-outer.mobile-only { display: none !important; }
+/* --- SxS: hard reset so each half truly fills & crops --- */
+body.sbs-mode #fsBars { display: none !important; }  /* no letterbox overlay */
+body.sbs-mode #afterWrapper,
+body.sbs-mode #beforeImage,
+body.sbs-mode #slider { display: none !important; }  /* hide single-view layers */
+
+body.sbs-mode #sbsWrapper {
+  display: flex !important;
+  position: absolute; inset: 0;
+  padding: 0 !important;
+  z-index: 3;
+}
+
+body.sbs-mode #sbsWrapper .pane {
+  position: relative;
+  flex: 1 1 50%;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.3);
+}
+body.sbs-mode #sbsWrapper .pane:first-child { border-right: 0; }
+body.sbs-mode #sbsWrapper .pane:last-child  { border-left:  0; }
+
+/* ⬇️ The fix: remove all transforms and force true cover */
+body.sbs-mode #sbsWrapper .pane img {
+  position: absolute !important;
+  top: 50% !important; left: 50% !important;
+  transform: translate(-50%, -50%) !important;   /* reset any scale(...) */
+  width: 100% !important; height: 100% !important;
+  min-width: 100% !important; min-height: 100% !important;
+  max-width: none !important; max-height: none !important;
+  object-fit: cover !important; object-position: center center !important;
+}
+
+/* 1px middenlijntje */
+body.sbs-mode #sbsWrapper::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 50%;
+  width: 1px; background: rgba(255,255,255,.35); z-index: 4;
+}
+
+/* voorkom dubbele buitenrand in SxS */
+body.sbs-mode #comparisonWrapper::after { display: none !important; }
+
+/* Hide the embedded mobile tool on desktop (if it crept back in) */
+.lens-frame-outer { display: none !important; }
+@media (max-width: 767px) { .lens-frame-outer { display: block !important; } }
