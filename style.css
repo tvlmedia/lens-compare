@@ -238,6 +238,19 @@ body.sbs-mode #comparisonWrapper { max-width: 1600px; }
   width: 14px; height: 14px; border-radius: 50%;
   background: #3a8bfd; border: 2px solid #0e1621; cursor: pointer;
 }
+/* Witte baseline achter de slider, zodat bolletje altijd 'lijntje' heeft */
+#scaleCtrl input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: #2a2a2a;
+  border-radius: 999px;
+  border-bottom: 1px solid #fff;   /* ← wit lijntje */
+}
+#scaleCtrl input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: #2a2a2a;
+  border-radius: 999px;
+  border-bottom: 1px solid #fff;   /* ← wit lijntje */
+}
 
 /* Select-breedtes */
 #cameraSelect, #sensorFormatSelect, #focalLength { min-width: 130px; }
