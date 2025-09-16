@@ -840,3 +840,7 @@ body.dragging * {
   height: auto;
   object-fit: contain;
 }
+/* bv. 1400px op desktop */
+@media (min-width: 1024px) {
+  #comparisonWrapper { max-width: 1400px; }
+}
