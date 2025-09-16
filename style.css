@@ -313,3 +313,54 @@ body.sbs-mode #sbsWrapper .pane img {
 
 /* voor de zekerheid: mobiele embed blijft desktop uit */
 .lens-frame-outer.mobile-only { display: none !important; }
+/* ========== HARD FIX: Side-by-Side moet fullscreen in de viewer vullen ========== */
+
+/* SxS aan → laat alleen de SxS laag zien, geen slider/clip-lagen */
+body.sbs-mode #afterWrapper,
+body.sbs-mode #beforeImage,
+body.sbs-mode #slider { display: none !important; }
+
+/* SxS container: geen letter/pillarbox, 100% van de viewer */
+body.sbs-mode #sbsWrapper {
+  display: flex !important;
+  position: absolute; inset: 0;
+  padding: 0 !important;
+  z-index: 3;
+}
+
+/* Pane vult 50%, snijdt netjes af, heeft outline */
+body.sbs-mode #sbsWrapper .pane {
+  position: relative;
+  flex: 1 1 50%;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.3);
+}
+body.sbs-mode #sbsWrapper .pane:first-child { border-right: 0; }
+body.sbs-mode #sbsWrapper .pane:last-child  { border-left:  0; }
+
+/* Afbeelding in pane: absolute cover, geen transforms */
+body.sbs-mode #sbsWrapper .pane > img,
+body.sbs-mode #sbsWrapper .pane img {
+  position: absolute; inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  transform: none !important;
+}
+
+/* Dun middenlijntje in SxS */
+body.sbs-mode #sbsWrapper::before {
+  content: "";
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  width: 1px; background: rgba(255,255,255,.35); z-index: 4;
+}
+
+/* voorkom dat een andere style dit stuk alsnog letterboxt */
+body.sbs-mode #comparisonWrapper { padding: 0 !important; }
+
+/* ========== Kill die ‘mini tool’/mobile embed op desktop compleet ========== */
+.lens-frame-outer,
+.lens-frame-outer.mobile-only,
+#infoContainer ~ .controls,
+#explanationBox .controls { display: none !important; }
