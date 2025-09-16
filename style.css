@@ -877,3 +877,24 @@ body.sbs-mode #comparisonWrapper {
   transform: scale(calc(var(--sensor-scale, 1) * var(--viewer-scale, 1)));
   transform-origin: center;
 }
+/* SxS layout */
+#sbsWrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+#sbsWrapper .pane {
+  flex: 1 1 50%;
+  position: relative;
+  overflow: hidden;            /* mag, maar niet verplicht */
+}
+#sbsWrapper .pane img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;         /* ← toont hele foto, geen crop */
+  image-rendering: auto;
+}
+ /* In SxS wil je dat het wrapper-aspectratio niet forceert */
+#comparisonWrapper.sbs-mode {
+  aspect-ratio: auto !important;
+}
