@@ -1553,42 +1553,46 @@ document.addEventListener("mousemove", (e) => {
     return;
   }
 
-  // Cursorpositie RELATIEF tot het beeld (voor zoom sampling)
-  const xIn = e.clientX - r.left;
-  const yIn = e.clientY - r.top;
+  // Kies de juiste bron <img> elementen
+  const srcLeftEl  = sbsActive ? sbsLeftImg  : afterImgTag;   // links
+  const srcRightEl = sbsActive ? sbsRightImg : beforeImgTag;  // rechts
 
-  // Vierkantjes POSITIONEREN op de echte muispositie (mag buiten vak)
-  // omdat #detailOverlay nu full-screen is
+  // Vierkantjes op muispositie (overlay is fullscreen)
   const xOut = e.clientX;
   const yOut = e.clientY;
 
   const zoom = 3.2;
   const size = 260;
 
-  const updateZoomViewer = (detail, detailImg, sourceImg) => {
-    if (detailImg.src !== sourceImg.src) detailImg.src = sourceImg.src;
+  const updateZoomViewer = (detailBox, detailImg, sourceEl) => {
+    // zorg dat we de zichtbare <img> sample'n
+    const imageRect = sourceEl.getBoundingClientRect();
+    if (imageRect.width <= 0 || imageRect.height <= 0) {
+      detailBox.style.display = "none";
+      return;
+    }
 
-    const imageRect = sourceImg.getBoundingClientRect();
+    if (detailImg.src !== sourceEl.src) detailImg.src = sourceEl.src;
+
     const relX = (e.clientX - imageRect.left) / imageRect.width;
-    const relY = (e.clientY - imageRect.top) / imageRect.height;
+    const relY = (e.clientY - imageRect.top)  / imageRect.height;
 
-    const zoomedWidth  = imageRect.width * zoom;
-    const zoomedHeight = imageRect.height * zoom;
-    const offsetX = -relX * zoomedWidth  + size / 2;
-    const offsetY = -relY * zoomedHeight + size / 2;
+    const zoomedW = imageRect.width  * zoom;
+    const zoomedH = imageRect.height * zoom;
+    const offsetX = -relX * zoomedW  + size / 2;
+    const offsetY = -relY * zoomedH  + size / 2;
 
-    // Zet de viewer OP de muis (full-screen overlay → kan buiten het vak)
-    detail.style.left = `${xOut - size / 2}px`;
-    detail.style.top  = `${yOut - size / 2}px`;
-    detail.style.display = "block";
+    detailBox.style.left = `${xOut - size / 2}px`;
+    detailBox.style.top  = `${yOut - size / 2}px`;
+    detailBox.style.display = "block";
 
-    detailImg.style.width  = `${zoomedWidth}px`;
-    detailImg.style.height = `${zoomedHeight}px`;
+    detailImg.style.width  = `${zoomedW}px`;
+    detailImg.style.height = `${zoomedH}px`;
     detailImg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
   };
 
-  updateZoomViewer(leftDetail,  leftDetailImg,  afterImgTag);
-  updateZoomViewer(rightDetail, rightDetailImg, beforeImgTag);
+  updateZoomViewer(leftDetail,  leftDetailImg,  srcLeftEl);
+  updateZoomViewer(rightDetail, rightDetailImg, srcRightEl);
 });
 
 
