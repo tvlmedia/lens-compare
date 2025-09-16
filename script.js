@@ -477,6 +477,12 @@ comparisonWrapper.appendChild(sbsWrapper);
 
 const sbsLeftImg  = sbsWrapper.querySelector("#sbsLeftImg");
 const sbsRightImg = sbsWrapper.querySelector("#sbsRightImg");
+// Enforce 'contain' in SxS
+[sbsLeftImg, sbsRightImg].forEach(im => {
+  im.style.setProperty('width', '100%', 'important');
+  im.style.setProperty('height', '100%', 'important');
+  im.style.setProperty('object-fit', 'contain', 'important');
+});
 let sbsActive = false;
 let isExportingPdf = false; // blokkeer UI-toggles terwijl er geëxporteerd wordt
 const leftLabel = document.getElementById("leftLabel");
@@ -807,28 +813,33 @@ function setSideBySide(on, { force = false } = {}) {
 
   sbsActive = next;
   document.body.classList.toggle("sbs-mode", sbsActive);
-  comparisonWrapper.classList.toggle("sbs-mode", sbsActive); // << nieuw
+  comparisonWrapper.classList.toggle("sbs-mode", sbsActive);
 
   if (sbsActive) {
-    sbsLeftImg.src  = afterImgTag.src;   // links = after
-    sbsRightImg.src = beforeImgTag.src;  // rechts = before
-    // reset eventuele transformaties in SxS
+    // in SxS: reset en toon hele foto’s
+    sbsLeftImg.src  = afterImgTag.src;
+    sbsRightImg.src = beforeImgTag.src;
     sbsLeftImg.style.transform  = '';
     sbsRightImg.style.transform = '';
-    comparisonWrapper.scrollLeft = 0;
+
     slider.style.display = "none";
-    // SxS: geen letter/pillarbox of slider
+
+    // letter/pillarbox naar 0 in SxS
     comparisonWrapper.style.setProperty('--lb-top','0px');
     comparisonWrapper.style.setProperty('--lb-bottom','0px');
     comparisonWrapper.style.setProperty('--lb-left','0px');
     comparisonWrapper.style.setProperty('--lb-right','0px');
     comparisonWrapper._lbLeft = comparisonWrapper._lbRight = comparisonWrapper._lbTop = comparisonWrapper._lbBottom = 0;
-    comparisonWrapper._usableW = comparisonWrapper.getBoundingClientRect().width;
+
+    // fullscreen: geen inline heights forceren
+    if (isWrapperFullscreen()) {
+      clearInlineHeights();
+    }
   } else {
-    slider.style.display = ""; // reset naar default
+    slider.style.display = "";
   }
 
-  // hoogte opnieuw berekenen (3:2 normaal, 6:2 in SxS)
+  // Hoogte/AR opnieuw zetten (buiten fullscreen)
   const { w, h } = getCurrentWH();
   setWrapperSizeByAR(w, h);
   requestAnimationFrame(() => setWrapperSizeByAR(w, h));
