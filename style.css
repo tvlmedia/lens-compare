@@ -16,7 +16,7 @@ body {
   align-items: center;
 }
 
-/* Buttons & selects – compacter (kleiner dus) */
+/* Buttons & selects – compacter */
 select,
 .control-button,
 #toggleButton,
@@ -55,18 +55,27 @@ select:focus {
   margin: 0 auto;
 }
 
-/* === Viewer (groter gemaakt) === */
+/* === Viewer === */
 #comparisonWrapper {
   position: relative;
   width: 100%;
-  max-width: 1200px;                 /* ← groter dan 1200px */
+  max-width: 1200px;
   min-height: clamp(360px, 56vw, 900px);
+  margin: 0 auto;
   background: #000;
-  border: 1px solid rgba(255,255,255,.6);
-  box-sizing: border-box;
   overflow: hidden;
+
   /* letter/pillarbox vars die JS zet */
-  --lb-top:0px; --lb-bottom:0px; --lb-left:0px; --lb-right:0px;
+  --lb-top: 0px; --lb-bottom: 0px; --lb-left: 0px; --lb-right: 0px;
+}
+
+/* Border overlay – beeld loopt nu door tot de rand */
+#comparisonWrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255,255,255,0.6);
+  pointer-events: none;
 }
 
 /* Onderlaag (rechts/before) */
@@ -80,12 +89,11 @@ select:focus {
   will-change: transform;
 }
 
-/* Bovenlaag (links/after) die we clippen */
+/* Bovenlaag (links/after) */
 #afterWrapper {
   position: absolute; inset: 0;
   overflow: hidden;
   z-index: 2;
-  /* 50/50 startpositie */
   clip-path: inset(0 50% 0 0);
   -webkit-clip-path: inset(0 50% 0 0);
   will-change: clip-path;
@@ -100,12 +108,12 @@ select:focus {
   will-change: transform;
 }
 
-/* Slider-lijn (compacter) */
+/* Slider-lijn */
 #slider {
   position: absolute;
   top: 0; bottom: 0;
   left: 50%; transform: translateX(-50%);
-  width: 2px;                          /* ← was 4px */
+  width: 2px;
   background: #fff;
   cursor: ew-resize;
   z-index: 10;
@@ -118,7 +126,7 @@ select:focus {
 #sbsWrapper {
   position: absolute; inset: 0;
   z-index: 3;
-  display: none;                        /* standaard uit */
+  display: none;
   padding: var(--lb-top,0) var(--lb-right,0) var(--lb-bottom,0) var(--lb-left,0);
   box-sizing: border-box;
 }
@@ -135,7 +143,7 @@ select:focus {
 }
 #sbsWrapper .pane img {
   width: 100%; height: 100%;
-  object-fit: contain;                  /* hele frame zichtbaar in SxS */
+  object-fit: contain;
   transform: scale(calc(var(--sensor-scale) * var(--viewer-scale)));
   transform-origin: center;
 }
@@ -145,11 +153,10 @@ select:focus {
 .sbs-mode #beforeImgTag,
 .sbs-mode #slider { display: none !important; }
 
-/* Viewer breder in SxS (optioneel) */
 body.sbs-mode #comparisonWrapper { max-width: 1600px; }
 
 /* ===========================
-   FULLSCREEN (letter/pillarbox via vars)
+   FULLSCREEN
    =========================== */
 #comparisonWrapper:fullscreen,
 #comparisonWrapper:-webkit-full-screen {
@@ -176,7 +183,7 @@ body.sbs-mode #comparisonWrapper { max-width: 1600px; }
   top: 0; bottom: 0;
 }
 
-/* Zwarte balken overlay (optioneel, als je #fsBars gebruikt) */
+/* Zwarte balken overlay */
 #fsBars { position: absolute; inset: 0; pointer-events: none; z-index: 9; }
 #fsBars .bar { position: absolute; background: #000; }
 #fsBars .top    { top:0;    left:var(--lb-left,0); right:var(--lb-right,0); height:var(--lb-top,0); }
@@ -185,13 +192,13 @@ body.sbs-mode #comparisonWrapper { max-width: 1600px; }
 #fsBars .right  { top:var(--lb-top,0); bottom:var(--lb-bottom,0); right:0; width:var(--lb-right,0); }
 
 /* ===========================
-   CONTROLS (boven de viewer) – compacter gemaakt
+   CONTROLS
    =========================== */
 .controls.desktop-only {
   position: sticky; top: 0; z-index: 50;
-  width: min(1400px, calc(100% - 32px));       /* iets breder dan eerst */
+  width: min(1400px, calc(100% - 32px));
   margin: 12px auto 16px;
-  padding: 10px 12px;                           /* ← compacter */
+  padding: 10px 12px;
   border: 1px solid #2a2a2a;
   border-radius: 10px;
   background: rgba(15,15,15,.9);
@@ -232,7 +239,7 @@ body.sbs-mode #comparisonWrapper { max-width: 1600px; }
   background: #3a8bfd; border: 2px solid #0e1621; cursor: pointer;
 }
 
-/* Select-breedtes zodat rij-1 past */
+/* Select-breedtes */
 #cameraSelect, #sensorFormatSelect, #focalLength { min-width: 130px; }
 #leftLens, #rightLens { min-width: 200px; }
 #tStopLeftSelect, #tStopRightSelect { min-width: 90px; }
@@ -245,7 +252,7 @@ body.pdf-compact .controls button {
 }
 
 /* ===========================
-   LABELS + RAW-KNOPEN ONDER DE VIEWER
+   LABELS + RAW-KNOPEN
    =========================== */
 #infoContainer {
   width: 100%;
@@ -326,41 +333,19 @@ body.dragging, body.dragging * {
   margin-top: 12px; max-width: 960px; font-size: 13px; color: #aaa;
   padding: 12px 16px; background: #1a1a1a; border-left: 4px solid orange; border-radius: 6px; line-height: 1.5;
 }
-/* 1) Verberg mobiele controls op desktop/tablet */
-.controls.mobile-only { 
-  display: none !important;
-}
+
+/* Mobiel controls */
+.controls.mobile-only { display: none !important; }
 @media (max-width: 767px){
-  .controls.mobile-only { 
-    display: block !important; 
-  }
+  .controls.mobile-only { display: block !important; }
 }
 
-/* 2) Extra vangnet: als er toch per ongeluk nog een duplicaat staat,
-      laat alleen de eerste controls-bar zien */
+/* Extra vangnet tegen duplicaten */
 .controls.desktop-only:not(:first-of-type),
 .controls.mobile-only:not(:first-of-type) {
   display: none !important;
 }
-/* Verberg ALLES met .mobile-only op desktop */
+
+/* Verberg alles met .mobile-only op desktop */
 .mobile-only { display: none !important; }
-
-@media (max-width: 767px){
-  .mobile-only { display: block !important; }
-}
-#comparisonWrapper {
-  position: relative;
-  max-width: 1200px;
-  margin: 0 auto;
-  background: #000;
-  overflow: hidden;
-}
-
-/* border overlay */
-#comparisonWrapper::after {
-  content: "";
-  position: absolute;
-  inset: 0;              /* helemaal over de viewer heen */
-  border: 1px solid rgba(255,255,255,0.6);
-  pointer-events: none;  /* blokkeert niets */
-}
+@media (max-width: 767px){ .mobile-only { display: block !important; } }
