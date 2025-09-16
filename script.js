@@ -1166,12 +1166,25 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   else pdf.text(text, x, y, opts);
 }
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
-  
-  const { jsPDF } = window.jspdf; // ← belangrijk
-  // Zorg dat de cache (pillar/letterbox + slider) up-to-date is
-updateFullscreenBars();
+  // --- NIEUW: SxS tijdelijk uit tijdens PDF ---
+  const wasSBS = sbsActive;
+  const sbsBtn = document.getElementById("sbsToggle");
+  try {
+    if (sbsBtn) sbsBtn.disabled = true;    // voorkom togglen middenin export
+    if (wasSBS) {
+      setSideBySide(false);                // ← schakel SxS uit
+      // 1–2 frames wachten zodat layout/AR klopt vóór we maten pakken
+      await new Promise(r => requestAnimationFrame(() => r()));
+      await new Promise(r => requestAnimationFrame(() => r()));
+      updateFullscreenBars();
+      resetSplitToMiddle();
+    }
 
-  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+    // ====== JE BESTAANDE PDF-CODE HIERONDER (ongewijzigd) ======
+    const { jsPDF } = window.jspdf;
+    updateFullscreenBars();
+
+    const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
 
   // Layout constants
   const TOP_BAR = 40;
