@@ -1103,7 +1103,8 @@ async function captureViewerWithUI() {
   if (!viewerEl) return null;
 
   const targetAR = getTargetAR();
-  const zoom = Math.max(1, BASE_SENSOR.w / sW);
+  const { w: sW } = getCurrentWH();
+const zoom = Math.max(1, BASE_SENSOR.w / sW);
 
   const origLeftSrc  = afterImgTag.src;
   const origRightSrc = beforeImgTag.src;
@@ -1316,6 +1317,7 @@ const exportScale = 8; // 2.5–3 is meestal top; 3 geeft veel detail
 const exportH = Math.round(box.h * exportScale);
 
   // Zoom/crop factor tov Venice breedte: nooit “uitzoomen”, alleen extra crop als kleiner is
+const { w: sW } = getCurrentWH();
 const { w: sW } = getCurrentWH();
 const zoom = Math.max(1, BASE_SENSOR.w / sW);
 // Wil je minder agressief? Neem bv: const zoom = 1 + 0.6 * (Math.max(1, BASE_SENSOR.w / sW) - 1);
