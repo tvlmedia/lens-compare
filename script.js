@@ -1586,23 +1586,57 @@ function updateZoomViewerAt(e, detailBox, detailImg, srcImgOrRect, opts = {}) {
   return true;
 }
 
-// --- vervangt je huidige mousemove handler ---
-document.addEventListener("mousemove", (e) => {
-  if (!detailActive) return;
+if (sbsActive) {
+  const L = sbsLeftImg.getBoundingClientRect();
+  const R = sbsRightImg.getBoundingClientRect();
 
-  // Als SxS actief is, sample per pane; anders je bestaande before/after.
-  if (sbsActive) {
-    // pak de twee SxS <img>’s
-   const hitL = updateZoomViewerAt(e, leftDetail,  leftDetailImg,  sbsLeftImg);
-const hitR = updateZoomViewerAt(e, rightDetail, rightDetailImg, sbsRightImg);
+  // Zit de muis links of rechts?
+  const inLeft  = e.clientX >= L.left && e.clientX <= L.right &&
+                  e.clientY >= L.top  && e.clientY <= L.bottom;
+  const inRight = e.clientX >= R.left && e.clientX <= R.right &&
+                  e.clientY >= R.top  && e.clientY <= R.bottom;
 
-    // Verberg boxen als muis buiten beide panelen is
-    if (!hitL && !hitR) {
-      leftDetail.style.display  = "none";
-      rightDetail.style.display = "none";
-    }
+  // Bepaal relX/relY uit de helft waar de muis is
+  let relX, relY;
+  if (inLeft) {
+    relX = (e.clientX - L.left) / L.width;
+    relY = (e.clientY - L.top)  / L.height;
+  } else if (inRight) {
+    relX = (e.clientX - R.left) / R.width;
+    relY = (e.clientY - R.top)  / R.height;
+  } else {
+    leftDetail.style.display  = "none";
+    rightDetail.style.display = "none";
     return;
   }
+
+  // Kleine helper die relX/relY forceert voor elk paneel
+  const updateWithRel = (detailBox, detailImg, srcEl, rect, rx, ry, zoom=3.2, size=260) => {
+    if (detailImg.src !== srcEl.src) detailImg.src = srcEl.src;
+
+    // positie van het vierkantje volgt de muis
+    detailBox.style.left   = `${e.clientX - size/2}px`;
+    detailBox.style.top    = `${e.clientY - size/2}px`;
+    detailBox.style.width  = `${size}px`;
+    detailBox.style.height = `${size}px`;
+    detailBox.style.display = "block";
+
+    const zoomW = rect.width  * zoom;
+    const zoomH = rect.height * zoom;
+    const offX  = -(rx * zoomW) + (size/2);
+    const offY  = -(ry * zoomH) + (size/2);
+
+    const img = detailBox.querySelector('img');
+    img.style.width  = `${zoomW}px`;
+    img.style.height = `${zoomH}px`;
+    img.style.transform = `translate(${offX}px, ${offY}px)`;
+  };
+
+  // Update BEIDE detailvensters met dezelfde relatieve coördinaten
+  updateWithRel(leftDetail,  leftDetailImg,  sbsLeftImg,  L, relX, relY);
+  updateWithRel(rightDetail, rightDetailImg, sbsRightImg, R, relX, relY);
+  return;
+}
 
   // Single-view (slider): gebruik je bestaande after/before beelden.
   const showL = updateZoomViewerAt(e, leftDetail,  leftDetailImg,  afterImgTag);
