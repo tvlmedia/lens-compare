@@ -1,3 +1,4 @@
+
 // ====== LENS COMPARISON TOOL SCRIPT (WERKEND MET PDF LOGO) ======
 if (window.innerWidth < 768) {
   document.body.classList.add("mobile-mode");
@@ -617,25 +618,24 @@ function updateImages() {
     notes[`${lens}_${nominalFocal}`] || nominalFocal;
 
   const resolveImagePath = (lens, nominalFocal, tStr, flare) => {
-  const aliasFocal = aliasFor(lens, nominalFocal);
-  // 1) Probeer eerst de alias (bijv. 32mm / 37mm), daarna pas de nominale 35mm
-  const bases = (aliasFocal !== nominalFocal)
-    ? [ `${lens}_${aliasFocal}_t${tStr}`, `${lens}_${nominalFocal}_t${tStr}` ]
-    : [ `${lens}_${nominalFocal}_t${tStr}` ];
-
-  const candidates = [];
-  bases.forEach(base => {
-    // Alleen toevoegen als de mapping echt bestaat
-    if (lensImageMap[`${base}_${flare}`]) candidates.push(lensImageMap[`${base}_${flare}`]);
-    if (lensImageMap[base])               candidates.push(lensImageMap[base]);
-    // Standaard bestandsnamen (vallen terug op jouw repo-naamgeving)
-    candidates.push(`${base}_${flare}.jpg`);
-    candidates.push(`${base}.jpg`);
-  });
-
-  // Neem de eerste kandidaat (alias komt nu eerst)
-  return `${IMG_BASE}${candidates[0]}`;
-};
+    const aliasFocal = aliasFor(lens, nominalFocal);
+   const bases = [
+  `${lens}_${nominalFocal}_t${tStr}`,      // ← eerst nominale key (die in lensImageMap staat)
+  ...(aliasFocal !== nominalFocal ? [`${lens}_${aliasFocal}_t${tStr}`] : [])
+];
+    const candidates = [];
+    bases.forEach(base => {
+      candidates.push(lensImageMap[`${base}_${flare}`]);
+      candidates.push(lensImageMap[base]);
+      candidates.push(`${base}_${flare}.jpg`);
+      candidates.push(`${base}.jpg`);
+    });
+    for (const cand of candidates) {
+      if (!cand) continue;
+      return `${IMG_BASE}${cand}`;
+    }
+    return `${IMG_BASE}${bases[0]}_${flare}.jpg`;
+  };
 
   // ⬇️ Let op: links gebruikt tStopLeft, rechts tStopRight
   const imgLeft  = resolveImagePath(leftLens,  focalNom, tStopLeft,  flareMode);
@@ -1165,43 +1165,39 @@ function pdfTextWithLink(pdf, text, x, y, url, opts = {}) {
   else pdf.text(text, x, y, opts);
 }
 document.getElementById("downloadPdfButton")?.addEventListener("click", async () => {
-  // ——— SxS tijdelijk uitzetten ———
-  const wasSbs = sbsActive;
-  if (wasSbs) {
-    setSideBySide(false);
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  
+  const { jsPDF } = window.jspdf; // ← belangrijk
+  // Zorg dat de cache (pillar/letterbox + slider) up-to-date is
+updateFullscreenBars();
+
+  const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+
+  // Layout constants
+  const TOP_BAR = 40;
+  const BOTTOM_BAR = 80;
+  const PAGE_MARGIN = 24;
+
+  function getContentBox(pageW, pageH) {
+    const x = PAGE_MARGIN;
+    const y = TOP_BAR + PAGE_MARGIN;
+    const w = pageW - PAGE_MARGIN * 2;
+    const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
+    return { x, y, w, h };
   }
 
-  try {
-    const { jsPDF } = window.jspdf;
-    updateFullscreenBars();
-
-    const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
-
-    // Layout constants
-    const TOP_BAR = 40;
-    const BOTTOM_BAR = 80;
-    const PAGE_MARGIN = 24;
-
-    function getContentBox(pageW, pageH) {
-      const x = PAGE_MARGIN;
-      const y = TOP_BAR + PAGE_MARGIN;
-      const w = pageW - PAGE_MARGIN * 2;
-      const h = pageH - TOP_BAR - BOTTOM_BAR - PAGE_MARGIN * 2;
-      return { x, y, w, h };
-    }
-    function drawTopBar(text) {
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const barHeight = TOP_BAR;
-      pdf.setFillColor(0, 0, 0);
-      pdf.rect(0, 0, pageWidth, barHeight, "F");
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(16);
-      pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, {
-        align: "center",
-        baseline: "middle"
-      });
-    }
+  
+  function drawTopBar(text) {
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const barHeight = TOP_BAR;
+    pdf.setFillColor(0, 0, 0);
+    pdf.rect(0, 0, pageWidth, barHeight, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.text(text, pageWidth / 2, Math.round(barHeight / 2) + 2, {
+      align: "center",
+      baseline: "middle"
+    });
+  }
   
   function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
