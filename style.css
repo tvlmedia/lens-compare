@@ -38,7 +38,7 @@ select:hover,
 /* ========== Wrapper en sliderstructuur ========== */
 #comparisonWrapper {
   width: 100%;
-  max-width: 1400px;         /* maak 1500–1600px als je 'm groter wilt */
+  max-width: 1600px;         /* maak 1500–1600px als je 'm groter wilt */
   min-height: clamp(360px, 56vw, 860px); /* fallback hoogte */
   position: relative;
   background: #000;
@@ -324,7 +324,7 @@ body.dragging * {
 
 /* ===== Labels + RAW-knoppen onder het beeld ===== */
 #infoContainer {
-  max-width: 1400px;   /* matcht de viewer */
+  max-width: 1600px;   /* matcht de viewer */
   width: 100%;
   margin: 12px auto 16px; /* incl. bottom-margin */
   padding: 0 40px;        /* gelijk aan de rest */
@@ -817,7 +817,7 @@ body.dragging * {
 }
 /* OVERRIDE — iets breder vak achter de knoppen */
 .controls.desktop-only{
-  width: min(1240px, calc(100% - 32px)); /* bv. 1240px, of 1280px als je meer ruimte wilt */
+  width: min(1400px, calc(100% - 32px)); /* iets ruimer achter de knoppen */
 }
 @media (min-width: 1240px){
   .controls.desktop-only .row-1{ flex-wrap: nowrap; } /* rij 1 op één lijn houden */
