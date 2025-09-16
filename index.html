@@ -9,61 +9,61 @@
 <body>
 
 <div class="controls desktop-only">
- <div class="row row-1">
-  <button id="toggleButton" class="control-button">↔ Flip</button>
-  <button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
-  <button id="detailViewToggle" class="control-button">🔍 Detail View</button>
- <button id="sbsToggle" type="button" class="control-button">Side-by-Side</button>
-  <button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
+  <div class="row row-1">
+    <button id="toggleButton" class="control-button">↔ Flip</button>
+    <button id="fullscreenButton" class="control-button">⛶ Fullscreen</button>
+    <button id="detailViewToggle" class="control-button">🔍 Detail View</button>
+    <button id="sbsToggle" type="button" class="control-button">Side-by-Side</button>
+    <button id="downloadPdfButton" class="control-button">⇩ Download PDF</button>
 
-  <label id="scaleCtrl" class="chip">
-    <span id="scaleVal">100%</span>
-    <input id="scaleSlider" type="range" min="100" max="130" value="100" step="1">
-  </label>
+    <label id="scaleCtrl" class="chip">
+      <span id="scaleVal">100%</span>
+      <input id="scaleSlider" type="range" min="100" max="130" value="100" step="1">
+    </label>
 
-  <select id="cameraSelect"></select>
-  <select id="sensorFormatSelect" disabled></select>
-  <button id="flareToggle" class="control-button" data-mode="noflare">Flare: OFF</button>
-</div>
-
-<div class="row row-2">
-  <select id="leftLens"></select>
-  <select id="tStopLeftSelect"></select>
-  <select id="rightLens"></select>
-  <select id="tStopRightSelect"></select>
-  <!-- Goed → nu in row 2 -->
-  <select id="focalLength" title="Focal length">
-    <option value="35mm">35mm</option>
-    <option value="75mm" selected>75mm</option>
-  </select>
-</div> <!-- sluit .controls -->
-</div>
- <div id="comparisonWrapper" class="desktop-only" tabindex="0">
-    <div id="beforeImage">
-      <img id="beforeImgTag" alt="Right lens preview">
-    </div>
-
-    <!-- === DETAIL VIEW OVERLAY (ZOOM) === -->
-<div id="detailOverlay">
-  <div id="leftDetail" class="detail-view-square"><img alt="Left zoom"></div>
-  <div id="rightDetail" class="detail-view-square"><img alt="Right zoom"></div>
-</div>
-
-    <div id="afterWrapper">
-      <div id="afterImage">
-        <img id="afterImgTag" alt="Left lens preview">
-      </div>
-    </div>
-
-<div id="fsBars" aria-hidden="true">
-  <div class="bar top"></div>
-  <div class="bar bottom"></div>
-  <div class="bar left"></div>
-  <div class="bar right"></div>
-</div>
-    
-    <div id="slider"></div>
+    <select id="cameraSelect"></select>
+    <select id="sensorFormatSelect" disabled></select>
+    <button id="flareToggle" class="control-button" data-mode="noflare">Flare: OFF</button>
   </div>
+
+  <div class="row row-2">
+    <select id="leftLens"></select>
+    <select id="tStopLeftSelect"></select>
+    <select id="rightLens"></select>
+    <select id="tStopRightSelect"></select>
+    <select id="focalLength" title="Focal length">
+      <option value="35mm">35mm</option>
+      <option value="75mm" selected>75mm</option>
+    </select>
+  </div>
+</div> <!-- sluit .controls -->
+
+<div id="comparisonWrapper" class="desktop-only" tabindex="0">
+  <div id="beforeImage">
+    <img id="beforeImgTag" alt="Right lens preview">
+  </div>
+
+  <!-- === DETAIL VIEW OVERLAY (ZOOM) === -->
+  <div id="detailOverlay">
+    <div id="leftDetail" class="detail-view-square"><img alt="Left zoom"></div>
+    <div id="rightDetail" class="detail-view-square"><img alt="Right zoom"></div>
+  </div>
+
+  <div id="afterWrapper">
+    <div id="afterImage">
+      <img id="afterImgTag" alt="Left lens preview">
+    </div>
+  </div>
+
+  <div id="fsBars" aria-hidden="true">
+    <div class="bar top"></div>
+    <div class="bar bottom"></div>
+    <div class="bar left"></div>
+    <div class="bar right"></div>
+  </div>
+    
+  <div id="slider"></div>
+</div>
 
  <div id="infoContainer" class="desktop-only">
   <div class="infoCol">
