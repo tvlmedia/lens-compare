@@ -466,25 +466,11 @@ const beforeImgTag = document.getElementById("beforeImgTag");
 const afterImgTag = document.getElementById("afterImgTag");
 const afterWrapper = document.getElementById("afterWrapper");
 const slider = document.getElementById("slider");
-// --- SBS DOM ---
-const sbsWrapper = document.createElement("div");
-sbsWrapper.id = "sbsWrapper";
-sbsWrapper.innerHTML = `
-  <div class="pane"><img id="sbsLeftImg"  alt=""></div>
-  <div class="pane"><img id="sbsRightImg" alt=""></div>
-`;
-comparisonWrapper.appendChild(sbsWrapper);
+const sbsWrapper = document.getElementById("sbsWrapper");
+const sbsLeftImg  = document.getElementById("sbsLeftImg");
+const sbsRightImg = document.getElementById("sbsRightImg");
+sbsWrapper.style.display = 'none'; // mag je laten staan
 
-sbsWrapper.style.display = 'none';   // ⬅️ hier toevoegen
-
-const sbsLeftImg  = sbsWrapper.querySelector("#sbsLeftImg");
-const sbsRightImg = sbsWrapper.querySelector("#sbsRightImg");
-// Enforce 'contain' in SxS
-[sbsLeftImg, sbsRightImg].forEach(im => {
-  im.style.setProperty('width', '100%', 'important');
-  im.style.setProperty('height', '100%', 'important');
-  im.style.setProperty('object-fit', 'contain', 'important');
-});
 let sbsActive = false;
 let isExportingPdf = false; // blokkeer UI-toggles terwijl er geëxporteerd wordt
 const leftLabel = document.getElementById("leftLabel");
