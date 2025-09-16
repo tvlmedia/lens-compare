@@ -225,7 +225,7 @@ function setWrapperSizeByAR(w, h) {
   // ← in SBS willen we 2× zo breed: 3:2 wordt 6:2
   const arWidth = sbsActive ? (w * 2) : w;
 
- const height = Math.round(width * (h / arWidth) * 1.3); // +30% hoger
+ const height = Math.round(width * (h / arWidth) * 1.35); // +35% hoger
 
   comparisonWrapper.style.removeProperty('aspect-ratio');
   comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
