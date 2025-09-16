@@ -225,7 +225,7 @@ function setWrapperSizeByAR(w, h) {
   // ← in SBS willen we 2× zo breed: 3:2 wordt 6:2
   const arWidth = sbsActive ? (w * 2) : w;
 
-  const height = Math.round(width * (h / arWidth)); // puur AR
+  const height = Math.round(width * (h / arWidth) * 1.2); // +20% hoger
 
   comparisonWrapper.style.removeProperty('aspect-ratio');
   comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
@@ -1678,6 +1678,90 @@ function onGlobalKeydown(e) {
   flareToggle.click(); // zelfde als handmatig op de knop drukken
     }
 }
+
+/* ---------- AUTO SCALE (v2, mm-based + slider sync) ---------- */
+
+/** Doelpercentages per focal (pak hoogste van links/rechts) */
+const LENS_SCALE_TABLE = {
+  "35mm": {
+    panchro: 100,
+    "red p": 116,
+    mkii: 117,
+    jena: 112,
+    vespid: 109,
+    arles: 110,
+    "lomo standard speed": 110,
+  },
+  "75mm": {
+    panchro: 100,
+    "red p": 118,
+    mkii: 117,
+    jena: 110,
+    vespid: 100,
+    arles: 100,
+    "lomo standard speed": 100,
+  },
+};
+
+function normalizeLensKey(label = "") {
+  const s = label.toLowerCase();
+  if (s.includes("panchro")) return "panchro";
+  if (s.includes("red p")) return "red p";
+  if (s.includes("mk ii") || s.includes("mkii") || s.includes("mk2")) return "mkii";
+  if (s.includes("jena")) return "jena";
+  if (s.includes("vespid")) return "vespid";
+  if (s.includes("arles")) return "arles";
+  if (s.includes("lomo") && s.includes("standard")) return "lomo standard speed";
+  return "";
+}
+
+function isScaleAllowedBySensor() {
+  const { w, h } = getCurrentWH(); // mm
+  const EPS   = 0.001;
+  const W_MIN = 30.720; 
+  const H_MIN = 16.200;
+  return (w > W_MIN + EPS) && (h > H_MIN + EPS);
+}
+
+function scaleForLens(lensLabel, focalStr) {
+  const key = normalizeLensKey(lensLabel);
+  const focalKey = (String(focalStr).includes("75") ? "75mm" : "35mm");
+  const table = LENS_SCALE_TABLE[focalKey] || {};
+  return table[key] || 100;
+}
+
+function applyScalePercent(pct) {
+  const p = Math.max(100, Math.min(130, Math.round(pct)));
+  if (scaleSlider) scaleSlider.value = String(p);
+  setUserScaleFromPct(p);
+}
+
+function autoScaleNow() {
+  if (!isScaleAllowedBySensor()) {
+    applyScalePercent(100);
+    return;
+  }
+
+  const leftLabel  = leftSelect?.value || "";
+  const rightLabel = rightSelect?.value || "";
+  const focalStr   = focalLengthSelect?.value || "35mm";
+
+  const leftPct  = scaleForLens(leftLabel,  focalStr);
+  const rightPct = scaleForLens(rightLabel, focalStr);
+
+  applyScalePercent(Math.max(leftPct, rightPct));
+}
+
+["change", "input"].forEach(evt => {
+  leftSelect?.addEventListener(evt,  autoScaleNow);
+  rightSelect?.addEventListener(evt, autoScaleNow);
+  focalLengthSelect?.addEventListener(evt, autoScaleNow);
+  sensorFormatSelect?.addEventListener(evt, autoScaleNow);
+  cameraSelect?.addEventListener(evt, autoScaleNow);
+});
+
+autoScaleNow();
+
 window.addEventListener("keydown", onGlobalKeydown, { capture: true });
 (function enforceBlankTargets(){
   const setBlank = (a) => {
