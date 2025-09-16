@@ -219,13 +219,15 @@ async function exitAnyFullscreen() {
   if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
 }
 function setWrapperSizeByAR(w, h) {
-  if (isWrapperFullscreen()) return;
+  if (isWrapperFullscreen()) return; // in fullscreen geen inline heights forceren
 
   const width = comparisonWrapper.getBoundingClientRect().width;
-  const ar = w / h; // altijd normale aspect ratio
 
-  const height = Math.round(width / ar); 
+  // ← in SBS willen we 2× zo breed: 3:2 wordt 6:2
+  const arWidth = sbsActive ? (w * 2) : w;
 
+const height = Math.round(width * (h / arWidth)); // ← geen * 1.35
+  
   comparisonWrapper.style.removeProperty('aspect-ratio');
   comparisonWrapper.style.setProperty('height',     `${height}px`, 'important');
   comparisonWrapper.style.setProperty('min-height', `${height}px`, 'important');
@@ -464,11 +466,25 @@ const beforeImgTag = document.getElementById("beforeImgTag");
 const afterImgTag = document.getElementById("afterImgTag");
 const afterWrapper = document.getElementById("afterWrapper");
 const slider = document.getElementById("slider");
-const sbsWrapper = document.getElementById("sbsWrapper");
-const sbsLeftImg  = document.getElementById("sbsLeftImg");
-const sbsRightImg = document.getElementById("sbsRightImg");
-sbsWrapper.style.display = 'none'; // mag je laten staan
+// --- SBS DOM ---
+const sbsWrapper = document.createElement("div");
+sbsWrapper.id = "sbsWrapper";
+sbsWrapper.innerHTML = `
+  <div class="pane"><img id="sbsLeftImg"  alt=""></div>
+  <div class="pane"><img id="sbsRightImg" alt=""></div>
+`;
+comparisonWrapper.appendChild(sbsWrapper);
 
+sbsWrapper.style.display = 'none';   // ⬅️ hier toevoegen
+
+const sbsLeftImg  = sbsWrapper.querySelector("#sbsLeftImg");
+const sbsRightImg = sbsWrapper.querySelector("#sbsRightImg");
+// Enforce 'contain' in SxS
+[sbsLeftImg, sbsRightImg].forEach(im => {
+  im.style.setProperty('width', '100%', 'important');
+  im.style.setProperty('height', '100%', 'important');
+  im.style.setProperty('object-fit', 'contain', 'important');
+});
 let sbsActive = false;
 let isExportingPdf = false; // blokkeer UI-toggles terwijl er geëxporteerd wordt
 const leftLabel = document.getElementById("leftLabel");
