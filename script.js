@@ -1390,29 +1390,21 @@ drawBottomBar({
 
  
 
- // --- Pagina 4 (UI-versie, zelfde scaling als p1–p3) ---
+// --- Pagina 4: hetzelfde beeld als pagina 1 (split), geen UI-screenshot ---
 pdf.addPage();
 fillBlack();
+drawTopBar(`${leftText} vs ${rightText}`);
 
-const toolURL_P4 = "https://tvlrental.nl/lens-comparison/";
+// gebruik exact dezelfde data als pagina 1
+await placeContain(pdf, splitData, fullBox);
 
-// Screenshot viewer + UI
-let viewerShot = await captureViewerWithUI(); // gebruikt jouw nieuwe korte versie
-if (!viewerShot) viewerShot = splitData; // fallback naar split-image
-
-// Plaats de screenshot met dezelfde contain-scaling als p1/p2/p3
-const placedP4 = await placeContainWithBox(pdf, viewerShot, fullBox);
-
-// Maak de hele afbeelding klikbaar
-pdfLinkRect(pdf, placedP4.x, placedP4.y, placedP4.w, placedP4.h, toolURL_P4);
-
-// Onderste balk met CTA
+// CTA onderin
 drawBottomBar({
-    text: "",
-    link: "",
-    logo,
-    ctaLabel: "Open de interactieve Lens Comparison Tool",
-    ctaUrl: toolURL_P4
+  text: "",
+  link: "",
+  logo,
+  ctaLabel: "Open de interactieve Lens Comparison Tool",
+  ctaUrl: "https://tvlrental.nl/lens-comparison/"
 });
 
 // ==== Bestandsnaam maken in vorm:
