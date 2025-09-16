@@ -348,4 +348,19 @@ body.dragging, body.dragging * {
 @media (max-width: 767px){
   .mobile-only { display: block !important; }
 }
+#comparisonWrapper {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #000;
+  overflow: hidden;
+}
 
+/* border overlay */
+#comparisonWrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;              /* helemaal over de viewer heen */
+  border: 1px solid rgba(255,255,255,0.6);
+  pointer-events: none;  /* blokkeert niets */
+}
