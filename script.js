@@ -247,7 +247,10 @@ function getCurrentWH() {
 }
 
 
-
+function getTargetAR() {
+  const { w, h } = getCurrentWH();
+  return sbsActive ? (2 * w) / h : w / h; // 6:2 in SxS, anders normaal
+}
   
 
 
@@ -1195,10 +1198,7 @@ updateFullscreenBars();
       baseline: "middle"
     });
   }
-  function getTargetAR() {
-  const { w, h } = getCurrentWH();
-  return sbsActive ? (2 * w) / h : w / h; // 6:2 in SxS, anders normaal
-}
+  
   function drawBottomBar({ text = "", link = "", logo = null, ctaLabel = "", ctaUrl = "" }) {
   const pageWidth  = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -1316,6 +1316,7 @@ const exportScale = 8; // 2.5–3 is meestal top; 3 geeft veel detail
 const exportH = Math.round(box.h * exportScale);
 
   // Zoom/crop factor tov Venice breedte: nooit “uitzoomen”, alleen extra crop als kleiner is
+const { w: sW } = getCurrentWH();
 const zoom = Math.max(1, BASE_SENSOR.w / sW);
 // Wil je minder agressief? Neem bv: const zoom = 1 + 0.6 * (Math.max(1, BASE_SENSOR.w / sW) - 1);
   
