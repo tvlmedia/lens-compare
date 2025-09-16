@@ -620,10 +620,10 @@ function updateImages() {
 
   const resolveImagePath = (lens, nominalFocal, tStr, flare) => {
     const aliasFocal = aliasFor(lens, nominalFocal);
-    const bases = [
-      `${lens}_${aliasFocal}_t${tStr}`,
-      ...(aliasFocal !== nominalFocal ? [`${lens}_${nominalFocal}_t${tStr}`] : [])
-    ];
+   const bases = [
+  `${lens}_${nominalFocal}_t${tStr}`,      // ← eerst nominale key (die in lensImageMap staat)
+  ...(aliasFocal !== nominalFocal ? [`${lens}_${aliasFocal}_t${tStr}`] : [])
+];
     const candidates = [];
     bases.forEach(base => {
       candidates.push(lensImageMap[`${base}_${flare}`]);
